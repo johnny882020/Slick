@@ -1,0 +1,3 @@
+{
+  "scripts": { "tidy": { "file": "scripts/tidy.js", "description": "Tidy a CSV file and add totals." } }
+}
