@@ -1,0 +1,5 @@
+{
+  "permissions": { "net": ["api.frankfurter.app"] },
+  "reasons": { "api.frankfurter.app": "Daily exchange rates published by the European Central Bank." },
+  "scripts": { "rates": { "file": "scripts/rates.ts", "description": "Print today's rate between two currencies as JSON." } }
+}
