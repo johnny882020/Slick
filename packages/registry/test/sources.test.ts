@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { cp, mkdir, readdir, symlink, writeFile } from "node:fs/promises";
-import { basename, join } from "node:path";
+import { lstatSync } from "node:fs";
+import { basename, join, relative, sep } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   RegistryError,
@@ -65,7 +66,7 @@ describe("download", () => {
 describe("discoverSkillDirs", () => {
   it("finds skills in common locations up to depth 4, skipping node_modules", async () => {
     const root = await multiRepoCopy();
-    const found = (await discoverSkillDirs(root)).map((d) => d.slice(root.length + 1));
+    const found = (await discoverSkillDirs(root)).map((d) => relative(root, d).split(sep).join("/"));
     expect(found).toEqual([".claude/skills/gamma", "deep/a/b/delta", "skills/alpha", "skills/beta"]);
   });
 
@@ -121,6 +122,8 @@ describe("stageSource: local", () => {
     } catch {
       return; // mkfifo unavailable on this platform
     }
+    // Windows has no FIFOs; Git Bash's mkfifo makes an ordinary file there.
+    if (!lstatSync(join(src, "pipe")).isFIFO()) return;
     const err = await copyTree(src, join(await tempDir(), "x")).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(UnsafeSourceError);
     expect((err as UnsafeSourceError).entries[0]).toMatchObject({ path: "pipe", rule: "special-file" });

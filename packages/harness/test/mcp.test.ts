@@ -125,7 +125,10 @@ describe("McpClient", () => {
     const t0 = Date.now();
     await client.close(100);
     expect(client.connected).toBe(false);
-    expect(Date.now() - t0).toBeGreaterThanOrEqual(150);
+    // POSIX: the server ignores SIGTERM, so close() waits out the grace period, then SIGKILLs.
+    // Windows has no catchable SIGTERM: Node's kill() terminates at once, before any grace.
+    if (process.platform === "win32") expect(Date.now() - t0).toBeLessThan(5_000);
+    else expect(Date.now() - t0).toBeGreaterThanOrEqual(150);
   });
 });
 

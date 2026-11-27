@@ -13,7 +13,7 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, realpathSync, statSync } from "node:fs";
 import { createRequire } from "node:module";
 import { arch, platform } from "node:os";
-import { delimiter, dirname, isAbsolute, join, resolve, sep } from "node:path";
+import { basename, delimiter, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SkillManifest } from "@oneseat/contracts";
 
@@ -116,9 +116,37 @@ export function resolvePermissionPath(raw: string, roots: SandboxRoots, kind: "r
   const segs = rest.split(/[/\\]+/).filter((s) => s && s !== ".");
   if (segs.includes("..")) throw new SandboxError(`${kind} path "${raw}" must not contain ".."`);
   const out = segs.length ? join(root, ...segs) : root;
-  if (kind === "write" && !(out === roots.workspace || out.startsWith(roots.workspace + sep)))
-    throw new SandboxError(`write path "${raw}" must be under $WORKSPACE`);
+  if (kind === "write" && !isInside(roots.workspace, out)) throw new SandboxError(`write path "${raw}" must be under $WORKSPACE`);
   return out;
+}
+
+/** True if `p` is `root` or inside it (separator- and, on Windows, case-insensitive). */
+function isInside(root: string, p: string): boolean {
+  const rel = relative(resolve(root), resolve(p));
+  return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
+}
+
+/**
+ * A path and its symlink-free form (macOS /var -> /private/var, Windows 8.3 short names).
+ * Deno checks permissions against the path a script passes without resolving links, so
+ * grants and denials list both. A path that does not exist yet resolves via its nearest
+ * existing ancestor.
+ */
+export function pathForms(p: string): string[] {
+  const abs = resolve(p);
+  const rest: string[] = [];
+  let head = abs;
+  for (;;) {
+    try {
+      const real = join(realpathSync.native(head), ...rest);
+      return real === abs ? [abs] : [abs, real];
+    } catch {
+      const parent = dirname(head);
+      if (parent === head) return [abs];
+      rest.unshift(basename(head));
+      head = parent;
+    }
+  }
 }
 
 export interface SandboxOptions {
@@ -183,6 +211,11 @@ export class ScriptSandbox {
     return { skill: realpathSync(manifest.dir), workspace: realpathSync(this.opts.workspaceDir) };
   }
 
+  /** The same roots as given (not symlink-resolved), for granting both path forms. */
+  private logicalRoots(manifest: SkillManifest): SandboxRoots {
+    return { skill: resolve(manifest.dir), workspace: resolve(this.opts.workspaceDir) };
+  }
+
   /** Build the exact Deno command line for a script. Throws SandboxError on a bad declaration. */
   plan(req: Pick<ScriptRunRequest, "manifest" | "script" | "args">): DenoInvocation {
     if (!this.denoPath) throw new SandboxError("Deno is not available (set ONESEAT_DENO or install deno)");
@@ -196,7 +229,8 @@ export class ScriptSandbox {
     const scriptPath = resolvePermissionPath(decl.file, roots, "read");
     if (!isFile(scriptPath)) throw new SandboxError(`script file "${decl.file}" not found in the skill folder`);
     const realScript = realpathSync(scriptPath);
-    if (!realScript.startsWith(roots.skill + sep)) throw new SandboxError(`script "${decl.file}" is outside the skill folder`);
+    if (!isInside(roots.skill, realScript) || realScript === roots.skill)
+      throw new SandboxError(`script "${decl.file}" is outside the skill folder`);
 
     const p = m.permissions;
     for (const h of p.net) if (!HOST_RE.test(h)) throw new SandboxError(`invalid network host "${h}"`);
@@ -205,8 +239,13 @@ export class ScriptSandbox {
       if (SECRET_ENV_RE.test(e)) throw new SandboxError(`env "${e}" looks like a secret; skills may not read secrets`);
     }
     for (const r of p.run) if (!RUN_RE.test(r)) throw new SandboxError(`invalid executable name "${r}"`);
-    const read = [roots.skill, ...p.read.map((r) => resolvePermissionPath(r, roots, "read"))];
-    const write = p.write.map((w) => resolvePermissionPath(w, roots, "write"));
+    const logical = this.logicalRoots(m);
+    const both = (raw: string, kind: "read" | "write") => [
+      ...pathForms(resolvePermissionPath(raw, roots, kind)),
+      resolvePermissionPath(raw, logical, kind),
+    ];
+    const read = [roots.skill, logical.skill, ...p.read.flatMap((r) => both(r, "read"))];
+    const write = p.write.flatMap((w) => both(w, "write"));
 
     const uniq = (xs: string[]) => [...new Set(xs)];
     const args = ["run", "--quiet", "--no-prompt", "--no-config", "--no-lock"];
@@ -219,7 +258,7 @@ export class ScriptSandbox {
     if (write.length > 0) args.push(`--allow-write=${uniq(write).join(",")}`);
     if (p.env.length > 0) args.push(`--allow-env=${uniq(p.env).join(",")}`);
     if (p.run.length > 0) args.push(`--allow-run=${uniq(p.run).join(",")}`);
-    const deny = (this.opts.denyPaths ?? []).filter(Boolean);
+    const deny = [...new Set((this.opts.denyPaths ?? []).filter(Boolean).flatMap(pathForms))];
     if (deny.length > 0) {
       args.push(`--deny-read=${deny.join(",")}`);
       args.push(`--deny-write=${deny.join(",")}`);

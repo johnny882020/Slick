@@ -1,5 +1,5 @@
 import { appendFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { formatLint, formatScan, parseArgs, resolveSourceArg, runCli, type FetchLike } from "../src/index.js";
 import { repoTarball } from "./helpers/tar.js";
@@ -58,7 +58,7 @@ describe("resolveSourceArg", () => {
     expect(await resolveSourceArg("acme/kit", cwd)).toEqual({ kind: "local", path: join(cwd, "acme", "kit") });
     expect(await resolveSourceArg("other/kit@one", cwd)).toEqual({ kind: "skills.sh", owner: "other", repo: "kit", skill: "one" });
     expect(await resolveSourceArg("./x", cwd)).toEqual({ kind: "local", path: join(cwd, "x") });
-    expect(await resolveSourceArg("~/x", cwd, { HOME: "/home/me" })).toEqual({ kind: "local", path: "/home/me/x" });
+    expect(await resolveSourceArg("~/x", cwd, { HOME: "/home/me" })).toEqual({ kind: "local", path: resolve("/home/me", "x") });
     expect(await resolveSourceArg("https://github.com/o/r/tree/main/skills/a", cwd)).toEqual({ kind: "github", owner: "o", repo: "r", ref: "main", path: "skills/a" });
     expect(await resolveSourceArg("just-a-name", cwd)).toEqual({ kind: "local", path: join(cwd, "just-a-name") });
   });
@@ -159,7 +159,8 @@ describe("install, list, verify, remove", () => {
     expect(inst.code).toBe(0);
     expect(inst.out).toContain("installed clean-skill@1.2.0");
     const list = await run(["list", ...dd]);
-    expect(list.out).toMatch(/^clean-skill\s+1\.2\.0\s+\/.*clean-skill$/);
+    // Third column is the absolute install path ("/..." on POSIX, "C:\..." on Windows).
+    expect(list.out).toMatch(/^clean-skill\s+1\.2\.0\s+(\/|[A-Za-z]:\\).*clean-skill$/);
     const listJson = JSON.parse((await run(["list", "--json", ...dd])).out);
     expect(listJson[0].manifest.frontmatter.name).toBe("clean-skill");
     expect((await run(["verify", "clean-skill", ...dd])).out).toBe("clean-skill  ok");

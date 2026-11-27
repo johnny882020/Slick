@@ -101,7 +101,7 @@ export async function prepareRunDirs(c: Pick<EvalCase, "db" | "workspace">, opts
   await mkdir(workspaceDir, { recursive: true });
   const dbPath = join(dataDir, EVAL_DB_FILE);
   const cleanup = async () => {
-    if (!opts.keep) await rm(root, { recursive: true, force: true }).catch(() => {});
+    if (!opts.keep) await rm(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }).catch(() => {});
   };
   try {
     await seedDatabase(dbPath, c.db);

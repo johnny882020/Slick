@@ -165,8 +165,8 @@ describe("daemon wiring", () => {
     expect(parseModelRef("openai:gpt-x")).toEqual({ provider: "openai", model: "gpt-x" });
     expect(parseModelRef("nope:x")).toBeUndefined();
     expect(parseModelRef("anthropic")).toBeUndefined();
-    expect(defaultDataDir({ ONESEAT_HOME: "/tmp/x" })).toBe("/tmp/x");
-    expect(defaultDataDir({}, "darwin")).toMatch(/Application Support\/app\.oneseat$/);
+    expect(defaultDataDir({ ONESEAT_HOME: "/tmp/x" })).toBe(resolve("/tmp/x"));
+    expect(defaultDataDir({}, "darwin")).toMatch(/Application Support[\\/]app\.oneseat$/);
     expect(defaultDataDir({ APPDATA: "C:\\U\\AppData\\Roaming" }, "win32")).toMatch(/app\.oneseat$/);
   });
 

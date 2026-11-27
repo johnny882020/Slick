@@ -118,7 +118,7 @@ const gate1: GateFn = async (o) => {
     const others = all.filter((p) => !coreNames.has(p.name) && p.manifest.scripts?.["test"]);
     if (others.length > 0) {
       o.log(`gate 1: turbo test for ${others.map((p) => p.name).join(", ")}`);
-      const r = await o.exec("pnpm", ["exec", "turbo", "run", "test", ...others.map((p) => `--filter=${p.name}`)], { cwd: o.root });
+      const r = await o.exec("pnpm", ["exec", "turbo", "run", "test", "--continue", ...others.map((p) => `--filter=${p.name}`)], { cwd: o.root });
       if (r.code !== 0) problems.push(`tests failed in ${others.map((p) => p.name).join(", ")} (turbo exit ${r.code})`);
     }
     for (const c of present) {

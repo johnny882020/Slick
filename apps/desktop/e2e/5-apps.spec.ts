@@ -48,7 +48,7 @@ test("pin a draft from a run, see it under Apps, open, export, unpin", async ({ 
   // Export: files are copied and the build command is shown.
   await card.getByRole("button", { name: "Export" }).click();
   await expect(pinned).toContainText("export-app -- --app");
-  await expect(pinned).toContainText("exports/invoice-tracker");
+  await expect(pinned).toContainText(/exports[\\/]invoice-tracker/);
 
   // Unpin with confirmation.
   await card.getByRole("button", { name: "Unpin", exact: true }).click();

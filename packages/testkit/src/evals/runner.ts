@@ -206,9 +206,10 @@ export async function runEvals(opts: RunEvalsOptions): Promise<EvalReport> {
     const started = Date.now();
     let collected: Collected;
     let dirs: Awaited<ReturnType<typeof prepareRunDirs>> | undefined;
+    let harness: (HarnessApi & { close?: () => unknown }) | undefined;
     try {
       dirs = await prepareRunDirs(job.c, { label: `${job.suite.skill}-${job.c.id}-${job.withSkill ? "skill" : "base"}`, ...(opts.tmpRoot ? { tmpRoot: opts.tmpRoot } : {}), ...(opts.keepRunDirs ? { keep: true } : {}) });
-      const harness = await opts.harness({
+      harness = await opts.harness({
         dataDir: dirs.dataDir,
         dbPath: dirs.dbPath,
         workspaceDir: dirs.workspaceDir,
@@ -231,6 +232,12 @@ export async function runEvals(opts: RunEvalsOptions): Promise<EvalReport> {
     } catch (e) {
       collected = { text: "", toolCalls: [], usage: { inputTokens: 0, outputTokens: 0 }, skillLoaded: false, error: `setup failed: ${(e as Error).message}` };
     } finally {
+      // Close first: Windows cannot delete a folder holding an open database.
+      try {
+        await harness?.close?.();
+      } catch {
+        /* best effort */
+      }
       await dirs?.cleanup();
     }
     const scored = await scoreCase(job.c, { text: collected.text, toolCalls: collected.toolCalls, input: job.c.input }, { ...(judge ? { judge } : {}), ...(collected.error !== undefined ? { error: collected.error } : {}) });

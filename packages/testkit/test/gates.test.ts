@@ -152,7 +152,7 @@ describe("gate 1: unit tests + coverage", () => {
     expect(r.status).toBe("PASS");
     expect(r.reason).toBe("core packages at or above 90% lines: contracts 100.0%, gateway 92.0%, harness 90.0%, registry 95.5%");
     expect(r.details).toContain("@oneseat/testkit: 97.00% lines (194/200) (not a core package; informational)");
-    expect(calls[0]).toEqual(["pnpm", "exec", "turbo", "run", "test", "--filter=@oneseat/desktop", "--filter=@oneseat/testkit"].filter((x) => x !== "--filter=@oneseat/desktop"));
+    expect(calls[0]).toEqual(["pnpm", "exec", "turbo", "run", "test", "--continue", "--filter=@oneseat/desktop", "--filter=@oneseat/testkit"].filter((x) => x !== "--filter=@oneseat/desktop"));
     expect(calls[1]).toEqual(expect.arrayContaining(["--filter", "@oneseat/contracts", "exec", "vitest", "run", "--coverage.reporter=json-summary", "--coverage.include=src/**", "--coverage.provider=custom"]));
     expect(calls[1]!.find((a) => a.startsWith("--coverage.customProviderModule="))).toMatch(/@vitest\/coverage-v8\/dist\/index\.js$/);
   });

@@ -3,7 +3,7 @@ import { join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { SkillPermissionsFile } from "@oneseat/contracts";
-import { findDeno, resolvePermissionPath, SandboxError, ScriptSandbox } from "../src/sandbox.js";
+import { findDeno, pathForms, resolvePermissionPath, SandboxError, ScriptSandbox } from "../src/sandbox.js";
 import { approveAll, collect, denyAll, MemorySkillStore, ofType, setup, task, tmpDir, writeSkill } from "./helpers.js";
 
 const PKG = fileURLToPath(new URL("..", import.meta.url));
@@ -35,8 +35,8 @@ try {
 }
 `;
 
-function makeSkill(oneseat: SkillPermissionsFile, name = "probe") {
-  const root = tmpDir();
+function makeSkill(oneseat: SkillPermissionsFile, name = "probe", rootDir?: string) {
+  const root = rootDir ?? tmpDir();
   const dir = writeSkill(root, {
     name,
     description: "Probe the sandbox.",
@@ -108,13 +108,19 @@ describe.skipIf(!DENO)("ScriptSandbox (Deno)", () => {
     const skillReal = plan.cwd;
     expect(plan.command).toBe(DENO);
     expect(plan.args.slice(0, 7)).toEqual(["run", "--quiet", "--no-prompt", "--no-config", "--no-lock", "--no-npm", "--no-remote"]);
-    expect(plan.args).toContain(`--allow-read=${skillReal}`);
+    // Only the skill folder (in its real and as-given forms) is readable.
+    const readFlag = plan.args.find((a) => a.startsWith("--allow-read="))!;
+    const readList = readFlag.slice("--allow-read=".length).split(",");
+    expect(readList).toContain(skillReal);
+    for (const r of readList) expect(pathForms(r).some((f) => pathForms(skillReal).includes(f))).toBe(true);
     for (const f of ["--allow-net", "--allow-write", "--allow-env", "--allow-run", "--allow-import", "--allow-all", "-A"])
       expect(plan.args.some((a) => a.startsWith(f))).toBe(false);
     expect(plan.args).toContain("--deny-ffi");
     expect(plan.args.at(-1)).toBe("x");
     expect(plan.args.at(-2)).toBe(join(skillReal, "scripts", "probe.ts"));
-    expect(Object.keys(plan.env).sort()).toEqual(["DENO_DIR", "DENO_NO_UPDATE_CHECK", "NO_COLOR"]);
+    // Windows processes need SystemRoot; nothing else from the parent environment passes.
+    const base = ["DENO_DIR", "DENO_NO_UPDATE_CHECK", "NO_COLOR", ...(process.platform === "win32" && process.env["SystemRoot"] ? ["SystemRoot"] : [])];
+    expect(Object.keys(plan.env).sort()).toEqual(base.sort());
 
     const full = makeSkill({
       permissions: { net: ["api.example.com", "registry.npmjs.org"], read: ["$WORKSPACE/in.txt"], write: ["$WORKSPACE/out"], env: ["GREETING"], run: ["git"] },
@@ -247,5 +253,31 @@ describe.skipIf(!DENO)("ScriptSandbox (Deno)", () => {
     const denied = setup(script.slice(0, 2).concat([{ steps: [{ text: "ok" }] }]), { store: s.store, sandbox: s.sandbox });
     const ev2 = await collect(denied.harness.run(task("mail"), denyAll("no")));
     expect(ofType(ev2, "tool_end")[1]!.result.content).toContain("The person declined");
+  });
+});
+
+describe("pathForms (symlinked folders, e.g. macOS /var -> /private/var)", () => {
+  it("lists the logical and real form, including for paths that do not exist yet", async () => {
+    const { mkdtempSync, symlinkSync, realpathSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const base = realpathSync(mkdtempSync(join(tmpdir(), "os-forms-")));
+    const real = join(base, "real");
+    mkdirSync(real);
+    const link = join(base, "link");
+    symlinkSync(real, link, "junction");
+    expect(pathForms(join(link, "a", "b.txt"))).toEqual([join(link, "a", "b.txt"), join(real, "a", "b.txt")]);
+    expect(pathForms(real)).toEqual([real]);
+  });
+
+  it.runIf(!!DENO)("lets a script read a declared file through a symlinked path", async () => {
+    const { mkdtempSync, symlinkSync, realpathSync, writeFileSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const base = realpathSync(mkdtempSync(join(tmpdir(), "os-link-")));
+    const real = join(base, "real");
+    mkdirSync(real);
+    symlinkSync(real, join(base, "link"), "junction");
+    const { probe, workspace } = makeSkill({ permissions: { read: ["$WORKSPACE/in.txt"] } }, "probe", join(base, "link"));
+    writeFileSync(join(workspace, "in.txt"), "via link");
+    expect(await probe("read", join(workspace, "in.txt"))).toEqual({ ok: true, value: "via link" });
   });
 });

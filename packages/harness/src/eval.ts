@@ -20,7 +20,7 @@ export function createEvalHarness(
   ctx: EvalHarnessContext,
   store: SkillStore,
   overrides: Partial<Omit<HarnessOptions, "store" | "db" | "provider" | "workspaceDir">> = {},
-): HarnessApi {
+): HarnessApi & { close(): void } {
   const db = OneSeatDb.open(ctx.dataDir);
   const denoPath = findDeno();
   const sandbox = new ScriptSandbox({
@@ -31,5 +31,7 @@ export function createEvalHarness(
   });
   // schedule_task records the schedule; nothing fires during an eval.
   const schedules = new Scheduler({ store: new ScheduleStore(db), fire: async () => "eval-no-fire" });
-  return new Harness({ store, db, provider: () => ctx.provider, workspaceDir: ctx.workspaceDir, sandbox, schedules, ...overrides });
+  const harness = new Harness({ store, db, provider: () => ctx.provider, workspaceDir: ctx.workspaceDir, sandbox, schedules, ...overrides });
+  // The runner deletes the data folder after each case; Windows cannot delete an open database.
+  return Object.assign(harness, { close: () => db.close() });
 }
