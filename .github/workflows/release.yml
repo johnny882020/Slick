@@ -79,11 +79,14 @@ jobs:
           cd apps/desktop/src-tauri/binaries
           lipo -create -output oneseat-daemon-universal-apple-darwin oneseat-daemon-aarch64-apple-darwin oneseat-daemon-x86_64-apple-darwin
           lipo -info oneseat-daemon-universal-apple-darwin
+          lipo -create -output deno-universal-apple-darwin deno-aarch64-apple-darwin deno-x86_64-apple-darwin
+          lipo -info deno-universal-apple-darwin
 
       - name: Check the sidecar exists
         run: |
           ls -la apps/desktop/src-tauri/binaries/
           ls apps/desktop/src-tauri/binaries/oneseat-daemon-* > /dev/null
+          ls apps/desktop/src-tauri/binaries/deno-* > /dev/null
 
       - name: Import Windows signing certificate
         if: ${{ runner.os == 'Windows' }}

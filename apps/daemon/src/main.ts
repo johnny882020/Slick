@@ -14,7 +14,15 @@ process.emitWarning = ((warning: string | Error, ...rest: unknown[]) => {
   if (/SQLite is an experimental feature/.test(text)) return;
   (emitWarning as (...a: unknown[]) => void)(warning, ...rest);
 }) as typeof process.emitWarning;
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { defaultDataDir, parseModelRef, startDaemon } from "./index.js";
+
+/** Tauri installs sidecars side by side with the triple stripped: <dir>/deno[.exe]. */
+function siblingDeno(): string | undefined {
+  const p = join(dirname(process.execPath), process.platform === "win32" ? "deno.exe" : "deno");
+  return existsSync(p) ? p : undefined;
+}
 
 async function main() {
   const defaultModel = parseModelRef(process.env.ONESEAT_DEFAULT_MODEL);
@@ -22,7 +30,7 @@ async function main() {
     dataDir: defaultDataDir(),
     ...(process.env.ONESEAT_BUNDLED_SKILLS ? { bundledSkillsDir: process.env.ONESEAT_BUNDLED_SKILLS } : {}),
     ...(defaultModel ? { defaultModel } : {}),
-    ...(process.env.ONESEAT_DENO ? { denoPath: process.env.ONESEAT_DENO } : {}),
+    ...((process.env.ONESEAT_DENO ?? siblingDeno()) ? { denoPath: (process.env.ONESEAT_DENO ?? siblingDeno())! } : {}),
   });
   process.stderr.write(`oneseat-daemon ready (data: ${dataDir}${seeded.length ? `, seeded: ${seeded.join(", ")}` : ""})\n`);
   serveStdio(daemon);

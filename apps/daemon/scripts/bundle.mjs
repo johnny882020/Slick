@@ -21,7 +21,14 @@ await build({
   sourcemap: false,
   // import.meta.url has no meaning in a CJS bundle; main.ts guards on it.
   define: { "import.meta.url": "__oneseat_import_meta_url" },
-  banner: { js: 'const __oneseat_import_meta_url = require("node:url").pathToFileURL(__filename).href;' },
+  // The SQLite ExperimentalWarning fires when node:sqlite is first required, before main.ts
+  // runs, so the filter lives in the banner.
+  banner: {
+    js: [
+      'const __oneseat_import_meta_url = require("node:url").pathToFileURL(__filename).href;',
+      "{ const w = process.emitWarning.bind(process); process.emitWarning = (m, ...r) => { if (/SQLite is an experimental feature/.test(typeof m === 'string' ? m : m && m.message)) return; w(m, ...r); }; }",
+    ].join("\n"),
+  },
   logLevel: "info",
 });
 console.log(`bundled -> ${out}`);
