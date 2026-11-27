@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { resolve } from "node:path";
 import { checkApp, defaultBundles, exportConfig, pngFromIcon, productName } from "../scripts/export-app.mjs";
 import { signingConfig } from "../scripts/signing-config.mjs";
 import { drawIcon, encodePng } from "../scripts/make-icon.mjs";
@@ -15,7 +16,7 @@ describe("export-app", () => {
     expect(c.mainBinaryName).toBe("oneseat-invoice-tracker");
     expect(c.bundle.targets).toEqual(["msi", "nsis"]);
     expect(Object.values(c.bundle.resources).sort()).toEqual(["pinned/app.json", "pinned/index.html"]);
-    expect(Object.keys(c.bundle.resources).every((k: string) => k.startsWith("/data/exports/invoice-tracker"))).toBe(true);
+    expect(Object.keys(c.bundle.resources).every((k: string) => k.startsWith(resolve("/data/exports/invoice-tracker")))).toBe(true);
     expect(c.bundle.icon).toBeUndefined();
     const withIcons = exportConfig(app, { appDir: "/d", bundles: [], icons: ["/d/icons/icon.ico"] });
     expect(withIcons.bundle.icon).toEqual(["/d/icons/icon.ico"]);
