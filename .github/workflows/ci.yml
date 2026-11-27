@@ -151,13 +151,19 @@ jobs:
       - name: Tauri build (unsigned)
         run: pnpm --filter @oneseat/desktop tauri build --ci --config "$RUNNER_TEMP/tauri-unsigned.json"
 
+      # Install the real installer on this clean machine, launch the installed app, and check
+      # that the shipped daemon and deno sidecars start and seed the starter skills.
+      - name: Install smoke test
+        run: node apps/desktop/scripts/install-smoke.mjs apps/desktop/src-tauri/target/release/bundle
+
       - name: Upload unsigned bundles
         uses: actions/upload-artifact@v4
         with:
           name: unsigned-${{ matrix.os }}
           path: apps/desktop/src-tauri/target/release/bundle/
           if-no-files-found: warn
-          retention-days: 7
+          # Pilot builds are shared from here; keep them for the length of a pilot.
+          retention-days: 30
 
   e2e:
     name: "Gate 6: desktop end to end (${{ matrix.os }})"

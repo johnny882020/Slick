@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
+  # Add the "live-qa" label to a PR to run live QA and gate 5 on it (uses the key secrets).
+  pull_request:
+    types: [labeled]
 
 permissions:
   contents: read
@@ -25,6 +28,7 @@ env:
 jobs:
   live:
     name: Live provider tests and evals
+    if: ${{ github.event_name != 'pull_request' || github.event.label.name == 'live-qa' }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     env:
@@ -108,3 +112,63 @@ jobs:
           path: eval-report/
           if-no-files-found: warn
           retention-days: 90
+
+  # Live QA of the shipped daemon binary: every starter skill and the safety paths, on each
+  # provider that has a key, through the same JSON-RPC protocol the desktop shell uses.
+  qa:
+    name: Live QA of the shipped daemon
+    if: ${{ github.event_name != 'pull_request' || github.event.label.name == 'live-qa' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Build the daemon sidecar (the binary that ships)
+        run: pnpm --filter @oneseat/daemon run build:sidecar
+
+      - name: Live QA
+        env:
+          ANTHROPIC_EVAL_MODEL: ${{ vars.ANTHROPIC_EVAL_MODEL || 'claude-sonnet-5-5' }}
+          OPENAI_EVAL_MODEL: ${{ vars.OPENAI_EVAL_MODEL }}
+          GEMINI_EVAL_MODEL: ${{ vars.GEMINI_EVAL_MODEL }}
+        run: |
+          list=()
+          add() {
+            if [ -z "$2" ]; then echo "::notice::$1 skipped: its API key secret is empty"; return; fi
+            if [ -z "$3" ]; then echo "::notice::$1 skipped: repository variable $4 is not set"; return; fi
+            list+=("$1:$3")
+          }
+          add anthropic "$ANTHROPIC_API_KEY" "$ANTHROPIC_EVAL_MODEL" ANTHROPIC_EVAL_MODEL
+          add openai "$OPENAI_API_KEY" "$OPENAI_EVAL_MODEL" OPENAI_EVAL_MODEL
+          add google "$GEMINI_API_KEY" "$GEMINI_EVAL_MODEL" GEMINI_EVAL_MODEL
+          export ONESEAT_QA_PROVIDERS=$(IFS=,; echo "${list[*]}")
+          echo "Live QA providers: ${ONESEAT_QA_PROVIDERS:-none}"
+          bin=apps/desktop/src-tauri/binaries
+          node apps/daemon/scripts/live-qa.mjs --daemon "$bin/oneseat-daemon-x86_64-unknown-linux-gnu" --deno "$bin/deno-x86_64-unknown-linux-gnu" --out qa-report
+
+      - name: Upload QA report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-qa-${{ github.run_id }}
+          path: qa-report/
+          if-no-files-found: warn
+          retention-days: 90
+

@@ -92,3 +92,36 @@ describe("native-smoke", () => {
     expect(checkReport(bad)).toHaveLength(4);
   });
 });
+
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { appPaths, checkFirstRun } from "../scripts/install-smoke.mjs";
+
+describe("install-smoke", () => {
+  it("knows where the installed app keeps data and logs", () => {
+    expect(appPaths("win32", { APPDATA: "C:\\A", LOCALAPPDATA: "C:\\L" }, "C:\\Users\\u")).toEqual({
+      data: join("C:\\A", "app.oneseat"),
+      log: join("C:\\L", "app.oneseat", "logs", "oneseat.log"),
+    });
+    expect(appPaths("darwin", {}, "/Users/u")).toEqual({
+      data: join("/Users/u", "Library", "Application Support", "app.oneseat"),
+      log: join("/Users/u", "Library", "Logs", "app.oneseat", "oneseat.log"),
+    });
+  });
+
+  it("accepts a healthy first run and names what is missing otherwise", () => {
+    const dir = mkdtempSync(join(tmpdir(), "os-smoke-"));
+    const ok = "[oneseat info] daemon ready (deno found)\n[INFO] daemon Running (restarts: 0)\n";
+    expect(checkFirstRun(dir, ok)).toEqual(expect.arrayContaining(["starter skill customers was not installed", "oneseat.db missing (harness did not open its database)"]));
+    for (const s of ["brand-kit", "customers", "outreach", "proposals-invoices", "social-posts", "support-inbox", "weekly-report"]) {
+      mkdirSync(join(dir, "skills", s), { recursive: true });
+      writeFileSync(join(dir, "skills", s, "SKILL.md"), "x");
+    }
+    writeFileSync(join(dir, "skills.lock.json"), "{}");
+    writeFileSync(join(dir, "oneseat.db"), "");
+    expect(checkFirstRun(dir, ok)).toEqual([]);
+    expect(checkFirstRun(dir, "daemon ready (deno missing)\ndaemon Running")).toHaveLength(1);
+    expect(checkFirstRun(dir, ok + "thread 'main' panicked at")).toHaveLength(1);
+  });
+});

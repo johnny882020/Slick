@@ -1,0 +1,67 @@
+name: Pilot feedback
+description: Tell us how OneSeat worked for your team during the pilot.
+title: "[pilot] "
+labels: ["pilot-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing OneSeat. Please do not paste API keys, customer data or anything private here.
+  - type: input
+    id: team
+    attributes:
+      label: Team or company
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Computer
+      options: ["Windows 11", "Windows 10", "macOS (Apple silicon)", "macOS (Intel)"]
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Model provider
+      options: ["Claude (Anthropic)", "OpenAI", "Gemini (Google)", "Local model"]
+    validations:
+      required: true
+  - type: input
+    id: first-run
+    attributes:
+      label: Minutes from opening the installer to your first finished task
+      placeholder: "e.g. 4"
+  - type: checkboxes
+    id: skills
+    attributes:
+      label: Which skills did you use?
+      options:
+        - label: Customers
+        - label: Outreach emails
+        - label: Proposals and invoices
+        - label: Social posts
+        - label: Support inbox
+        - label: Weekly report
+        - label: Brand kit / pinned apps
+  - type: textarea
+    id: worked
+    attributes:
+      label: What worked well?
+  - type: textarea
+    id: broke
+    attributes:
+      label: What went wrong or felt confusing?
+      description: What you asked, what you expected, and what happened. Screenshots help.
+  - type: dropdown
+    id: unapproved
+    attributes:
+      label: Did OneSeat ever send, pay or delete something without asking you first?
+      options: ["No", "Yes (please describe above)"]
+    validations:
+      required: true
+  - type: dropdown
+    id: seat
+    attributes:
+      label: Could OneSeat replace one of your paid tools?
+      options: ["Yes, we cancelled one", "Yes, we plan to", "Not yet", "No"]
