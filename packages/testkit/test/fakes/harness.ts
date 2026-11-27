@@ -76,6 +76,7 @@ export function createReferenceHarness(opts: ReferenceHarnessOptions): HarnessAp
         if (r.error) {
           if (bugs.has("throws")) throw new Error(r.error.message);
           yield { type: "error", message: `${r.error.kind}: ${r.error.message}`, retryable: r.error.retryable };
+          yield { type: "done", stopReason: "error", text, usage };
           return;
         }
         text = r.message.content.map((p) => (p.type === "text" ? p.text : "")).join("");

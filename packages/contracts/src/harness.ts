@@ -23,6 +23,11 @@ export interface TaskRequest {
   origin?: { kind: "main" } | { kind: "app"; appId: string } | { kind: "schedule"; scheduleId: string } | { kind: "eval" };
 }
 
+/**
+ * Run event stream. Order: session_start first; exactly one done, last.
+ * error is informational (it does not end the stream): a failed run emits error,
+ * then done with stopReason "error". Listeners stop on done only.
+ */
 export type HarnessEvent =
   | { type: "session_start"; sessionId: string; runId: string }
   | { type: "skill_loaded"; name: string; reason: "router" | "forced" }

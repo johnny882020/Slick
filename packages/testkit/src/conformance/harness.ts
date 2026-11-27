@@ -50,7 +50,7 @@ export interface HarnessIssue {
   message: string;
 }
 
-const TERMINAL = new Set(["done", "error"]);
+
 
 function nonNegativeUsage(u: unknown): boolean {
   if (!u || typeof u !== "object") return false;
@@ -58,7 +58,10 @@ function nonNegativeUsage(u: unknown): boolean {
   return ["inputTokens", "outputTokens"].every((k) => typeof x[k] === "number" && Number.isInteger(x[k]) && (x[k] as number) >= 0);
 }
 
-/** Check a HarnessEvent sequence: one terminal (done | error) at the end, ids that pair up, sane usage. */
+/**
+ * Check a HarnessEvent sequence: exactly one done, last; an error (if any) is followed by
+ * done with stopReason "error"; ids pair up; usage is sane. (Contract: harness.ts HarnessEvent.)
+ */
 export function validateHarnessEvents(events: readonly HarnessEvent[]): HarnessIssue[] {
   const issues: HarnessIssue[] = [];
   if (events.length === 0) return [{ index: -1, rule: "empty", message: "run produced no events" }];
@@ -66,6 +69,7 @@ export function validateHarnessEvents(events: readonly HarnessEvent[]): HarnessI
   const approvals = new Set<string>();
   const approvalCalls = new Set<string>();
   let terminals = 0;
+  let sawError = false;
   events.forEach((ev, i) => {
     if (terminals > 0) issues.push({ index: i, rule: "after-terminal", message: `${ev.type} after the terminal event` });
     switch (ev.type) {
@@ -98,17 +102,20 @@ export function validateHarnessEvents(events: readonly HarnessEvent[]): HarnessI
         if (!nonNegativeUsage(ev.usage)) issues.push({ index: i, rule: "usage", message: "done.usage must have non-negative integer token counts" });
         break;
       case "error":
-        terminals++;
+        sawError = true;
         if (typeof ev.message !== "string" || !ev.message) issues.push({ index: i, rule: "error-message", message: "error.message must be a non-empty string" });
         break;
       default:
         break;
     }
   });
-  const terminalCount = events.filter((e) => TERMINAL.has(e.type)).length;
-  if (terminalCount === 0) issues.push({ index: -1, rule: "terminal", message: "run ended without done or error" });
-  else if (terminalCount > 1) issues.push({ index: -1, rule: "terminal", message: `run has ${terminalCount} terminal events, expected exactly one` });
-  else if (!TERMINAL.has(events[events.length - 1]!.type)) issues.push({ index: -1, rule: "terminal", message: "terminal event is not last" });
+  const dones = events.filter((e) => e.type === "done");
+  const last = events[events.length - 1]!;
+  if (dones.length === 0) issues.push({ index: -1, rule: "terminal", message: "run ended without done" });
+  else if (dones.length > 1) issues.push({ index: -1, rule: "terminal", message: `run has ${dones.length} done events, expected exactly one` });
+  else if (last.type !== "done") issues.push({ index: -1, rule: "terminal", message: "done is not the last event" });
+  if (sawError && last.type === "done" && last.stopReason !== "error")
+    issues.push({ index: events.length - 1, rule: "error-done", message: `an error must end with done/error, got done/${last.stopReason}` });
   return issues;
 }
 
@@ -358,12 +365,13 @@ const CHECKS: Check[] = [
     },
   },
   {
-    name: "a provider error ends the run with exactly one terminal event",
+    name: "a provider error emits error, then exactly one done/error",
     run: async (ctx) => {
       const r = await runOnce(ctx, [{ steps: [{ error: { kind: "auth", message: "bad key" } }] }], { input: "Hello" });
       const p = [...r.problems];
       const last = r.events[r.events.length - 1];
-      if (last && last.type === "done" && last.stopReason !== "error") p.push(`a provider error ended with done/${last.stopReason}; expected error or done/error`);
+      if (!r.events.some((e) => e.type === "error")) p.push("a provider error produced no error event");
+      if (last?.type !== "done" || last.stopReason !== "error") p.push(`a provider error must end with done/error; got ${last?.type}/${last?.type === "done" ? last.stopReason : "-"}`);
       return p;
     },
   },

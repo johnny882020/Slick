@@ -159,10 +159,10 @@ export async function collectHarnessRun(harness: HarnessApi, task: TaskRequest, 
           terminal = true;
           out.text = ev.text || deltas;
           out.usage = { inputTokens: ev.usage.inputTokens, outputTokens: ev.usage.outputTokens };
-          if (ev.stopReason === "error" || ev.stopReason === "cancelled") out.error = `run ended with ${ev.stopReason}`;
+          if ((ev.stopReason === "error" || ev.stopReason === "cancelled") && !out.error) out.error = `run ended with ${ev.stopReason}`;
           break;
         case "error":
-          terminal = true;
+          // Informational: the run still ends with done/error (contract). Keep the message.
           out.error = ev.message;
           break;
         default:
@@ -170,7 +170,7 @@ export async function collectHarnessRun(harness: HarnessApi, task: TaskRequest, 
       }
       if (terminal) break;
     }
-    if (!terminal && !out.error) out.error = "run ended without done or error";
+    if (!terminal && !out.error) out.error = "run ended without done";
   } catch (e) {
     out.error = `harness threw: ${(e as Error)?.message ?? String(e)}`;
   } finally {

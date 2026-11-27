@@ -224,9 +224,11 @@ describe("collectHarnessRun", () => {
     expect(r).toEqual({ text: "ab", toolCalls: ["db_query"], usage: { inputTokens: 3, outputTokens: 4 }, skillLoaded: true });
   });
   it("turns missing terminals, throws, errors and cancelled runs into errors", async () => {
-    expect((await collectHarnessRun(h([{ type: "text_delta", text: "a" }]), task, DENY_ALL_APPROVALS, 1000)).error).toBe("run ended without done or error");
+    expect((await collectHarnessRun(h([{ type: "text_delta", text: "a" }]), task, DENY_ALL_APPROVALS, 1000)).error).toBe("run ended without done");
     expect((await collectHarnessRun(h([], true), task, DENY_ALL_APPROVALS, 1000)).error).toBe("harness threw: exploded");
     expect((await collectHarnessRun(h([{ type: "error", message: "bad", retryable: false }]), task, DENY_ALL_APPROVALS, 1000)).error).toBe("bad");
+    // Contract: error then done/error; the error message wins.
+    expect((await collectHarnessRun(h([{ type: "error", message: "bad", retryable: false }, { type: "done", stopReason: "error", text: "", usage: { inputTokens: 0, outputTokens: 0 } }]), task, DENY_ALL_APPROVALS, 1000)).error).toBe("bad");
     expect((await collectHarnessRun(h([{ type: "done", stopReason: "cancelled", text: "t", usage: { inputTokens: 1, outputTokens: 1 } }]), task, DENY_ALL_APPROVALS, 1000)).error).toBe("run ended with cancelled");
   });
 });

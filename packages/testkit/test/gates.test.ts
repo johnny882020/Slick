@@ -402,3 +402,10 @@ describe("exec", () => {
     expect(quoteWindowsArg("C:\\dir with space\\")).toBe('"C:\\dir with space\\\\"');
   });
 });
+
+describe("parseScanOutput with the registry CLI envelope", () => {
+  it("reads { ok, results: [{ scan }] }", () => {
+    const out = JSON.stringify({ ok: false, results: [{ scan: { verdict: "pass", findings: [] } }, { scan: { verdict: "block", findings: [{ severity: "block", rule: "r", file: "a.ts", line: 2, message: "m" }] } }] }, null, 2);
+    expect(parseScanOutput(out)).toEqual({ verdicts: ["pass", "block"], findings: ["r a.ts:2 m"] });
+  });
+});

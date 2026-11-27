@@ -266,11 +266,15 @@ export function parseScanOutput(stdout: string): { verdicts: string[]; findings:
     } catch {
       continue;
     }
+    // Accept a bare report, a list, or an envelope ({ reports } or the registry CLI's { ok, results }).
+    const env = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as { reports?: unknown; results?: unknown }) : undefined;
     const list: unknown[] = Array.isArray(raw)
       ? raw
-      : raw && typeof raw === "object" && Array.isArray((raw as { reports?: unknown[] }).reports)
-        ? (raw as { reports: unknown[] }).reports
-        : [raw];
+      : Array.isArray(env?.reports)
+        ? env.reports
+        : Array.isArray(env?.results)
+          ? env.results
+          : [raw];
     const verdicts: string[] = [];
     const findings: string[] = [];
     for (const item of list) {

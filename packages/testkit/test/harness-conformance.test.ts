@@ -27,7 +27,7 @@ describe("harness conformance catches broken harnesses", () => {
     ["run-before-approval", /before a "send" tool/, /ran before the person approved/],
     ["bodies-in-index", /skill index/, /contains skill content/],
     ["index-when-disabled", /disableSkills/, /baseline mentions skill/],
-    ["double-done", /plain reply/, /terminal events, expected exactly one/],
+    ["double-done", /plain reply/, /done events, expected exactly one/],
     ["denial-not-error", /denied approval/, /isError: true/],
     ["throws", /provider error/, /harness threw/],
     ["no-skill-loaded-event", /forced skill/, /no skill_loaded event/],

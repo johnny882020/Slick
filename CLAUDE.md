@@ -32,7 +32,9 @@ A stream changes only its own path. A PR that touches another stream's path is r
    drives approvals: `send`, `pay`, `delete` always need a person.
 4. **ArtifactBundle** (`artifact.ts`): one self-contained HTML file + `app.json`. Pinned pages get
    `PINNED_APP_CSP` and only `oneseat.run(skill, input)`.
-5. Shared extras: `harness.ts` (TaskRequest, HarnessEvent, SkillStore, daemon JSON-RPC methods),
+5. Shared extras: `harness.ts` (TaskRequest, HarnessEvent, SkillStore, daemon JSON-RPC methods).
+   A run's events start with `session_start` and end with exactly one `done`; `error` is informational
+   and is followed by `done` with `stopReason: "error"`. Listeners stop on `done` only. Also
    `evals.ts` (EvalSuite format), `data.ts` (business SQLite schema), `testing.ts` (`createScriptedProvider`).
 
 ## Rules
