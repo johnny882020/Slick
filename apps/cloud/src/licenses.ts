@@ -32,7 +32,15 @@ export class LicenseSigner {
   private readonly key: KeyObject;
 
   constructor(privateKeyPem: string) {
-    this.key = createPrivateKey(privateKeyPem);
+    try {
+      this.key = createPrivateKey(privateKeyPem);
+    } catch {
+      // Never echo the value: it is the signing key.
+      throw new Error(
+        "LICENSE_PRIVATE_KEY is not a readable PEM private key. Paste the whole single line from license-private.escaped " +
+          "(from -----BEGIN PRIVATE KEY----- to -----END PRIVATE KEY-----), or the PEM file with its line breaks.",
+      );
+    }
     if (this.key.asymmetricKeyType !== "ed25519") throw new Error("LICENSE_PRIVATE_KEY must be an ed25519 key");
     this.publicKeyPem = createPublicKey(this.key).export({ type: "spki", format: "pem" }).toString();
   }

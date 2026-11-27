@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { generateKeyPairSync, verify, createPublicKey } from "node:crypto";
 import type { AddressInfo } from "node:net";
 import { decodeLicenseToken, entitlementFrom } from "@oneseat/contracts";
-import { createCloudApp, loadConfig, MemoryStore, signStripePayload, verifyStripeSignature, tierFromSubscription, mapSubscriptionStatus, generateLicenseKey, hashKey } from "../src/index.js";
+import { createCloudApp, loadConfig, LicenseSigner, MemoryStore, signStripePayload, verifyStripeSignature, tierFromSubscription, mapSubscriptionStatus, generateLicenseKey, hashKey } from "../src/index.js";
 
 const WHSEC = "whsec_test_secret";
 const { privateKey } = generateKeyPairSync("ed25519");
@@ -204,6 +204,35 @@ describe("unconfigured service", () => {
       expect(await (await fetch(`${b}/`)).text()).toContain("Checkout opens soon");
     } finally {
       await new Promise<void>((r) => bare.server.close(() => r()));
+    }
+  });
+});
+
+describe("LICENSE_PRIVATE_KEY as pasted into a dashboard", () => {
+  const { privateKey } = generateKeyPairSync("ed25519");
+  const pem = privateKey.export({ type: "pkcs8", format: "pem" }).toString();
+  const body = pem.split("\n").filter((l) => l && !l.startsWith("-----")).join("");
+  const shapes: Record<string, string> = {
+    "real newlines": pem,
+    "\\n escapes": pem.trim().replace(/\n/g, "\\n"),
+    "newlines as spaces": pem.trim().replace(/\n/g, " "),
+    "in quotes": `"${pem.trim().replace(/\n/g, "\\n")}"`,
+    "base64 body only": body,
+    "CRLF": pem.replace(/\n/g, "\r\n"),
+  };
+  for (const [name, value] of Object.entries(shapes)) {
+    it(`accepts ${name}`, () => {
+      const cfg = loadConfig({ LICENSE_PRIVATE_KEY: value });
+      expect(new LicenseSigner(cfg.licensePrivateKey!).publicKeyPem).toContain("BEGIN PUBLIC KEY");
+    });
+  }
+  it("rejects a broken key without echoing it", () => {
+    const cfg = loadConfig({ LICENSE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\\nnot-a-key\\n-----END PRIVATE KEY-----" });
+    expect(() => new LicenseSigner(cfg.licensePrivateKey!)).toThrow(/not a readable PEM/);
+    try {
+      new LicenseSigner(cfg.licensePrivateKey!);
+    } catch (e) {
+      expect((e as Error).message).not.toContain("not-a-key");
     }
   });
 });
