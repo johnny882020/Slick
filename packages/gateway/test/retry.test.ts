@@ -64,6 +64,13 @@ describe("withRetry", () => {
     expect(delays).toEqual([1000, 2000]);
   });
 
+  it("does not retry when the provider asks for a longer wait than maxDelayMs (daily quota)", async () => {
+    const inner = scripted([[err("rate_limit", true, 34_840)], [START, END]]);
+    const events = await all(withRetry(inner, { ...noSleep, maxDelayMs: 30_000 }).send(textRequest("m")));
+    expect(events).toEqual([err("rate_limit", true, 34_840)]);
+    expect(inner.calls).toBe(1);
+  });
+
   it("passes a message_end with no content straight through", async () => {
     const inner = scripted([[START, END]]);
     expect(await all(withRetry(inner, noSleep).send(textRequest("m")))).toEqual([START, END]);

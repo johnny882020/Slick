@@ -96,7 +96,10 @@ export function withRetry<P extends ModelProvider>(provider: P, options: RetryOp
         yield { type: "error", error: providerError("network", "stream ended before the response completed") };
         return;
       }
-      const canRetry = failure.retryable && attempt < maxRetries && !req.signal?.aborted;
+      // A provider that asks for a longer wait than we allow (a daily quota: "retry in 9h") will
+      // refuse again after our capped wait; report it now instead of stalling the run.
+      const waitTooLong = failure.retryAfter !== undefined && failure.retryAfter * 1000 > maxDelayMs;
+      const canRetry = failure.retryable && !waitTooLong && attempt < maxRetries && !req.signal?.aborted;
       if (!canRetry) {
         yield { type: "error", error: failure };
         return;

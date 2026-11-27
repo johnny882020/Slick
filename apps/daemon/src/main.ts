@@ -15,7 +15,7 @@ process.emitWarning = ((warning: string | Error, ...rest: unknown[]) => {
   (emitWarning as (...a: unknown[]) => void)(warning, ...rest);
 }) as typeof process.emitWarning;
 import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { defaultDataDir, parseModelRef, startDaemon } from "./index.js";
 
 /** Tauri installs sidecars side by side with the triple stripped: <dir>/deno[.exe]. */
@@ -31,7 +31,8 @@ async function main() {
     ...(process.env.ONESEAT_BUNDLED_SKILLS ? { bundledSkillsDir: process.env.ONESEAT_BUNDLED_SKILLS } : {}),
     ...(defaultModel ? { defaultModel } : {}),
     ...(process.env.ONESEAT_CLOUD_URL ? { cloudUrl: process.env.ONESEAT_CLOUD_URL } : {}),
-    ...((process.env.ONESEAT_DENO ?? siblingDeno()) ? { denoPath: (process.env.ONESEAT_DENO ?? siblingDeno())! } : {}),
+    // Absolute: the sandbox starts deno from the skill's folder, not from our working folder.
+    ...((process.env.ONESEAT_DENO || siblingDeno()) ? { denoPath: resolve((process.env.ONESEAT_DENO || siblingDeno())!) } : {}),
   });
   process.stderr.write(`oneseat-daemon ready (data: ${dataDir}${seeded.length ? `, seeded: ${seeded.join(", ")}` : ""})\n`);
   serveStdio(daemon);

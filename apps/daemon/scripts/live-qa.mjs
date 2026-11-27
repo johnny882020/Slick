@@ -235,8 +235,8 @@ function parseArgs(argv) {
   const o = { daemon: undefined, deno: undefined, out: undefined, only: undefined, timeoutMs: 300_000 };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--daemon") o.daemon = argv[++i];
-    else if (a === "--deno") o.deno = argv[++i];
+    if (a === "--daemon") o.daemon = resolve(argv[++i]);
+    else if (a === "--deno") o.deno = resolve(argv[++i]);
     else if (a === "--out") o.out = argv[++i];
     else if (a === "--only") o.only = argv[++i].split(",");
     else if (a === "--timeout") o.timeoutMs = Number(argv[++i]) * 1000;
