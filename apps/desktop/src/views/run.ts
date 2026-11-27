@@ -30,7 +30,7 @@ export function runView(ctx: Ctx): View {
   const { api, store } = ctx;
   const modelCache = new Map<string, { id: string; label: string; tier?: string }[]>();
 
-  const task = h("textarea", { name: "task", rows: 4, placeholder: "For example: chase overdue invoices from last month", required: true });
+  const task = h("textarea", { name: "task", rows: 4, placeholder: "For example: chase overdue invoices from last month", required: true, attrs: { dir: "auto" } });
   const provider = h("select", { name: "provider" });
   const model = h("select", { name: "model" });
   const skill = h("select", { name: "skill" });
@@ -78,7 +78,7 @@ export function runView(ctx: Ctx): View {
   });
   provider.addEventListener("change", () => void loadModels(provider.value as ProviderId));
 
-  const el = h("section", { class: "view", attrs: { "aria-labelledby": "run-title" } }, h("h1", { id: "run-title", text: "Run a task" }), noKey, form, output.el, recentSection);
+  const el = h("section", { class: "view view-run", attrs: { "aria-labelledby": "run-title" } }, h("h1", { id: "run-title", text: "Run a task" }), noKey, form, output.el, recentSection);
 
   function renderProviders(): void {
     const ready = store.readyProviders();
@@ -152,7 +152,7 @@ export function runView(ctx: Ctx): View {
           h("button", {
             type: "button",
             class: `link ${r.runId === store.currentRunId ? "current" : ""}`,
-            attrs: { "aria-current": r.runId === store.currentRunId ? "true" : null },
+            attrs: { "aria-current": r.runId === store.currentRunId ? "true" : null, dir: "auto" },
             text: `${truncate(r.input ?? "Background run", 60)} — ${STATUS_LABEL[r.status]}`,
             on: {
               click: () => {

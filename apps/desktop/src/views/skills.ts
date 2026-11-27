@@ -91,7 +91,7 @@ export function skillsView(ctx: Ctx): View {
 
   const el = h(
     "section",
-    { class: "view", attrs: { "aria-labelledby": "skills-title" } },
+    { class: "view view-skills", attrs: { "aria-labelledby": "skills-title" } },
     h("h1", { id: "skills-title", text: "Skill library" }),
     addForm,
     h("section", { class: "card", attrs: { "aria-labelledby": "installed-title" } }, h("h2", { id: "installed-title", text: "Installed skills" }), listStatus, list),
@@ -137,7 +137,7 @@ export function skillsView(ctx: Ctx): View {
         "div",
         { class: `scan verdict-${scan.verdict}`, attrs: { "data-verdict": scan.verdict } },
         h("h3", null, h("span", { class: `badge ${scan.verdict}`, text: VERDICT_LABEL[scan.verdict] }), " ", scan.skill),
-        h("p", { class: "scan-summary", text: scan.summary }),
+        h("p", { class: "scan-summary", attrs: { dir: "auto" }, text: scan.summary }),
         perms.length ? h("ul", { class: "perms", attrs: { "aria-label": "What it can touch" } }, ...perms.map((p) => h("li", { text: p }))) : h("p", { class: "muted", text: "It asks for no internet, file or program access." }),
         findings.length
           ? h(
@@ -209,7 +209,7 @@ export function skillsView(ctx: Ctx): View {
       "article",
       { class: "skill", attrs: { "data-skill": name, "aria-labelledby": `skill-${name}` } },
       h("h3", { id: `skill-${name}` }, name, h("span", { class: "muted", text: ` v${s.version}` })),
-      h("p", { text: m.frontmatter.description }),
+      h("p", { attrs: { dir: "auto" }, text: m.frontmatter.description }),
       m.effects.length ? h("p", { class: "effects", text: `Asks you before it ${m.effects.map((e) => (e === "send" ? "sends" : e === "pay" ? "pays" : "deletes")).join(", ")} anything.` }) : null,
       perms.length ? h("p", { class: "muted", text: perms.join(" · ") }) : null,
       h("p", { class: "muted", text: `${describeSource(s.source)} · installed ${formatTime(s.installedAt)}` }),

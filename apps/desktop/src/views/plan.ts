@@ -36,16 +36,16 @@ export function planView(ctx: Ctx): View {
   const deactivateBtn = button("Use Free on this computer", () => void deactivate());
   deactivateBtn.hidden = true;
 
-  const message = h("textarea", { name: "feedback", rows: 5, attrs: { maxlength: "5000" } });
+  const message = h("textarea", { name: "feedback", rows: 5, attrs: { maxlength: "5000", dir: "auto" } });
   const rating = h("select", { name: "rating" }, h("option", { value: "", text: "No rating" }), ...[5, 4, 3, 2, 1].map((n) => h("option", { value: String(n), text: `${n} of 5` })));
-  const topic = h("input", { name: "topic", placeholder: "e.g. invoices, install, approvals", autocomplete: "off" });
+  const topic = h("input", { name: "topic", placeholder: "e.g. invoices, install, approvals", autocomplete: "off", attrs: { dir: "auto" } });
   const email = h("input", { type: "email", name: "email", placeholder: "Optional, if you'd like a reply", autocomplete: "email" });
   const fbStatus = h("p", { class: "status", attrs: { role: "status", "aria-live": "polite" } });
   const sendBtn = button("Send feedback", () => void sendFeedback(), { kind: "primary" });
 
   const el = h(
     "section",
-    { class: "view", attrs: { "aria-labelledby": "plan-title" } },
+    { class: "view view-plan", attrs: { "aria-labelledby": "plan-title" } },
     h("h1", { id: "plan-title", text: "Plan" }),
     summary,
     features,

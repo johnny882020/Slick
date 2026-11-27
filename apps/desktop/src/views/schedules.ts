@@ -26,7 +26,7 @@ export function schedulesView(ctx: Ctx): View {
   const cron = h("input", { type: "text", name: "cron", value: "0 9 * * 1-5", spellcheck: false, autocomplete: "off" });
   const cronField = field("Schedule (cron: minute hour day month weekday)", cron, describeCron("0 9 * * 1-5"));
   const cronHint = cronField.querySelector(".hint")!;
-  const task = h("textarea", { name: "schedule-task", rows: 3, placeholder: "For example: send me the weekly report" });
+  const task = h("textarea", { name: "schedule-task", rows: 3, placeholder: "For example: send me the weekly report", attrs: { dir: "auto" } });
   const provider = h("select", { name: "schedule-provider" });
   const model = h("select", { name: "schedule-model" });
   const enabledId = uid("enabled");
@@ -95,7 +95,7 @@ export function schedulesView(ctx: Ctx): View {
 
   const el = h(
     "section",
-    { class: "view", attrs: { "aria-labelledby": "schedules-title" } },
+    { class: "view view-schedules", attrs: { "aria-labelledby": "schedules-title" } },
     h("h1", { id: "schedules-title", text: "Schedules" }),
     h("p", { class: "lead", text: "Run a task automatically at set times. Anything that sends, pays or deletes still waits for your approval." }),
     h(
@@ -104,14 +104,18 @@ export function schedulesView(ctx: Ctx): View {
       h("h2", { id: "sched-list-title", text: "Your schedules" }),
       listStatus,
       h(
-        "table",
-        { class: "table" },
+        "div",
+        { class: "table-scroll" },
         h(
-          "thead",
-          null,
-          h("tr", null, ...["When", "Task", "Model", "Next run", "Last run", "Enabled", ""].map((t) => h("th", { scope: "col", text: t }))),
+          "table",
+          { class: "table" },
+          h(
+            "thead",
+            null,
+            h("tr", null, ...["When", "Task", "Model", "Next run", "Last run", "Enabled", ""].map((t) => h("th", { scope: "col", text: t }))),
+          ),
+          tbody,
         ),
-        tbody,
       ),
     ),
     form,
@@ -177,7 +181,7 @@ export function schedulesView(ctx: Ctx): View {
       "tr",
       { attrs: { "data-schedule": s.id } },
       h("td", null, describeCron(s.cron), h("div", { class: "muted" }, h("code", { text: s.cron }))),
-      h("td", { text: truncate(s.task.input, 80) }),
+      h("td", { attrs: { dir: "auto" }, text: truncate(s.task.input, 80) }),
       h("td", { text: `${providerLabel(s.task.provider)} · ${s.task.model}` }),
       h("td", { text: s.enabled ? formatTime(s.nextRunAt) || "—" : "Paused" }),
       h("td", { text: formatTime(s.lastRunAt) || "Never" }),

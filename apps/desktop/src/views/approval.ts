@@ -1,4 +1,4 @@
-// Approval dialog: anything that sends, pays or deletes waits here for a person.
+// Approval drawer: anything that sends, pays or deletes waits here for a person.
 // It shows requests from every run (including schedules and pinned apps), one at a time.
 
 import { describeError } from "../api";
@@ -14,9 +14,9 @@ export function createApprovalDialog(ctx: Pick<Ctx, "api" | "store" | "notify">)
   let busy = false;
 
   const title = h("h2", { id: "approval-title", text: "Approve this action?" });
-  const summary = h("p", { class: "approval-summary", id: "approval-desc" });
+  const summary = h("p", { class: "approval-summary", id: "approval-desc", attrs: { dir: "auto" } });
   const meta = h("div", { class: "approval-meta" });
-  const note = h("textarea", { name: "approval-note", rows: 2, placeholder: "For example: wait until Friday" });
+  const note = h("textarea", { name: "approval-note", rows: 2, placeholder: "For example: wait until Friday", attrs: { dir: "auto" } });
   const error = h("p", { class: "error-text", attrs: { role: "alert" } });
   const approve = button("Approve", () => void decide(true), { kind: "primary" });
   const deny = button("Deny", () => void decide(false), { kind: "danger" });
@@ -41,13 +41,22 @@ export function createApprovalDialog(ctx: Pick<Ctx, "api" | "store" | "notify">)
     e.preventDefault();
     close(true);
   });
+  // A click on the backdrop (outside the drawer) does the same as Escape. Only when the
+  // press also started there, so a text selection dragged out of the drawer does not close it.
+  let downOnBackdrop = false;
+  el.addEventListener("pointerdown", (e) => (downOnBackdrop = e.target === el));
+  el.addEventListener("click", (e) => {
+    const outside = e.target === el && downOnBackdrop;
+    downOnBackdrop = false;
+    if (outside && !busy) close(true);
+  });
 
   function render(a: PendingApproval): void {
     const run = store.runs.get(a.runId);
     summary.textContent = a.summary;
     replace(
       meta,
-      run?.input ? h("p", { class: "muted", text: `Task: ${run.input}` }) : h("p", { class: "muted", text: "From a background run (a schedule or a pinned app)." }),
+      run?.input ? h("p", { class: "muted" }, "Task: ", h("span", { attrs: { dir: "auto" }, text: run.input })) : h("p", { class: "muted", text: "From a background run (a schedule or a pinned app)." }),
       h("p", null, "Action: ", h("code", { text: a.call.name })),
       h(
         "ul",

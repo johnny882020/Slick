@@ -22,16 +22,24 @@ export function activityView(ctx: Ctx): View {
 
   const el = h(
     "section",
-    { class: "view", attrs: { "aria-labelledby": "activity-title" } },
+    { class: "view view-activity", attrs: { "aria-labelledby": "activity-title" } },
     h("h1", { id: "activity-title", text: "Activity" }),
     h("p", { class: "lead", text: "Every action OneSeat took for you, newest first." }),
     h("div", { class: "row" }, field("Show", limit), button("Refresh", () => void refresh())),
     status,
     h(
-      "table",
-      { class: "table" },
-      h("thead", null, h("tr", null, ...["Time", "Action", "What it does", "Approval", "Result", "Details"].map((t) => h("th", { scope: "col", text: t })))),
-      tbody,
+      "div",
+      { class: "card table-card" },
+      h(
+        "div",
+        { class: "table-scroll" },
+        h(
+          "table",
+          { class: "table" },
+          h("thead", null, h("tr", null, ...["Time", "Action", "What it does", "Approval", "Result", "Details"].map((t) => h("th", { scope: "col", text: t })))),
+          tbody,
+        ),
+      ),
     ),
   );
 
@@ -44,7 +52,7 @@ export function activityView(ctx: Ctx): View {
       h("td", { text: e.effects.map(effectLabel).join(", ") || "—" }),
       h("td", { class: e.approved === false ? "denied" : "", text: approvalLabel(e.approved) }),
       h("td", { class: e.isError ? "error-text" : "", text: e.isError ? "Error" : "OK" }),
-      h("td", { text: e.summary }),
+      h("td", { attrs: { dir: "auto" }, text: e.summary }),
     );
   }
 

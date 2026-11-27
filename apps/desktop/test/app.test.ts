@@ -115,6 +115,44 @@ describe("app shell", () => {
     expect(store.pendingApprovals()).toEqual([]);
   });
 
+  it("a backdrop click on the approval drawer keeps the request waiting, like Escape", async () => {
+    location.hash = "#/run";
+    const root = document.createElement("div");
+    document.body.replaceChildren(root);
+    const shell = memoryShell();
+    const { store } = await startApp(root, shell.transport);
+    shell.emit("daemon://notification", {
+      method: "harness.event",
+      params: {
+        runId: "bg-2",
+        event: { type: "approval_request", approvalId: "ap-10", call: { id: "c", name: "email_send", input: {} }, effects: ["send"], summary: "Send it" },
+      },
+    });
+    await tick();
+    const dialog = document.querySelector("dialog.approval-dialog") as HTMLDialogElement;
+    expect(dialog.open).toBe(true);
+    // A click inside the drawer does not close it.
+    dialog.querySelector("form")!.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    dialog.querySelector("form")!.click();
+    expect(dialog.open).toBe(true);
+    // Pressed and released on the backdrop (the dialog element itself): decide later.
+    dialog.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    dialog.click();
+    await tick();
+    expect(dialog.open).toBe(false);
+    expect(shell.calls.some((c) => c.args?.["method"] === "harness.approve")).toBe(false);
+    expect(store.pendingApprovals().map((p) => p.approvalId)).toEqual(["ap-10"]);
+  });
+
+  it("is light only: no theme control and no data-theme", async () => {
+    location.hash = "#/run";
+    const root = document.createElement("div");
+    document.body.replaceChildren(root);
+    await startApp(root, memoryShell().transport);
+    expect(root.querySelector('[aria-label="Theme"]')).toBeNull();
+    expect(document.documentElement.hasAttribute("data-theme")).toBe(false);
+  });
+
   it("reflects daemon status in a banner", async () => {
     location.hash = "#/run";
     const root = document.createElement("div");

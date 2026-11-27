@@ -32,7 +32,7 @@ export function appsView(ctx: Ctx): View {
 
   const el = h(
     "section",
-    { class: "view", attrs: { "aria-labelledby": "apps-title" } },
+    { class: "view view-apps", attrs: { "aria-labelledby": "apps-title" } },
     h("h1", { id: "apps-title", text: "Apps" }),
     h(
       "p",
@@ -53,7 +53,7 @@ export function appsView(ctx: Ctx): View {
           "div",
           { class: "draft-card", attrs: { "data-draft": d.bundle.app.id } },
           appIcon(d.bundle.app.icon, d.bundle.app.name),
-          h("div", null, h("strong", { text: d.bundle.app.name }), h("p", { class: "muted", text: `${formatBytes(new TextEncoder().encode(d.bundle.html).length)} · can run ${d.bundle.app.allowedSkills.join(", ") || "no skills"}` })),
+          h("div", null, h("strong", { attrs: { dir: "auto" }, text: d.bundle.app.name }), h("p", { class: "muted", text: `${formatBytes(new TextEncoder().encode(d.bundle.html).length)} · can run ${d.bundle.app.allowedSkills.join(", ") || "no skills"}` })),
           button("Pin as app", () => void pinDraft(ctx, d).then((ok) => {
             if (ok) void refresh();
           }), { kind: "primary", disabled: !d.pinnable }),
@@ -129,7 +129,7 @@ export function appsView(ctx: Ctx): View {
       h(
         "div",
         { class: "grow" },
-        h("h3", { id: `app-${p.app.id}` }, p.app.name, h("span", { class: "muted", text: ` v${p.app.version}` })),
+        h("h3", { id: `app-${p.app.id}` }, h("span", { attrs: { dir: "auto" }, text: p.app.name }), h("span", { class: "muted", text: ` v${p.app.version}` })),
         h("p", { class: "muted", text: `Can run: ${p.app.allowedSkills.join(", ") || "no skills"} · ${p.app.window.width}×${p.app.window.height} · pinned ${formatTime(p.pinnedAt)}` }),
         actions,
       ),

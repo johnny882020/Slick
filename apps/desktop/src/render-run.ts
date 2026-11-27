@@ -26,7 +26,7 @@ interface Entry {
 }
 
 function textEntry(item: TextItem): Entry {
-  const el = h("div", { class: "out-text" });
+  const el = h("div", { class: "out-text", attrs: { dir: "auto" } });
   el.textContent = item.text;
   return {
     el,
@@ -79,7 +79,7 @@ function approvalEntry(item: ApprovalItem, handlers: RunOutputHandlers): Entry {
   const el = h(
     "div",
     { class: "approval-card", attrs: { "data-approval": item.approvalId } },
-    h("p", { class: "approval-summary" }, h("strong", { text: "Needs your approval: " }), item.summary),
+    h("p", { class: "approval-summary" }, h("strong", { text: "Needs your approval: " }), h("span", { attrs: { dir: "auto" }, text: item.summary })),
     h("p", { class: "muted", text: `${item.call.name} · ${item.effects.map(effectLabel).join(", ")}` }),
     label,
     actions,
@@ -181,7 +181,7 @@ export function createRunOutput(handlers: RunOutputHandlers): { el: HTMLElement;
         return h(
           "div",
           { class: "draft-card", attrs: { "data-draft": d.bundle.app.id } },
-          h("p", null, h("strong", { text: d.bundle.app.name }), h("span", { class: "muted", text: ` · app draft · ${formatBytes(new TextEncoder().encode(d.bundle.html).length)}` })),
+          h("p", null, h("strong", { attrs: { dir: "auto" }, text: d.bundle.app.name }), h("span", { class: "muted", text: ` · app draft · ${formatBytes(new TextEncoder().encode(d.bundle.html).length)}` })),
           h("p", { class: "muted", text: `Can run: ${d.bundle.app.allowedSkills.join(", ") || "no skills"}` }),
           errors.length ? h("ul", { class: "issues" }, ...errors.map((i) => h("li", { text: i.message }))) : null,
           pinned

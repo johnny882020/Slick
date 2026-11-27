@@ -1,4 +1,4 @@
-// App shell: navigation, routing, theme, daemon status, notifications.
+// App shell: navigation, routing, daemon status, notifications. Light theme only.
 
 import { Api } from "./api";
 import { announce, h, replace } from "./dom";
@@ -14,9 +14,6 @@ import { runView } from "./views/run";
 import { schedulesView } from "./views/schedules";
 import { setupView } from "./views/setup";
 import { skillsView } from "./views/skills";
-
-export type Theme = "system" | "light" | "dark";
-const THEME_KEY = "oneseat.theme";
 
 export function parseRoute(hash: string): Route | null {
   const id = hash.replace(/^#\/?/, "").split(/[/?]/)[0];
@@ -36,25 +33,6 @@ export function daemonBanner(s: DaemonStatus | null): string | null {
       return `OneSeat's engine could not start${s.lastError ? `: ${s.lastError}` : ""}. Retrying.`;
     case "stopped":
       return "OneSeat's engine has stopped.";
-  }
-}
-
-function readTheme(): Theme {
-  try {
-    const t = localStorage.getItem(THEME_KEY);
-    return t === "light" || t === "dark" ? t : "system";
-  } catch {
-    return "system";
-  }
-}
-
-function applyTheme(t: Theme): void {
-  if (t === "system") document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme", t);
-  try {
-    localStorage.setItem(THEME_KEY, t);
-  } catch {
-    /* private mode */
   }
 }
 
@@ -123,16 +101,6 @@ export async function startApp(root: HTMLElement, transport: Transport): Promise
     if (changed) main.focus({ preventScroll: true });
   }
 
-  const themeSelect = h(
-    "select",
-    { class: "theme", attrs: { "aria-label": "Theme" }, on: { change: () => applyTheme(themeSelect.value as Theme) } },
-    h("option", { value: "system", text: "System theme" }),
-    h("option", { value: "light", text: "Light" }),
-    h("option", { value: "dark", text: "Dark" }),
-  );
-  themeSelect.value = readTheme();
-  applyTheme(themeSelect.value as Theme);
-
   const nav = h(
     "nav",
     { attrs: { "aria-label": "Main" } },
@@ -150,7 +118,7 @@ export async function startApp(root: HTMLElement, transport: Transport): Promise
   replace(
     root,
     h("a", { class: "skip", href: "#main", text: "Skip to content", on: { click: (e) => (e.preventDefault(), main.focus()) } }),
-    h("header", { class: "top" }, h("div", { class: "brand", text: "OneSeat" }), nav, themeSelect),
+    h("header", { class: "top" }, h("div", { class: "brand", text: "OneSeat" }), nav),
     banner,
     main,
     toast,

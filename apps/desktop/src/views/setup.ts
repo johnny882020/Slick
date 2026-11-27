@@ -82,7 +82,7 @@ export function setupView(ctx: Ctx): View {
 
   const el = h(
     "section",
-    { class: "view", attrs: { "aria-labelledby": "setup-title" } },
+    { class: "view view-setup", attrs: { "aria-labelledby": "setup-title" } },
     h("h1", { id: "setup-title", text: "Connect a model" }),
     h(
       "p",
@@ -100,10 +100,14 @@ export function setupView(ctx: Ctx): View {
       { class: "card", attrs: { "aria-labelledby": "keys-title" } },
       h("h2", { id: "keys-title", text: "Your keys" }),
       h(
-        "table",
-        { class: "table" },
-        h("thead", null, h("tr", null, h("th", { scope: "col", text: "Provider" }), h("th", { scope: "col", text: "In keychain" }), h("th", { scope: "col", text: "Engine" }), h("th", { scope: "col", text: "" }))),
-        table,
+        "div",
+        { class: "table-scroll" },
+        h(
+          "table",
+          { class: "table" },
+          h("thead", null, h("tr", null, h("th", { scope: "col", text: "Provider" }), h("th", { scope: "col", text: "In keychain" }), h("th", { scope: "col", text: "Engine" }), h("th", { scope: "col", text: "" }))),
+          table,
+        ),
       ),
     ),
     h("div", { class: "row" }, continueBtn),
