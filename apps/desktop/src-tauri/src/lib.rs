@@ -32,6 +32,22 @@ fn bundled_skills_dir(debug: bool, resource_dir: Option<PathBuf>, manifest_dir: 
     dir.is_dir().then_some(dir)
 }
 
+/// The app's resource folder. Tauri refuses to resolve it when the program was started through
+/// a symlinked path (macOS `/var` -> `/private/var`), so fall back to the program's own resolved
+/// location: `Contents/Resources` beside `Contents/MacOS` on macOS, the install folder elsewhere.
+fn resource_dir(tauri_dir: Option<PathBuf>, exe: Option<PathBuf>) -> Option<PathBuf> {
+    if tauri_dir.is_some() {
+        return tauri_dir;
+    }
+    let exe = exe?.canonicalize().ok()?;
+    let dir = exe.parent()?;
+    if cfg!(target_os = "macos") {
+        Some(dir.parent()?.join("Resources"))
+    } else {
+        Some(dir.to_path_buf())
+    }
+}
+
 /// Single-app export: a pinned app bundled as resources `pinned/index.html` + `pinned/app.json`.
 fn bundled_app(resource_dir: Option<PathBuf>) -> Option<BundledApp> {
     let dir = resource_dir?.join("pinned");
@@ -137,7 +153,8 @@ pub fn run() {
         ])
         .setup(move |app| {
             let handle = app.handle().clone();
-            let single = bundled_app(app.path().resource_dir().ok());
+            let resource_dir = resource_dir(app.path().resource_dir().ok(), std::env::current_exe().ok());
+            let single = bundled_app(resource_dir.clone());
             let own_dir = app.path().app_data_dir()?;
             let mut data_dir = data_dir_for(own_dir, single.is_some());
             // Debug builds only: a throwaway data dir (native smoke test, parallel dev copies).
@@ -169,7 +186,6 @@ pub fn run() {
             );
             match spec {
                 Ok(mut spec) => {
-                    let resource_dir = app.path().resource_dir().ok();
                     match bundled_skills_dir(
                         cfg!(debug_assertions),
                         resource_dir.clone(),
@@ -257,6 +273,26 @@ mod tests {
         assert_eq!(bundled_skills_dir(false, Some(tmp.clone()), manifest), Some(tmp.join("skills")));
         assert_eq!(bundled_skills_dir(false, None, manifest), None);
         std::fs::remove_dir_all(&tmp).unwrap();
+    }
+
+    #[test]
+    fn resource_dir_falls_back_to_the_programs_resolved_location() {
+        let tauri = PathBuf::from("/tauri/resources");
+        assert_eq!(resource_dir(Some(tauri.clone()), None), Some(tauri));
+        assert_eq!(resource_dir(None, None), None);
+        let root = std::env::temp_dir().join(format!("oneseat-res-{}", std::process::id()));
+        let bin = root.join("Contents").join("MacOS");
+        std::fs::create_dir_all(&bin).unwrap();
+        let exe = bin.join("oneseat-desktop");
+        std::fs::write(&exe, b"").unwrap();
+        let got = resource_dir(None, Some(exe.clone())).unwrap();
+        let bin = bin.canonicalize().unwrap();
+        if cfg!(target_os = "macos") {
+            assert_eq!(got, bin.parent().unwrap().join("Resources"));
+        } else {
+            assert_eq!(got, bin);
+        }
+        let _ = std::fs::remove_dir_all(&root);
     }
 
     #[test]
