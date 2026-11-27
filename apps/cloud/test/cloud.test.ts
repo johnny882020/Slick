@@ -185,10 +185,71 @@ describe("feedback, admin and pages", () => {
     expect(text).toContain("$79");
     expect(text).toContain("Manage billing");
     expect(text).not.toMatch(/<script/i);
-    expect(await (await fetch(`${base}/download`)).text()).toContain("https://dl.test/OneSeat-setup.exe");
+    const download = await (await fetch(`${base}/download`)).text();
+    expect(download).toContain('href="/download/windows"');
+    expect(download).toContain("Download for Mac: not published yet");
+    const win = await fetch(`${base}/download/windows`, { redirect: "manual" });
+    expect(win.status).toBe(302);
+    expect(win.headers.get("location")).toBe("https://dl.test/OneSeat-setup.exe");
+    expect((await fetch(`${base}/download/mac`, { redirect: "manual" })).status).toBe(404);
+    const pilot = await (await fetch(`${base}/pilot`)).text();
+    expect(pilot).toContain("Activate your pilot license");
+    expect(pilot).not.toContain("$79");
+    expect(pilot).not.toContain("buy.stripe.com");
+    expect(home.headers.get("content-security-policy")).toContain("font-src 'self'");
+    // Keeps referrers off links to other sites, and lets the admin form's origin check work.
+    expect(home.headers.get("referrer-policy")).toBe("same-origin");
+    const font = await fetch(`${base}/fonts/newsreader-latin-wght-normal.woff2`);
+    expect(font.status).toBe(200);
+    expect(font.headers.get("content-type")).toBe("font/woff2");
+    expect((await fetch(`${base}/fonts/../package.json`)).status).toBe(404);
+    expect((await fetch(`${base}/fonts/nope.woff2`)).status).toBe(404);
     for (const p of ["/pilot", "/privacy"]) expect((await fetch(base + p)).status).toBe(200);
     expect((await fetch(`${base}/missing`)).status).toBe(404);
     expect(await (await fetch(`${base}/healthz`)).json()).toEqual({ ok: true, db: true, licensing: true, webhooks: true });
+  });
+});
+
+describe("pilot licenses", () => {
+  const auth = { authorization: `Basic ${Buffer.from("admin:admin-secret").toString("base64")}` };
+  const form = (fields: Record<string, string>, headers: Record<string, string> = {}) =>
+    fetch(`${base}/admin/pilot`, { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded", ...auth, ...headers }, body: new URLSearchParams(fields).toString() });
+
+  it("creates a Team license for a pilot team from the admin form, shown once with an invitation", async () => {
+    const r = await form({ team: "Acme Bakery", email: "owner@acme.example", weeks: "4" }, { origin: "https://oneseat.test", "sec-fetch-site": "same-origin" });
+    expect(r.status).toBe(200);
+    expect(r.headers.get("cache-control")).toBe("no-store");
+    const page = await r.text();
+    const key = /OS(-[0-9A-HJKMNP-TV-Z]{4}){4}/.exec(page)![0];
+    expect(page).toContain("mailto:owner%40acme.example");
+    expect(page).toContain("https://oneseat.test/pilot");
+    const lic = [...store.licenses.values()].find((l) => l.team === "Acme Bakery")!;
+    expect(lic).toMatchObject({ tier: "team", status: "trialing", computers: 15, email: "owner@acme.example", stripeSubscription: null });
+    expect(Date.parse(lic.endsAt!) - Date.now()).toBeGreaterThan(27 * 86_400_000);
+    const a = await post("/api/v1/licenses/activate", { licenseKey: key, deviceId: "pilot-dev-1", deviceName: "Front desk" });
+    expect(a.status).toBe(200);
+    expect(a.body).toMatchObject({ tier: "team", status: "trialing", computers: 15 });
+    const admin = await (await fetch(`${base}/admin`, { headers: auth })).text();
+    expect(admin).toContain("Acme Bakery");
+  });
+
+  it("refuses cross-site posts, bad input and missing auth", async () => {
+    expect((await form({ team: "X", email: "x@x.example" }, { origin: "https://evil.example" })).status).toBe(403);
+    expect((await form({ team: "X", email: "x@x.example" }, { "sec-fetch-site": "cross-site" })).status).toBe(403);
+    expect((await form({ team: "", email: "x@x.example" })).status).toBe(400);
+    expect((await form({ team: "X", email: "not-an-email" })).status).toBe(400);
+    expect((await form({ team: "X", email: "x@x.example", weeks: "40" })).status).toBe(400);
+    const noAuth = await fetch(`${base}/admin/pilot`, { method: "POST", body: "team=X&email=x%40x.example" });
+    expect(noAuth.status).toBe(401);
+  });
+
+  it("stops working after its end date, so the app falls back to Free", async () => {
+    const key = "OS-ABCD-EFGH-JKMN-PQRS";
+    await store.createLicense({ id: "lic_ended", keyHash: hashKey(key), email: "t@t.example", tier: "team", status: "trialing", computers: 15, team: "Ended Co", endsAt: new Date(Date.now() - 1000).toISOString() });
+    const a = await post("/api/v1/licenses/activate", { licenseKey: key, deviceId: "d1" });
+    expect(a.status).toBe(403);
+    expect(a.body).toMatchObject({ code: "canceled" });
+    expect(String(a.body.error)).toMatch(/pilot license ended/);
   });
 });
 

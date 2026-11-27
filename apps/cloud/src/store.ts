@@ -14,8 +14,24 @@ export interface LicenseRow {
   stripeCustomer: string | null;
   stripeSubscription: string | null;
   checkoutSession: string | null;
+  /** Pilot team name; null for licenses bought through Stripe. */
+  team: string | null;
+  /** When a pilot license stops working (ISO time); null when it has no end date. */
+  endsAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/** A license created by an admin (pilot teams), not by a Stripe checkout. */
+export interface NewLicense {
+  id: string;
+  keyHash: string;
+  email: string;
+  tier: Tier;
+  status: LicenseStatus;
+  computers: number;
+  team: string;
+  endsAt: string;
 }
 
 export interface DeviceRow {
@@ -50,6 +66,7 @@ export interface Store {
   licenseBySession(sessionId: string): Promise<LicenseRow | undefined>;
   /** Create the license for a subscription if it is new (with this key), else merge the fields. */
   upsertLicense(fields: LicenseUpsert, newKey: { id: string; keyHash: string; key: string }): Promise<{ license: LicenseRow; created: boolean }>;
+  createLicense(l: NewLicense): Promise<LicenseRow>;
   /** The plain key, kept for 24 hours so the welcome page can show it. */
   revealKey(licenseId: string): Promise<string | undefined>;
   purgeReveals(olderThanHours: number): Promise<number>;
@@ -110,12 +127,20 @@ export class MemoryStore implements Store {
       stripeCustomer: fields.stripeCustomer ?? null,
       stripeSubscription: fields.stripeSubscription,
       checkoutSession: fields.checkoutSession ?? null,
+      team: fields.team ?? null,
+      endsAt: fields.endsAt ?? null,
       createdAt: nowIso(),
       updatedAt: nowIso(),
     };
     this.licenses.set(row.id, row);
     this.reveals.set(row.id, { key: k.key, at: Date.now() });
     return { license: row, created: true };
+  }
+  async createLicense(l: NewLicense) {
+    if ([...this.licenses.values()].some((x) => x.keyHash === l.keyHash)) throw new Error("duplicate license key");
+    const row: LicenseRow = { ...l, stripeCustomer: null, stripeSubscription: null, checkoutSession: null, createdAt: nowIso(), updatedAt: nowIso() };
+    this.licenses.set(row.id, row);
+    return row;
   }
   async revealKey(id: string) {
     return this.reveals.get(id)?.key;

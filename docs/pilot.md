@@ -8,6 +8,31 @@ least one paid seat.
 
 ## Per team
 
+Each team gets one pilot license from `/admin` (see `docs/first-users.md`, step 5). Fill in the
+license row when you send the invitation, and update computers active and feedback each week
+from https://oneseat-cloud.onrender.com/admin:
+
+- **Computers active:** the **Computers** column of the team's row in **Licenses** (for example `3 / 15`).
+- **Feedback count:** the rows in **Feedback** from that team. Each row shows the sender's email and
+  the license id it came from (not the team name), plus anything the team sent by email or GitHub.
+
+### Licenses and activity
+
+| Team | Team name | License created | Pilot ends | Computers active (from /admin) | Feedback count | Notes |
+|---|---|---|---|---|---|---|
+| 1 | | | | | | |
+| 2 | | | | | | |
+| 3 | | | | | | |
+| 4 | | | | | | |
+| 5 | | | | | | |
+| 6 | | | | | | |
+| 7 | | | | | | |
+| 8 | | | | | | |
+| 9 | | | | | | |
+| 10 | | | | | | |
+
+### Results
+
 | Team | Start | OS | Provider | First run (min) | Data loss | Unapproved send | Seats cancelled | Notes |
 |---|---|---|---|---|---|---|---|---|
 | 1 | | | | | | | | |

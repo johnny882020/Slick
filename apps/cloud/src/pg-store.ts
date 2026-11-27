@@ -1,6 +1,6 @@
 // Postgres (Neon) implementation of the Store.
 import pg from "pg";
-import type { DeviceRow, FeedbackRow, LicenseRow, LicenseUpsert, Store } from "./store.js";
+import type { DeviceRow, FeedbackRow, LicenseRow, LicenseUpsert, NewLicense, Store } from "./store.js";
 import { newId } from "./store.js";
 
 export const SCHEMA_SQL = `
@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS licenses (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE licenses ADD COLUMN IF NOT EXISTS team text;
+ALTER TABLE licenses ADD COLUMN IF NOT EXISTS ends_at timestamptz;
 CREATE TABLE IF NOT EXISTS license_reveals (
   license_id text PRIMARY KEY REFERENCES licenses(id) ON DELETE CASCADE,
   license_key text NOT NULL,
@@ -63,6 +65,8 @@ function licenseFrom(r: Row): LicenseRow {
     stripeCustomer: (r["stripe_customer"] as string | null) ?? null,
     stripeSubscription: (r["stripe_subscription"] as string | null) ?? null,
     checkoutSession: (r["checkout_session"] as string | null) ?? null,
+    team: (r["team"] as string | null) ?? null,
+    endsAt: r["ends_at"] === null || r["ends_at"] === undefined ? null : iso(r["ends_at"]),
     createdAt: iso(r["created_at"]),
     updatedAt: iso(r["updated_at"]),
   };
@@ -91,6 +95,8 @@ const COLS: Record<keyof Omit<LicenseUpsert, "stripeSubscription">, string> = {
   computers: "computers",
   stripeCustomer: "stripe_customer",
   checkoutSession: "checkout_session",
+  team: "team",
+  endsAt: "ends_at",
 };
 
 export class PgStore implements Store {
@@ -132,6 +138,15 @@ export class PgStore implements Store {
     const r = await this.q("SELECT * FROM licenses WHERE checkout_session = $1", [s]);
     return r[0] ? licenseFrom(r[0]) : undefined;
   }
+  async createLicense(l: NewLicense) {
+    const r = await this.q(
+      `INSERT INTO licenses (id, key_hash, email, tier, status, computers, team, ends_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [l.id, l.keyHash, l.email, l.tier, l.status, l.computers, l.team, l.endsAt],
+    );
+    return licenseFrom(r[0]!);
+  }
+
   async upsertLicense(fields: LicenseUpsert, k: { id: string; keyHash: string; key: string }) {
     const client = await this.pool.connect();
     try {

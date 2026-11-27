@@ -33,7 +33,7 @@ const ALLOWED_ACTIONS = new Set([
 describe("workflow files", () => {
   const files = readdirSync(dir).filter((f) => /\.ya?ml$/.test(f)).sort();
 
-  it("exist", () => expect(files).toEqual(["ci.yml", "nightly-live.yml", "release.yml"]));
+  it("exist", () => expect(files).toEqual(["ci.yml", "nightly-live.yml", "pilot-release.yml", "release.yml"]));
 
   for (const f of files)
     it(`${f} is valid YAML with pinned actions, minimal permissions and no secrets on PRs`, () => {
@@ -49,7 +49,7 @@ describe("workflow files", () => {
           if (s.uses) expect(ALLOWED_ACTIONS.has(s.uses), `${f} ${id}: ${s.uses} is not a pinned, allowed action`).toBe(true);
         }
       }
-      if (f === "ci.yml") expect(readFileSync(join(dir, f), "utf8")).not.toMatch(/secrets\./);
+      if (f === "ci.yml" || f === "pilot-release.yml") expect(readFileSync(join(dir, f), "utf8")).not.toMatch(/secrets\./);
     });
 });
 
@@ -157,5 +157,25 @@ describe("release.yml", () => {
     const win = all.find((s) => s.name === "Import Windows signing certificate")!;
     expect(win.env).toEqual({ WINDOWS_CERTIFICATE: "${{ secrets.WINDOWS_CERTIFICATE }}", WINDOWS_CERTIFICATE_PASSWORD: "${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}" });
     expect(win.run).toMatch(/certificateThumbprint/);
+  });
+});
+
+describe("pilot-release.yml", () => {
+  const wf = load("pilot-release.yml");
+  const job = wf.jobs["publish"]!;
+  it("runs from the pilot-release label or by hand, with write access only in the publishing job", () => {
+    expect(wf.on).toEqual({ workflow_dispatch: null, pull_request: { types: ["labeled"] } });
+    expect(job.if).toContain("github.event.label.name == 'pilot-release'");
+    expect(job.permissions).toEqual({ contents: "write", actions: "read" });
+  });
+  it("publishes the installers CI built and tested, never a rebuild, under fixed names", () => {
+    const r = runs(job);
+    expect(r).toContain("--workflow ci.yml --commit \"$SHA\" --status success");
+    expect(r).toContain("-n unsigned-windows-latest");
+    expect(r).toContain("-n unsigned-macos-latest");
+    expect(r).toContain("dist/OneSeat-Windows-x64-setup.exe");
+    expect(r).toContain("dist/OneSeat-macOS-AppleSilicon.dmg");
+    expect(r).toContain("gh release create pilot");
+    expect(r).not.toMatch(/tauri build|build:sidecar/);
   });
 });

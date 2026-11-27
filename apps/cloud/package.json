@@ -20,14 +20,19 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@fontsource-variable/frank-ruhl-libre": "5.3.0",
+    "@fontsource-variable/heebo": "5.3.0",
+    "@fontsource-variable/instrument-sans": "5.3.0",
+    "@fontsource-variable/newsreader": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
     "@oneseat/contracts": "workspace:*",
     "pg": "^8.13.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
     "@types/pg": "^8.11.0",
+    "@vitest/coverage-v8": "^3.2.0",
     "typescript": "^5.8.0",
-    "vitest": "^3.2.0",
-    "@vitest/coverage-v8": "^3.2.0"
+    "vitest": "^3.2.0"
   }
 }

@@ -1,14 +1,15 @@
 // OneSeat Cloud HTTP server: pages, Stripe webhook, license API, feedback, admin.
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { timingSafeEqual } from "node:crypto";
-import { isLicenseKey, type LicenseStatus } from "@oneseat/contracts";
+import { isLicenseKey, PLANS, type LicenseStatus } from "@oneseat/contracts";
 import type { CloudConfig } from "./config.js";
-import { hashKey, LicenseSigner } from "./licenses.js";
-import { adminPage, downloadPage, homePage, layout, pilotPage, privacyPage, welcomePage } from "./pages.js";
+import { loadFonts } from "./fonts.js";
+import { generateLicenseKey, hashKey, LicenseSigner } from "./licenses.js";
+import { adminPage, downloadPage, homePage, layout, pilotCreatedPage, pilotPage, privacyPage, welcomePage } from "./pages.js";
 import { handleStripeEvent, StripeSignatureError, verifyStripeSignature } from "./stripe.js";
-import type { LicenseRow, Store } from "./store.js";
+import { newId, type LicenseRow, type Store } from "./store.js";
 
-const PAGE_CSP = "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; form-action 'self' https://checkout.stripe.com https://buy.stripe.com; frame-ancestors 'none'; base-uri 'none'";
+const PAGE_CSP = "default-src 'none'; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' data:; form-action 'self' https://checkout.stripe.com https://buy.stripe.com; frame-ancestors 'none'; base-uri 'none'";
 const MAX_BODY = 1024 * 1024;
 
 export class HttpError extends Error {
@@ -41,7 +42,9 @@ function send(res: ServerResponse, status: number, body: string, type: string, e
   res.writeHead(status, {
     "content-type": type,
     "x-content-type-options": "nosniff",
-    "referrer-policy": "no-referrer",
+    // Not "no-referrer": with it, browsers send "Origin: null" on our own form posts, and the
+    // admin form's same-origin check could not tell its page from another site.
+    "referrer-policy": "same-origin",
     ...(type.startsWith("text/html") ? { "content-security-policy": PAGE_CSP, "x-frame-options": "DENY" } : {}),
     ...extra,
   });
@@ -130,7 +133,28 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
     return l;
   };
 
-  const usable = (l: LicenseRow): LicenseStatus => l.status;
+  /** A pilot license past its end date works like a canceled subscription: the app falls back to Free. */
+  const usable = (l: LicenseRow, now = Date.now()): LicenseStatus => (l.endsAt && Date.parse(l.endsAt) <= now ? "canceled" : l.status);
+  const canceledMessage = (l: LicenseRow) =>
+    l.endsAt && Date.parse(l.endsAt) <= Date.now()
+      ? `this pilot license ended on ${l.endsAt.slice(0, 10)}; your data is still on your computer, and you can choose a plan at ${cfg.publicUrl}/#plans`
+      : "this subscription was canceled; renew it to use this key";
+
+  /** Browsers send basic-auth credentials on cross-site form posts too: only accept our own pages. */
+  const sameOrigin = (req: IncomingMessage) => {
+    const site = req.headers["sec-fetch-site"];
+    const origin = req.headers["origin"];
+    if (site !== undefined && site !== "same-origin") return false;
+    if (origin !== undefined && origin !== new URL(cfg.publicUrl).origin) return false;
+    return true;
+  };
+
+  const requireAdmin = (req: IncomingMessage, res: ServerResponse) => {
+    if (checkAdmin(req, cfg.adminToken)) return true;
+    res.writeHead(401, { "www-authenticate": 'Basic realm="OneSeat admin"', "content-type": "text/plain" });
+    res.end("authentication required");
+    return false;
+  };
 
   async function route(req: IncomingMessage, res: ServerResponse, url: URL) {
     const path = url.pathname.replace(/\/+$/, "") || "/";
@@ -161,13 +185,23 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
           return html(res, 200, welcomePage({ kind: "ready", license: l, key: await store.revealKey(l.id) }));
         }
         case "/admin": {
-          if (!checkAdmin(req, cfg.adminToken)) {
-            res.writeHead(401, { "www-authenticate": 'Basic realm="OneSeat admin"', "content-type": "text/plain" });
-            return res.end("authentication required");
-          }
+          if (!requireAdmin(req, res)) return;
           return html(res, 200, adminPage(await store.listLicenses(200), await store.listFeedback(200)));
         }
+        case "/download/windows":
+        case "/download/mac": {
+          // Stable links for pages, emails and the app; the file host behind them can change.
+          const target = path.endsWith("windows") ? cfg.downloads.windows : cfg.downloads.mac;
+          if (!target) return html(res, 404, downloadPage(cfg));
+          return send(res, 302, "", "text/plain", { location: target, "cache-control": "no-store" });
+        }
         default:
+          if (path.startsWith("/fonts/")) {
+            const file = loadFonts().files.get(path.slice("/fonts/".length));
+            if (!file) throw new HttpError(404, "not found");
+            res.writeHead(200, { "content-type": "font/woff2", "cache-control": "public, max-age=31536000, immutable", "x-content-type-options": "nosniff", "access-control-allow-origin": "*" });
+            return res.end(file);
+          }
           return html(res, 404, layout("Not found", "<h1>Page not found</h1><p><a href=\"/\">Go home</a></p>"));
       }
     }
@@ -189,6 +223,23 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
       return json(res, 200, { received: true, ...r });
     }
 
+    if (path === "/admin/pilot") {
+      if (!requireAdmin(req, res)) return;
+      if (!sameOrigin(req)) throw new HttpError(403, "this form only works from the admin page");
+      const form = new URLSearchParams(await readBody(req));
+      const team = (form.get("team") ?? "").trim();
+      const email = (form.get("email") ?? "").trim();
+      const weeks = Number(form.get("weeks") ?? "4");
+      if (!team || team.length > 80) throw new HttpError(400, "give the team a name of at most 80 characters");
+      if (!/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, "give a contact email for the team");
+      if (!Number.isInteger(weeks) || weeks < 1 || weeks > 12) throw new HttpError(400, "the pilot lasts 1 to 12 weeks");
+      const key = generateLicenseKey();
+      const endsAt = new Date(Date.now() + weeks * 7 * 86_400_000).toISOString();
+      const license = await store.createLicense({ id: newId("lic"), keyHash: hashKey(key), email, tier: "team", status: "trialing", computers: PLANS.team.computers, team, endsAt });
+      log(`pilot license ${license.id} for "${team}" until ${endsAt.slice(0, 10)}`);
+      return send(res, 200, pilotCreatedPage(cfg, license, key), "text/html; charset=utf-8", { "cache-control": "no-store" });
+    }
+
     if (path.startsWith("/api/v1/")) {
       const limiter = path === "/api/v1/feedback" ? feedbackLimit : apiLimit;
       if (!limiter.allow(`${clientIp(req)} ${path}`)) throw new HttpError(429, "too many requests; try again in a minute", "rate_limited");
@@ -201,7 +252,7 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
         const l = await findLicense(body);
         const deviceId = str(body, "deviceId", 80)!;
         const deviceName = str(body, "deviceName", 80, false) ?? "";
-        if (usable(l) === "canceled") throw new HttpError(403, "this subscription was canceled; renew it to use this key", "canceled");
+        if (usable(l) === "canceled") throw new HttpError(403, canceledMessage(l), "canceled");
         if (l.tier === "free") throw new HttpError(409, "this license is still being set up; try again in a minute", "pending");
         const devices = await store.devices(l.id);
         const known = devices.some((d) => d.deviceId === deviceId);
@@ -209,7 +260,7 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
         if (!known && devices.length >= l.computers)
           throw new HttpError(409, `this license is already used on ${devices.length} of ${l.computers} computers; deactivate one in OneSeat → Plan on that computer`, "computer_limit");
         await store.upsertDevice({ licenseId: l.id, deviceId, deviceName });
-        const { token, payload } = tokenFor(l, deviceId);
+        const { token, payload } = tokenFor({ ...l, status: usable(l) }, deviceId);
         return json(res, 200, { token, tier: payload.tier, status: payload.status, computers: payload.computers, used: known ? devices.length : devices.length + 1, expiresAt: new Date(payload.exp * 1000).toISOString() });
       }
       case "/api/v1/licenses/deactivate": {

@@ -42,6 +42,17 @@ function storeSuite(name: string, make: () => Promise<Store>, done?: () => Promi
       expect(await s.licenseBySubscription("nope")).toBeUndefined();
     });
 
+    it("creates admin-issued pilot licenses with a team and an end date", async () => {
+      const endsAt = new Date(Date.UTC(2027, 0, 15)).toISOString();
+      const l = await s.createLicense({ id: `lic_${name}_pilot`, keyHash: `hash_${name}_pilot`, email: "owner@acme.example", tier: "team", status: "trialing", computers: 15, team: "Acme Bakery", endsAt });
+      expect(l).toMatchObject({ tier: "team", status: "trialing", computers: 15, team: "Acme Bakery", endsAt, stripeSubscription: null, checkoutSession: null });
+      expect((await s.licenseByKeyHash(`hash_${name}_pilot`))?.team).toBe("Acme Bakery");
+      expect((await s.listLicenses(50)).find((x) => x.id === l.id)?.endsAt).toBe(endsAt);
+      await expect(s.createLicense({ id: `lic_${name}_pilot2`, keyHash: l.keyHash, email: l.email, tier: "team", status: "trialing", computers: 15, team: "Dup", endsAt })).rejects.toThrow();
+      const stripe = await s.upsertLicense({ stripeSubscription: `sub_${name}_9`, tier: "pro" }, k(9));
+      expect(stripe.license).toMatchObject({ team: null, endsAt: null });
+    });
+
     it("tracks devices per license", async () => {
       const lic = k(1).id;
       await s.upsertDevice({ licenseId: lic, deviceId: "d1", deviceName: "Mac" });
