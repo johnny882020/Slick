@@ -68,3 +68,4 @@ export { AppStore, AppError, prepareHtml, parseJsonText, bridgeResult } from "./
 export { RpcError, serveLines, type LineConnection, type RpcHandler } from "./rpc.js";
 export { Redactor, REDACTED, createLogger, AsyncQueue, truncateText, type Logger } from "./util.js";
 export { resolveInside, normaliseRelativePath, PathError } from "./workspace.js";
+export { createEvalHarness, type EvalHarnessContext } from "./eval.js";
