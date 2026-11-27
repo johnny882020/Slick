@@ -1,0 +1,110 @@
+# Nightly: live provider tests (re-recording fixtures) and gate 5 live evals.
+# A provider whose secret is empty is skipped, and the summary says so.
+# Re-recorded fixtures and the eval report are uploaded as artifacts; nothing is committed.
+name: Nightly live
+
+on:
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-live
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  TURBO_TELEMETRY_DISABLED: "1"
+
+jobs:
+  live:
+    name: Live provider tests and evals
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      ONESEAT_LIVE: "1"
+      ONESEAT_RECORD: "1"
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # Model ids come from repository variables so they can change without a code change.
+      - name: Pick providers that have keys
+        id: providers
+        env:
+          ANTHROPIC_EVAL_MODEL: ${{ vars.ANTHROPIC_EVAL_MODEL || 'claude-sonnet-5-5' }}
+          OPENAI_EVAL_MODEL: ${{ vars.OPENAI_EVAL_MODEL }}
+          GEMINI_EVAL_MODEL: ${{ vars.GEMINI_EVAL_MODEL }}
+        run: |
+          list=()
+          add() {
+            local name="$1" key="$2" model="$3" var="$4"
+            if [ -z "$key" ]; then echo "::notice::$name skipped: its API key secret is empty"; return; fi
+            if [ -z "$model" ]; then echo "::notice::$name skipped: repository variable $var is not set"; return; fi
+            list+=("$name:$model")
+          }
+          add anthropic "$ANTHROPIC_API_KEY" "$ANTHROPIC_EVAL_MODEL" ANTHROPIC_EVAL_MODEL
+          add openai "$OPENAI_API_KEY" "$OPENAI_EVAL_MODEL" OPENAI_EVAL_MODEL
+          add google "$GEMINI_API_KEY" "$GEMINI_EVAL_MODEL" GEMINI_EVAL_MODEL
+          joined=$(IFS=,; echo "${list[*]}")
+          echo "list=$joined" >> "$GITHUB_OUTPUT"
+          echo "Live providers: ${joined:-none}"
+
+      # Adapters skip providers whose key is empty. ONESEAT_RECORD=1 re-records fixtures.
+      - name: Gateway live tests (re-record fixtures)
+        id: gateway
+        run: pnpm --filter @oneseat/gateway test
+
+      - name: "Gate 5: live evals (skill vs no-skill baseline)"
+        id: evals
+        if: ${{ !cancelled() && steps.providers.outputs.list != '' }}
+        run: node packages/testkit/bin/oneseat-evals.js --live --providers "${{ steps.providers.outputs.list }}" --out eval-report
+
+      - name: "Gate 5: skipped"
+        if: ${{ !cancelled() && steps.providers.outputs.list == '' }}
+        run: echo "## Gate 5 SKIPPED — no provider has both a key secret and a model variable" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Eval summary and no-skill check
+        if: ${{ !cancelled() && hashFiles('eval-report/eval-report.json') != '' }}
+        run: cat eval-report/eval-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload re-recorded fixtures
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: recorded-fixtures-${{ github.run_id }}
+          path: |
+            packages/gateway/test/fixtures/
+            packages/gateway/fixtures/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload eval report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report-${{ github.run_id }}
+          path: eval-report/
+          if-no-files-found: warn
+          retention-days: 90
