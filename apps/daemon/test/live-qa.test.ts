@@ -36,6 +36,6 @@ describe("live QA script", () => {
     expect(md).toContain("x / y");
     const blocked = renderMarkdown([{ provider: "openai", scenario: "account", pass: false, blocked: true, problems: ["no credit"], seconds: 0, usage: { inputTokens: 0, outputTokens: 0 } }]);
     expect(blocked).toContain("BLOCKED (account)");
-    expect(blocked).toContain("Not tested: openai");
+    expect(blocked).toContain("Not fully tested: openai");
   });
 });

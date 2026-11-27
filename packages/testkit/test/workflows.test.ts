@@ -120,7 +120,9 @@ describe("nightly-live.yml", () => {
     const r = runs(job);
     expect(r).toMatch(/skipped: its API key secret is empty/);
     expect(r).toContain("pnpm --filter @oneseat/gateway test");
-    expect(r).toMatch(/oneseat-evals\.js --live --providers/);
+    expect(r).toMatch(/oneseat-evals\.js --live (--concurrency \d+ )?--providers/);
+    // Evals share the keys with live QA, so they run after it, not beside it.
+    expect(job.needs).toBe("qa");
     expect(r).not.toMatch(/git (commit|push)/);
     const uploads = steps(job).filter((s) => s.uses === "actions/upload-artifact@v4").map((s) => String(s.with?.["path"]));
     expect(uploads.join()).toContain("eval-report/");

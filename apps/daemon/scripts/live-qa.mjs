@@ -48,6 +48,8 @@ INSERT INTO brand (key, value) VALUES ('company_name','Northwind Studio'),('prim
 const words = (t) => (t.match(/\S+/g) ?? []).length;
 /** Same rule as @oneseat/gateway OUT_OF_CREDIT: the provider account has no credit left. */
 const OUT_OF_CREDIT = /credit balance is too low|credit_balance_exhausted|no credits remaining|insufficient_quota|billing_hard_limit/i;
+/** A rate limit or quota still exhausted after the harness's retries (free tiers hit this). */
+const QUOTA_EXHAUSTED = /\b429\b|RESOURCE_EXHAUSTED|rate[_ ]limit/i;
 const has = (t, re) => re.test(t);
 
 /** Scenarios. `check` gets { text, events, tools, loaded, db, approvals } and returns problems. */
@@ -288,9 +290,10 @@ async function qaProvider(p, opts) {
       if (run.timeout) problems.push(run.timeout);
       if (done && done.stopReason !== "end_turn") problems.push(`run ended with ${done.stopReason}`);
       const err = run.events.find((e) => e.type === "error");
-      if (err && OUT_OF_CREDIT.test(err.message)) {
-        results.push({ provider: p.provider, model: p.model, scenario: "account", pass: false, blocked: true, problems: [`BLOCKED by the provider account, not OneSeat: ${err.message}`], seconds: 0, tools: [], usage: { inputTokens: 0, outputTokens: 0 }, text: "" });
-        console.log(`BLOCKED  ${p.provider}: the account has no credit; skipping its scenarios\n      - ${err.message}`);
+      if (err && (OUT_OF_CREDIT.test(err.message) || QUOTA_EXHAUSTED.test(err.message))) {
+        const why = OUT_OF_CREDIT.test(err.message) ? "the account has no credit" : "the account's rate limit or quota stayed exhausted after retries";
+        results.push({ provider: p.provider, model: p.model, scenario: `account (at ${s.id})`, pass: false, blocked: true, problems: [`BLOCKED by the provider account, not OneSeat: ${why}. ${err.message}`], seconds: Math.round((Date.now() - t0) / 1000), tools: [], usage: { inputTokens: 0, outputTokens: 0 }, text: "" });
+        console.log(`BLOCKED  ${p.provider} at ${s.id}: ${why}; skipping its remaining scenarios\n      - ${err.message}`);
         break;
       }
       if (err) problems.push(`error: ${err.message}`);
@@ -322,7 +325,7 @@ export function renderMarkdown(results) {
   const rows = results.map((r) => `| ${r.provider} | ${r.scenario} | ${r.pass ? "PASS" : r.blocked ? "BLOCKED (account)" : "FAIL"} | ${r.seconds}s | ${r.usage.inputTokens + r.usage.outputTokens} | ${r.problems.join("; ").replace(/\|/g, "/").replace(/\n/g, " ").slice(0, 300)} |`);
   const passed = results.filter((r) => r.pass).length;
   const blocked = results.filter((r) => r.blocked).map((r) => r.provider);
-  const note = blocked.length ? [`> Not tested: ${blocked.join(", ")} — the provider account has no credit. Add credit and run again.`, ""] : [];
+  const note = blocked.length ? [`> Not fully tested: ${blocked.join(", ")} — the provider account ran out of credit or quota (see the BLOCKED rows). Add credit or wait for the quota to reset, then run again.`, ""] : [];
   return [`## Live QA: ${passed}/${results.length} passed`, "", ...note, "", "| Provider | Scenario | Result | Time | Tokens | Problems |", "|---|---|---|---|---|---|", ...rows, ""].join("\n");
 }
 

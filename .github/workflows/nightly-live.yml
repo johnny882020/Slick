@@ -26,9 +26,12 @@ env:
   TURBO_TELEMETRY_DISABLED: "1"
 
 jobs:
+  # Runs after live QA, not beside it: both use the same keys, and on a free tier (Gemini)
+  # running them together exhausts the per-minute and daily quota for both.
   live:
     name: Live provider tests and evals
-    if: ${{ github.event_name != 'pull_request' || github.event.label.name == 'live-qa' }}
+    needs: qa
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.label.name == 'live-qa') }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     env:
@@ -90,7 +93,7 @@ jobs:
       - name: "Gate 5: live evals (skill vs no-skill baseline)"
         id: evals
         if: ${{ !cancelled() && steps.providers.outputs.list != '' }}
-        run: node packages/testkit/bin/oneseat-evals.js --live --providers "${{ steps.providers.outputs.list }}" --out eval-report
+        run: node packages/testkit/bin/oneseat-evals.js --live --concurrency 2 --providers "${{ steps.providers.outputs.list }}" --out eval-report
 
       - name: "Gate 5: skipped"
         if: ${{ !cancelled() && steps.providers.outputs.list == '' }}
