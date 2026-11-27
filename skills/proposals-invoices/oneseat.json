@@ -1,0 +1,11 @@
+{
+  "permissions": {},
+  "effects": ["send", "delete"],
+  "reasons": {},
+  "scripts": {
+    "totals": {
+      "file": "scripts/totals.ts",
+      "description": "Line totals, tax, discount, grand total in integer cents and the due date, from JSON items. No permissions."
+    }
+  }
+}

@@ -1,0 +1,2631 @@
+{
+  "skill": "weekly-report",
+  "cases": [
+    {
+      "id": "revenue-week-over-week",
+      "input": "Today is 2026-11-25. Give me the weekly report.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "contains",
+          "value": "1,950.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "1,500.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "\\+?30(\\.0)?%",
+          "flags": "i"
+        },
+        {
+          "type": "regex",
+          "pattern": "Nov(ember)? 16|2026-11-16",
+          "flags": "i"
+        },
+        {
+          "type": "max_words",
+          "value": 520
+        }
+      ]
+    },
+    {
+      "id": "monday-excludes-today",
+      "input": "Today is Monday 2026-11-23. How did last week go?",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "contains",
+          "value": "1,950.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "2,949.99",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "Nov(ember)? 22|2026-11-22",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "average-order-down",
+      "input": "Today is 2026-11-25. What was our average order value last week versus the week before?",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "contains",
+          "value": "650.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "750.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "13.3%",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "customers-and-tickets",
+      "input": "Today is 2026-11-25. How many new customers and support tickets did we get last week compared with the week before?",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "regex",
+          "pattern": "new customers?\\D{0,40}2\\D{0,40}1",
+          "flags": "i"
+        },
+        {
+          "type": "regex",
+          "pattern": "tickets?\\D{0,40}4\\D{0,40}2",
+          "flags": "i"
+        },
+        {
+          "type": "contains",
+          "value": "100%",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "metrics-table-included",
+      "input": "Today is 2026-11-25. Weekly numbers please, including website visits.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "contains",
+          "value": "1,240",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "\\+?24(\\.0)?%",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "html-one-pager",
+      "input": "Today is 2026-11-25. Make last week's report as a one-page HTML I can pin.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "tool_called",
+          "name": "read_skill_file"
+        },
+        {
+          "type": "tool_called",
+          "name": "make_artifact"
+        }
+      ]
+    },
+    {
+      "id": "weekly-schedule",
+      "input": "Run this weekly report for me every Monday morning.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "schedule_task"
+        },
+        {
+          "type": "regex",
+          "pattern": "Monday",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "has been sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I have sent",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "empty-database",
+      "input": "Today is 2026-11-25. Weekly report please.",
+      "db": {
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "regex",
+          "pattern": "no data|no (purchases|sales|orders|revenue)",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "NaN",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "Infinity",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "currencies-not-mixed",
+      "input": "Today is 2026-11-25. Weekly report.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          },
+          {
+            "id": "w8",
+            "customer_id": "c1",
+            "product": "EU workshop",
+            "amount_cents": 20000,
+            "currency": "EUR",
+            "purchased_at": "2026-11-18T12:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "EUR|€",
+          "flags": "i"
+        },
+        {
+          "type": "contains",
+          "value": "1,950.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "2,150.00",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "brief-quality",
+      "input": "Today is 2026-11-25. Write the weekly brief for the team.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c7",
+            "name": "Lena Fox",
+            "email": "lena@fox.dev",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 10:00:00"
+          },
+          {
+            "id": "c8",
+            "name": "Omar Haddad",
+            "email": "omar@haddad.me",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-20 16:20:00"
+          },
+          {
+            "id": "c9",
+            "name": "Ivy Chen",
+            "email": "ivy@chen.studio",
+            "company": "",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-12 09:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "w1",
+            "customer_id": "c1",
+            "product": "Holiday campaign add-on",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-17T10:00:00Z"
+          },
+          {
+            "id": "w2",
+            "customer_id": "c7",
+            "product": "Starter audit",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-11-19T13:00:00Z"
+          },
+          {
+            "id": "w3",
+            "customer_id": "c8",
+            "product": "Logo refresh",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-11-22T18:30:00Z"
+          },
+          {
+            "id": "w4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 100000,
+            "currency": "USD",
+            "purchased_at": "2026-11-10T09:00:00Z"
+          },
+          {
+            "id": "w5",
+            "customer_id": "c9",
+            "product": "Starter audit",
+            "amount_cents": 50000,
+            "currency": "USD",
+            "purchased_at": "2026-11-15T23:00:00Z"
+          },
+          {
+            "id": "w6",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 99999,
+            "currency": "USD",
+            "purchased_at": "2026-11-23T09:00:00Z"
+          },
+          {
+            "id": "w7",
+            "customer_id": "c3",
+            "product": "Retainer",
+            "amount_cents": 77777,
+            "currency": "USD",
+            "purchased_at": "2026-11-08T09:00:00Z"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-1",
+            "customer_id": "c1",
+            "subject": "Login broken",
+            "status": "closed",
+            "priority": "urgent",
+            "category": "technical",
+            "received_at": "2026-11-16T08:00:00Z"
+          },
+          {
+            "id": "T-2",
+            "customer_id": "c7",
+            "subject": "Invoice question",
+            "status": "closed",
+            "priority": "normal",
+            "category": "billing",
+            "received_at": "2026-11-18T08:00:00Z"
+          },
+          {
+            "id": "T-3",
+            "customer_id": "c8",
+            "subject": "Where is my order",
+            "status": "open",
+            "priority": "normal",
+            "category": "order",
+            "received_at": "2026-11-20T08:00:00Z"
+          },
+          {
+            "id": "T-4",
+            "customer_id": "c2",
+            "subject": "Feature idea",
+            "status": "open",
+            "priority": "low",
+            "category": "feature-request",
+            "received_at": "2026-11-22T21:00:00Z"
+          },
+          {
+            "id": "T-5",
+            "customer_id": "c3",
+            "subject": "How do I export",
+            "status": "closed",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-11T08:00:00Z"
+          },
+          {
+            "id": "T-6",
+            "customer_id": "c9",
+            "subject": "Thanks",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-13T08:00:00Z"
+          }
+        ],
+        "posts": [
+          {
+            "id": "q1",
+            "channel": "linkedin",
+            "body": "Case study: Ortiz Design",
+            "status": "published",
+            "published_at": "2026-11-17T09:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q2",
+            "channel": "instagram",
+            "body": "Studio tour",
+            "status": "published",
+            "published_at": "2026-11-19T11:00",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q3",
+            "channel": "x",
+            "body": "Holiday slots open",
+            "status": "published",
+            "published_at": "2026-11-21T08:30",
+            "campaign": "Holiday"
+          },
+          {
+            "id": "q4",
+            "channel": "linkedin",
+            "body": "Hiring a designer",
+            "status": "published",
+            "published_at": "2026-11-12T09:00",
+            "campaign": ""
+          }
+        ],
+        "metrics": [
+          {
+            "id": "mt1",
+            "name": "website_visits",
+            "value": 1240,
+            "unit": "visits",
+            "period_start": "2026-11-16",
+            "period_end": "2026-11-22",
+            "source": "analytics"
+          },
+          {
+            "id": "mt2",
+            "name": "website_visits",
+            "value": 1000,
+            "unit": "visits",
+            "period_start": "2026-11-09",
+            "period_end": "2026-11-15",
+            "source": "analytics"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "max_words",
+          "value": 480
+        },
+        {
+          "type": "judge",
+          "rubric": "Pass only if the brief: covers Nov 16-22, 2026 compared with Nov 9-15, 2026; reports revenue $1,950.00 vs $1,500.00 (+30%), orders 3 vs 2, average order $650.00 vs $750.00 (down about 13.3%), new customers 2 vs 1, tickets received 4 vs 2 with 1 urgent, posts published 3 vs 1 and website visits 1,240 vs 1,000 (+24%); opens with a headline that contains a number; puts drops (average order) under a watch item; does not include the 2026-11-23 purchase of $999.99 or the 2026-11-08 purchase; and does not invent causes. Score 0 if any reported number is wrong.",
+          "threshold": 0.7
+        }
+      ]
+    }
+  ]
+}
