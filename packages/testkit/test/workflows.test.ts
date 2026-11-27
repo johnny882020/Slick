@@ -142,6 +142,9 @@ describe("nightly-live.yml live QA", () => {
     expect(r).toContain('ls "$bin"/deno-*');
     expect(r).toContain("free-tier quota is kept for the Linux run");
     expect(r).toContain('--repeat "$QA_REPEAT"');
+    // Run on demand: one of the two jobs alone (inputs.jobs), or both.
+    expect(qa.if).toContain("inputs.jobs != 'evals'");
+    expect(load("nightly-live.yml").jobs["live"]!.if).toContain("inputs.jobs != 'qa'");
   });
 });
 

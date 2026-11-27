@@ -7,6 +7,12 @@ on:
   schedule:
     - cron: "23 4 * * *"
   workflow_dispatch:
+    inputs:
+      jobs:
+        description: "What to run: live QA, gate 5 evals (with the gateway live tests), or both"
+        type: choice
+        options: [all, qa, evals]
+        default: all
   # Add the "live-qa" label to a PR to run live QA and gate 5 on it (uses the key secrets).
   pull_request:
     types: [labeled]
@@ -31,7 +37,7 @@ jobs:
   live:
     name: Live provider tests and evals
     needs: qa
-    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.label.name == 'live-qa') }}
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || github.event.label.name == 'live-qa') && inputs.jobs != 'qa' }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     env:
@@ -131,7 +137,7 @@ jobs:
   # there (prepaid key); the free-tier providers run on Linux, where their small quota goes furthest.
   qa:
     name: Live QA of the shipped daemon (${{ matrix.os }})
-    if: ${{ github.event_name != 'pull_request' || github.event.label.name == 'live-qa' }}
+    if: ${{ (github.event_name != 'pull_request' || github.event.label.name == 'live-qa') && inputs.jobs != 'evals' }}
     strategy:
       fail-fast: false
       matrix:

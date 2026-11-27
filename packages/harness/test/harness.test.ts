@@ -646,6 +646,28 @@ describe("provider errors", () => {
     expect(sleeps).toHaveLength(3);
   });
 
+  it("does not retry when the provider asks for a longer wait than it would sleep (a daily quota)", async () => {
+    const sleeps: number[] = [];
+    let calls = 0;
+    const provider = {
+      id: "google" as const,
+      models: async () => [],
+      countTokens: async () => 0,
+      async *send(): AsyncIterable<import("@oneseat/contracts").ChatEvent> {
+        calls++;
+        yield { type: "message_start", model: "m" };
+        // As seen live from Gemini's free tier: "Please retry in 8h13m".
+        yield { type: "error", error: { kind: "rate_limit", message: "RESOURCE_EXHAUSTED: quota", retryable: true, retryAfter: 29_637 } };
+      },
+    };
+    const { harness } = setup([], { provider: () => provider, sleep: async (ms) => void sleeps.push(ms), retry: { maxRetries: 3 } });
+    const events = await collect(harness.run(task("x"), approveAll));
+    expect(calls).toBe(1);
+    expect(sleeps).toEqual([]);
+    expect(ofType(events, "error")[0]!.message).toContain("RESOURCE_EXHAUSTED");
+    expect(done(events).stopReason).toBe("error");
+  });
+
   it("reports a provider factory failure", async () => {
     const { harness } = setup([], {
       provider: () => {

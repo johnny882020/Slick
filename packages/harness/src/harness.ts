@@ -495,7 +495,10 @@ export class Harness implements HarnessApi {
         return { parts, text: this.redactor.redactKnown(text), calls, stopReason: stopReason!, usage };
       }
       if (failure.kind === "aborted") throw new AbortError();
-      if (failure.retryable && !emitted && attempt < maxRetries) {
+      // A provider asking for a longer wait than we would ever sleep (a daily quota: "retry in
+      // 8h") will refuse again; report it now instead of stalling the run for minutes.
+      const waitTooLong = failure.retryAfter !== undefined && failure.retryAfter * 1000 > maxDelay * 4;
+      if (failure.retryable && !waitTooLong && !emitted && attempt < maxRetries) {
         const delay =
           failure.retryAfter !== undefined
             ? Math.min(maxDelay * 4, failure.retryAfter * 1000)
