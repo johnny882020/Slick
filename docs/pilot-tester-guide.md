@@ -70,11 +70,18 @@ Everything stays on your computer: the database, skills and pinned apps are in
 Only the text of your requests (and the data a skill looks up to answer them) goes to the
 model provider you chose.
 
+## 4b. Your pilot plan
+
+Pilot teams get OneSeat Team free during the pilot. Open https://oneseat-cloud.onrender.com/pilot,
+choose Team, and enter the code your OneSeat contact gave you at checkout (no card needed).
+Copy the license key from the welcome page into OneSeat → **Plan → Activate**. Team unlocks
+pinned apps, schedules, skill imports and tool connectors on up to 15 computers.
+
 ## 6. Tell us how it went
 
 Please send feedback at least once a week, and any time something breaks or confuses you:
-- the link your OneSeat contact gave you (or the "Pilot feedback" form on GitHub), or
-- reply to the pilot email.
+- in the app: **Plan → Send feedback** (fastest; it includes your app version), or
+- the "Pilot feedback" form on GitHub, or a reply to the pilot email.
 
 Useful things to include: what you typed, what you expected, what happened, and a
 screenshot. Never include your API key. The app log is here if we ask for it:

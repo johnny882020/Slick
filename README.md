@@ -19,6 +19,7 @@ several per-seat tools.
 | `apps/daemon` | The sidecar: wires the three packages; builds a single executable + Deno |
 | `apps/desktop` | Tauri 2 shell: keychain, skill library, runs, approvals, schedules, "Pin as app" |
 | `skills/` | Seven starter skills, each with 10 eval cases |
+| `apps/cloud` | OneSeat Cloud (Render): website, Stripe plans, licenses, feedback; Neon Postgres |
 
 ## Run it
 
@@ -40,6 +41,8 @@ Release sidecars (run on each target OS before `tauri build`):
 ```bash
 pnpm --filter @oneseat/daemon run build:sidecar
 ```
+
+Running it with first users, including the cloud setup: [`docs/first-users.md`](docs/first-users.md).
 
 ## Status
 
