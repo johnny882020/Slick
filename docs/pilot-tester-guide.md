@@ -15,9 +15,14 @@ Pick one:
 - OpenAI: platform.openai.com → API keys
 - Gemini: aistudio.google.com → Get API key
 
-Your account with that provider needs some prepaid credit (a few dollars is plenty to
-start). Without it the key is accepted but every task fails with the provider's message,
-such as "credit balance is too low".
+These are *API* keys, billed separately from chat subscriptions: a Claude Pro/Max or
+ChatGPT subscription does not include API use. Claude and OpenAI need some prepaid API
+credit on the account (a few dollars is plenty to start); without it the key is accepted
+but every task fails with the provider's message, such as "credit balance is too low".
+
+Gemini has a free tier, which is the quickest way to try OneSeat. It is rate limited, and
+on the free tier Google may use what you send to improve its products, so don't use it
+with real customer data. For real work, use a paid account with any of the three.
 
 The key is stored in your computer's own keychain (Windows Credential Manager or macOS
 Keychain). It is never written to a file or sent anywhere except to that provider.

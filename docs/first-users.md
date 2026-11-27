@@ -17,6 +17,20 @@ A provider whose key or model variable is missing is skipped, and the run summar
 Gemini defaults to `gemini-3.8-flash` (the id Google's API recommends; 2.5 models are closed to
 new accounts). Set `OPENAI_EVAL_MODEL` to a model your OpenAI account can use.
 
+**Which accounts work for the API.** OneSeat calls each provider's *API*, which is billed
+separately from chat subscriptions:
+
+| Provider | What works | What does not |
+|---|---|---|
+| Anthropic (Claude) | Console account with prepaid API credit (console.anthropic.com → Plans & Billing) | A Claude Pro or Max subscription: it covers claude.ai and Claude Code, not API keys |
+| OpenAI | Platform account with prepaid credit (platform.openai.com → Billing) | A free account or a ChatGPT subscription |
+| Google Gemini | The free tier works (rate limited); a paid tier for real data | — |
+
+On Gemini's free tier, Google's terms let it use prompts and responses to improve its
+products, and requests per minute and per day are capped. It is fine for trying OneSeat
+and for QA with the sample data; testers working with real customer data should use a
+paid tier with any provider.
+
 **Each provider account needs credit.** A key without credit is accepted, but every call
 fails ("credit balance is too low" / "no credits remaining"). Live QA reports that provider
 as **BLOCKED (account)**, not as a OneSeat failure. Add credit in the provider's billing page

@@ -3,9 +3,9 @@
 import type { ProviderId, SkillSource, ToolEffect, Usage } from "@oneseat/contracts";
 
 export const PROVIDERS: { id: ProviderId; label: string; keyHint: string }[] = [
-  { id: "anthropic", label: "Claude", keyHint: "Starts with sk-ant-. Create one in the Anthropic Console." },
-  { id: "openai", label: "OpenAI", keyHint: "Starts with sk-. Create one in the OpenAI dashboard." },
-  { id: "google", label: "Gemini", keyHint: "Create one in Google AI Studio." },
+  { id: "anthropic", label: "Claude", keyHint: "Starts with sk-ant-. Create one in the Anthropic Console and add API credit there: a Claude Pro or Max subscription does not cover API use." },
+  { id: "openai", label: "OpenAI", keyHint: "Starts with sk-. Create one in the OpenAI dashboard; API use needs prepaid credit (ChatGPT plans do not include it)." },
+  { id: "google", label: "Gemini", keyHint: "Create one in Google AI Studio. The free tier is enough to try OneSeat; on it, Google may use your requests to improve its products, so use a paid key for real customer data." },
   { id: "local", label: "Local", keyHint: "An OpenAI-compatible server on your computer, such as Ollama or LM Studio. A key is optional." },
 ];
 
