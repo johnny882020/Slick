@@ -2,7 +2,7 @@
 // fake Messages API (SSE) -> tools against the real starter skills and SQLite.
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createServer, type Server } from "node:http";
-import { mkdtempSync, rmSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { writeFileSync, mkdtempSync, rmSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { PassThrough } from "node:stream";
@@ -145,6 +145,26 @@ afterAll(async () => {
   await started?.daemon.close();
   api?.server.close();
   rmSync(dir, { recursive: true, force: true });
+});
+
+describe("MCP connectors", () => {
+  // Regression: startDaemon never passed mcp.json to the daemon, so connectors never loaded.
+  const withConnectors = async (plans: boolean) => {
+    const d = mkdtempSync(join(tmpdir(), "oneseat-mcp-"));
+    writeFileSync(join(d, "mcp.json"), JSON.stringify({ mcpServers: { mail: { command: join(d, "no-such-server") } } }));
+    const s = await startDaemon({ dataDir: d, log: () => {}, startScheduler: false, plans, cloudUrl: "http://127.0.0.1:9" });
+    await s.daemon.ready;
+    const status = await s.daemon.handle("mcp.status", {});
+    await s.daemon.close();
+    rmSync(d, { recursive: true, force: true });
+    return status.servers.map((x) => x.id);
+  };
+  it("loads <dataDir>/mcp.json when the plan includes connectors", async () => {
+    expect(await withConnectors(false)).toEqual(["mail"]);
+  });
+  it("does not load connectors on Free", async () => {
+    expect(await withConnectors(true)).toEqual([]);
+  });
 });
 
 describe("daemon wiring", () => {

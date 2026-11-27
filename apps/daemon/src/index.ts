@@ -21,6 +21,8 @@ export interface StartOptions {
   cloudUrl?: string;
   /** Turn plan gates off (tests that predate plans). Default on. */
   plans?: boolean;
+  /** MCP connectors file (Pro and Team). Default `<dataDir>/mcp.json`; a missing file means none. */
+  mcpConfigPath?: string;
 }
 
 export interface StartedDaemon {
@@ -82,6 +84,8 @@ export async function startDaemon(opts: StartOptions = {}): Promise<StartedDaemo
     store,
     providers: PROVIDER_FACTORIES,
     dataDir,
+    // Without this the daemon never loaded connectors, so Pro/Team's MCP connectors did nothing.
+    mcpConfigPath: opts.mcpConfigPath ?? join(dataDir, "mcp.json"),
     defaultModel: opts.defaultModel ?? DEFAULT_MODEL,
     log,
     ...(opts.denoPath ? { denoPath: opts.denoPath } : {}),
