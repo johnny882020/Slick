@@ -571,9 +571,11 @@ export class Harness implements HarnessApi {
       let decision: ApprovalDecision | undefined;
       if (requiresApproval(effects)) {
         const approvalId = newId("apr");
+        // Register the waiter before anyone can see the request, so an instant answer is never lost.
+        const pending = onApproval({ approvalId, call, effects, summary: p.summary });
         ctx.emit({ type: "approval_request", approvalId, call, effects, summary: p.summary });
         try {
-          decision = await raceAbort(onApproval({ approvalId, call, effects, summary: p.summary }), ctx.signal);
+          decision = await raceAbort(pending, ctx.signal);
         } catch (e) {
           decision = { approved: false, note: e instanceof AbortError ? "the run was cancelled" : `approval failed: ${errorMessage(e)}` };
         }

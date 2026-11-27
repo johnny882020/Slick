@@ -147,3 +147,22 @@ describe("fake daemon", () => {
     expect((await c.call("schedules.list", {})).schedules).toEqual([]);
   });
 });
+
+describe("fake daemon approval timing", () => {
+  it("accepts an answer that arrives the moment the request is seen", async () => {
+    // A slow step widens the gap between emitting approval_request and the next step,
+    // so a waiter registered after the emit would miss this instant answer.
+    const dir = mkdtempSync(join(tmpdir(), "oneseat-fake-slow-"));
+    const slow = new Client(spawn(process.execPath, [script], { env: { ...process.env, ONESEAT_HOME: dir, FAKE_DAEMON_STEP_MS: "150" } }));
+    try {
+      await slow.call("auth.set", { provider: "anthropic", apiKey: "sk-ant-fake-key-123456" });
+      const { runId } = await slow.call("harness.run", { input: "send the reminder email", provider: "anthropic", model: "m" });
+      const req = await slow.waitFor((e) => e.runId === runId && e.event.type === "approval_request");
+      const approvalId = (req.event as Extract<HarnessEvent, { type: "approval_request" }>).approvalId;
+      expect(await slow.call("harness.approve", { approvalId, approved: false })).toEqual({ ok: true });
+    } finally {
+      slow.child.kill();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }, 30_000);
+});

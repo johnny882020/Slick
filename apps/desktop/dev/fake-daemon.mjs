@@ -355,6 +355,8 @@ async function runScript(runId, task) {
       name: "email_send",
       input: { to: "billing@acme.example", subject: "Friendly reminder: invoice INV-1042", body: "Hi Acme team, ..." },
     };
+    // Register the waiter before emitting, like the real harness: a client may answer at once.
+    const pendingDecision = waitApproval(run, approvalId);
     await emit(runId, {
       type: "approval_request",
       approvalId,
@@ -362,7 +364,7 @@ async function runScript(runId, task) {
       effects: ["send"],
       summary: "Send an email to billing@acme.example: “Friendly reminder: invoice INV-1042”",
     });
-    const decision = await waitApproval(run, approvalId);
+    const decision = await pendingDecision;
     run.approvals.delete(approvalId);
     if (run.cancelled) return finishCancelled(runId, text);
     await emit(runId, { type: "approval_result", approvalId, approved: decision.approved });
