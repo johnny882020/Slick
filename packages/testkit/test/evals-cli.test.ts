@@ -1,6 +1,7 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterAll, describe, expect, it } from "vitest";
 import { createScriptedProvider, type ModelProvider, type ProviderConfig, type ProviderId } from "@oneseat/contracts";
 import {
@@ -87,13 +88,13 @@ describe("parseEvalArgs", () => {
       "/w",
     );
     if (o === "help") throw new Error("help");
-    expect(o).toMatchObject({ root: "/r", skillsDir: "/w/s", out: "/w/o", live: true, dryRun: false, concurrency: 2, skills: ["a", "b"], minCases: 0, timeoutMs: 5000, harnessModule: "h.js", noSkillCheck: true, json: true, judge: { provider: "anthropic", model: "claude-opus-5-5" } });
+    expect(o).toMatchObject({ root: resolve("/r"), skillsDir: resolve("/w", "s"), out: resolve("/w", "o"), live: true, dryRun: false, concurrency: 2, skills: ["a", "b"], minCases: 0, timeoutMs: 5000, harnessModule: "h.js", noSkillCheck: true, json: true, judge: { provider: "anthropic", model: "claude-opus-5-5" } });
     expect(o.providers.map((p) => `${p.provider}:${p.model}`)).toEqual(["anthropic:claude-sonnet-5-5", "openai:gpt-x", "google:gemini-y", "local:llama3:8b"]);
     expect(parseEvalArgs(["--help"])).toBe("help");
     const rec = parseEvalArgs(["--recorded", "r.json"], "/w");
-    expect(rec !== "help" && rec.recorded).toBe("/w/r.json");
+    expect(rec !== "help" && rec.recorded).toBe(resolve("/w", "r.json"));
     const from = parseEvalArgs(["--from", "r.json"], "/w");
-    expect(from !== "help" && from.from).toBe("/w/r.json");
+    expect(from !== "help" && from.from).toBe(resolve("/w", "r.json"));
   });
 
   it("rejects bad input", () => {
@@ -146,7 +147,7 @@ describe("provider keys and factories", () => {
     expect(got[1]).toEqual({ provider: ctx.provider, providers: { anthropic: ctx.provider }, store, dataDir: "/d", dbPath: "/d/oneseat.db", workspaceDir: "/w" });
     const seen: string[] = [];
     await loadHarnessFactory({ root, store, harnessModule: "adapter.js", importer: async (s) => (seen.push(s), { createEvalHarness: () => ({}) }) });
-    expect(seen[0]).toBe(new URL(`file://${join(root, "adapter.js")}`).href);
+    expect(seen[0]).toBe(pathToFileURL(join(root, "adapter.js")).href);
     await expect(loadHarnessFactory({ root, store, importer: async () => ({ nothing: 1 }) })).rejects.toThrow(/exports neither createEvalHarness/);
   });
 });
@@ -236,7 +237,7 @@ describe("workspace helpers", () => {
     await mkdir(join(root, "packages", "broken"), { recursive: true });
     await writeFile(join(root, "packages", "broken", "package.json"), "{");
     expect(findRepoRoot(join(root, "packages", "gateway"))).toBe(root);
-    expect(findRepoRoot("/")).toBe("/");
+    expect(findRepoRoot(resolve("/"))).toBe(resolve("/"));
     expect(listWorkspacePackages(root).map((p) => p.name)).toEqual(["@oneseat/desktop", "@oneseat/gateway"]);
     const gw = listWorkspacePackages(root).find((p) => p.name === "@oneseat/gateway")!;
     expect(packageEntry(gw)).toBe(join(gw.dir, "dist", "index.js"));

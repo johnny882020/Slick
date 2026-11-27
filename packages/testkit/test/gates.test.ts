@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   checkCoverage,
@@ -339,8 +339,8 @@ describe("oneseat-gates CLI", () => {
     if (o === "help") throw new Error("help");
     expect(o.ids).toEqual([1]);
     expect(o.skippedIds).toEqual([3]);
-    expect(o.report).toBe("/w/g.json");
-    expect(o.gate).toMatchObject({ root: "/r", skillsDir: "/w/s", coverageThreshold: 85, corePackages: ["contracts", "gateway"], coverageFromExisting: true, liveEvals: true, evalProviders: "anthropic:x", recordedEvals: "/w/rec.json", evalOut: "/w/out" });
+    expect(o.report).toBe(resolve("/w", "g.json"));
+    expect(o.gate).toMatchObject({ root: resolve("/r"), skillsDir: resolve("/w", "s"), coverageThreshold: 85, corePackages: ["contracts", "gateway"], coverageFromExisting: true, liveEvals: true, evalProviders: "anthropic:x", recordedEvals: resolve("/w", "rec.json"), evalOut: resolve("/w", "out") });
     const all = parseGatesArgs([], "/w", {});
     expect(all !== "help" && all.ids).toEqual([1, 2, 3, 4, 5, 6, 7]);
     expect(parseGatesArgs(["-h"])).toBe("help");

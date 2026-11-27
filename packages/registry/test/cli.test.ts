@@ -58,7 +58,10 @@ describe("resolveSourceArg", () => {
     expect(await resolveSourceArg("acme/kit", cwd)).toEqual({ kind: "local", path: join(cwd, "acme", "kit") });
     expect(await resolveSourceArg("other/kit@one", cwd)).toEqual({ kind: "skills.sh", owner: "other", repo: "kit", skill: "one" });
     expect(await resolveSourceArg("./x", cwd)).toEqual({ kind: "local", path: join(cwd, "x") });
-    expect(await resolveSourceArg("~/x", cwd, { HOME: "/home/me" })).toEqual({ kind: "local", path: resolve("/home/me", "x") });
+    const home = process.platform === "win32" ? "C:\\Users\\me" : "/home/me";
+    expect(await resolveSourceArg("~/x", cwd, { HOME: home, USERPROFILE: home })).toEqual({ kind: "local", path: join(home, "x") });
+    if (process.platform === "win32") expect(await resolveSourceArg("~\\x", cwd, { USERPROFILE: home })).toEqual({ kind: "local", path: join(home, "x") });
+    else expect(await resolveSourceArg("~\\x", cwd, { HOME: home })).toEqual({ kind: "local", path: join(cwd, "~\\x") });
     expect(await resolveSourceArg("https://github.com/o/r/tree/main/skills/a", cwd)).toEqual({ kind: "github", owner: "o", repo: "r", ref: "main", path: "skills/a" });
     expect(await resolveSourceArg("just-a-name", cwd)).toEqual({ kind: "local", path: join(cwd, "just-a-name") });
   });

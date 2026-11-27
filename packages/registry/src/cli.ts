@@ -73,7 +73,9 @@ export function parseArgs(argv: string[]): Args {
 }
 
 function expandHome(p: string, env: Record<string, string | undefined>): string {
-  if (p === "~" || p.startsWith("~/")) return join(env["HOME"] ?? homedir(), p.slice(1));
+  // "~\\x" is a home path only on Windows; on POSIX a backslash is a filename character.
+  const homeRel = p === "~" || p.startsWith("~/") || (process.platform === "win32" && p.startsWith("~\\"));
+  if (homeRel) return join(env["HOME"] ?? env["USERPROFILE"] ?? homedir(), p.slice(1));
   return p;
 }
 

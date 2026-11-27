@@ -123,7 +123,13 @@ describe("stageSource: local", () => {
       return; // mkfifo unavailable on this platform
     }
     // Windows has no FIFOs; Git Bash's mkfifo makes an ordinary file there.
-    if (!lstatSync(join(src, "pipe")).isFIFO()) return;
+    let isFifo = false;
+    try {
+      isFifo = lstatSync(join(src, "pipe")).isFIFO();
+    } catch {
+      /* Windows: mkfifo can exit 0 and create nothing */
+    }
+    if (!isFifo) return;
     const err = await copyTree(src, join(await tempDir(), "x")).catch((e: unknown) => e);
     expect(err).toBeInstanceOf(UnsafeSourceError);
     expect((err as UnsafeSourceError).entries[0]).toMatchObject({ path: "pipe", rule: "special-file" });

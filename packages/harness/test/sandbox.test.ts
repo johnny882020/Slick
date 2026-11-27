@@ -260,7 +260,8 @@ describe("pathForms (symlinked folders, e.g. macOS /var -> /private/var)", () =>
   it("lists the logical and real form, including for paths that do not exist yet", async () => {
     const { mkdtempSync, symlinkSync, realpathSync } = await import("node:fs");
     const { tmpdir } = await import("node:os");
-    const base = realpathSync(mkdtempSync(join(tmpdir(), "os-forms-")));
+    // .native also expands Windows 8.3 short names (RUNNER~1), as pathForms does.
+    const base = realpathSync.native(mkdtempSync(join(tmpdir(), "os-forms-")));
     const real = join(base, "real");
     mkdirSync(real);
     const link = join(base, "link");
