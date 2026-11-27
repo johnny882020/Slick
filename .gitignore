@@ -13,3 +13,4 @@ apps/desktop/src-tauri/binaries/
 playwright-report/
 test-results/
 .oneseat-dev/
+.claude/worktrees/
