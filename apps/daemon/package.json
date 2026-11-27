@@ -23,9 +23,7 @@
   },
   "dependencies": {
     "@oneseat/contracts": "workspace:*",
-    "@oneseat/gateway": "workspace:*",
-    "@oneseat/harness": "workspace:*",
-    "@oneseat/registry": "workspace:*"
+    "@oneseat/gateway": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
