@@ -1,0 +1,37 @@
+{
+  "name": "@oneseat/daemon",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The OneSeat sidecar: wires gateway + registry + harness behind the JSON-RPC daemon protocol.",
+  "type": "module",
+  "bin": { "oneseat-daemon": "./dist/main.js" },
+  "exports": {
+    ".": {
+      "@oneseat/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:bundle": "node scripts/bundle.mjs",
+    "build:sidecar": "node scripts/bundle.mjs && node scripts/build-sidecar.mjs",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@oneseat/contracts": "workspace:*",
+    "@oneseat/gateway": "workspace:*",
+    "@oneseat/harness": "workspace:*",
+    "@oneseat/registry": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.25.0",
+    "postject": "1.0.0-alpha.6",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
