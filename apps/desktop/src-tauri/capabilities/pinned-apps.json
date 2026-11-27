@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "pinned-apps",
+  "description": "Pinned app windows (label app-<id>). They may call exactly one command, bridge_run. No core APIs, no events, no plugins.",
+  "windows": ["app-*"],
+  "permissions": ["allow-bridge-run"]
+}

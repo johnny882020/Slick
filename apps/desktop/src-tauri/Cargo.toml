@@ -1,0 +1,52 @@
+[package]
+name = "oneseat-desktop"
+version = "0.1.0"
+description = "OneSeat desktop shell: spawns the harness daemon, keeps keys in the OS keychain, hosts pinned apps."
+authors = ["OneSeat"]
+license = "UNLICENSED"
+edition = "2021"
+rust-version = "1.77.2"
+publish = false
+
+[lib]
+name = "oneseat_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "oneseat-desktop"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+tauri = { version = "2.12", features = ["tray-icon"] }
+tauri-plugin-opener = "2.7"
+tauri-plugin-dialog = "2.8"
+tauri-plugin-window-state = "2.5"
+tauri-plugin-log = "2"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["sync", "time", "rt", "macros"] }
+regex = "1"
+url = "2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3.6", features = ["apple-native"] }
+
+[target.'cfg(windows)'.dependencies]
+keyring = { version = "3.6", features = ["windows-native"] }
+
+[target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
+keyring = { version = "3.6", features = ["sync-secret-service", "crypto-rust"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["sync", "time", "rt", "rt-multi-thread", "macros"] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
