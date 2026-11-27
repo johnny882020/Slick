@@ -29,6 +29,12 @@ importers:
       '@oneseat/gateway':
         specifier: workspace:*
         version: link:../../packages/gateway
+      '@oneseat/harness':
+        specifier: workspace:*
+        version: link:../../packages/harness
+      '@oneseat/registry':
+        specifier: workspace:*
+        version: link:../../packages/registry
     devDependencies:
       '@types/node':
         specifier: ^22.10.0

@@ -2,7 +2,7 @@
 //   apps/desktop/src-tauri/binaries/oneseat-daemon-<target-triple>[.exe]
 // Run on each target OS (CI matrix). Requires dist-bundle/daemon.cjs (scripts/bundle.mjs).
 import { execFileSync } from "node:child_process";
-import { copyFileSync, chmodSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { copyFileSync, chmodSync, mkdirSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -51,3 +51,24 @@ execFileSync(postject, args, { stdio: "inherit", shell: process.platform === "wi
 if (process.platform === "darwin") execFileSync("codesign", ["--sign", "-", outFile], { stdio: "inherit" });
 if (process.platform !== "win32") chmodSync(outFile, 0o755);
 console.log(`sidecar -> ${outFile}`);
+
+// Ship the native Deno binary for the script sandbox as a second sidecar:
+//   binaries/deno-<target-triple>[.exe]   (the shell passes its path as ONESEAT_DENO)
+function findNativeDeno() {
+  const pnpmDir = join(root, "..", "..", "node_modules", ".pnpm");
+  if (!existsSync(pnpmDir)) return undefined;
+  const os = process.platform === "win32" ? "win32" : process.platform;
+  const want = os === "linux" ? `linux-${process.arch}-glibc` : `${os}-${process.arch}`;
+  for (const d of readdirSync(pnpmDir)) {
+    if (!d.startsWith(`@deno+${want}@`)) continue;
+    const bin = join(pnpmDir, d, "node_modules", "@deno", want, `deno${exe}`);
+    if (existsSync(bin)) return bin;
+  }
+  return undefined;
+}
+const deno = process.env.ONESEAT_DENO ?? findNativeDeno();
+if (!deno) throw new Error("no native deno binary found; run pnpm install (the harness depends on the deno npm package)");
+const denoOut = join(outDir, `deno-${triple}${exe}`);
+copyFileSync(deno, denoOut);
+if (process.platform !== "win32") chmodSync(denoOut, 0o755);
+console.log(`deno    -> ${denoOut}`);

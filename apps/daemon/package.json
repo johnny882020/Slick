@@ -4,7 +4,9 @@
   "private": true,
   "description": "The OneSeat sidecar: wires gateway + registry + harness behind the JSON-RPC daemon protocol.",
   "type": "module",
-  "bin": { "oneseat-daemon": "./dist/main.js" },
+  "bin": {
+    "oneseat-daemon": "./dist/main.js"
+  },
   "exports": {
     ".": {
       "@oneseat/source": "./src/index.ts",
@@ -23,7 +25,9 @@
   },
   "dependencies": {
     "@oneseat/contracts": "workspace:*",
-    "@oneseat/gateway": "workspace:*"
+    "@oneseat/gateway": "workspace:*",
+    "@oneseat/harness": "workspace:*",
+    "@oneseat/registry": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
