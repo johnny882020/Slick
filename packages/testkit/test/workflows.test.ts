@@ -142,6 +142,9 @@ describe("nightly-live.yml live QA", () => {
     expect(r).toContain('ls "$bin"/deno-*');
     expect(r).toContain("free-tier quota is kept for the Linux run");
     expect(r).toContain('--repeat "$QA_REPEAT"');
+    // Regression: QA_REPEAT once landed on another job's step, so --repeat got "" and QA exited 2.
+    const qaStep = steps(qa).find((s) => s.name === "Live QA")!;
+    expect(qaStep.env?.["QA_REPEAT"]).toBe("${{ github.event_name == 'schedule' && '1' || '3' }}");
     // Run on demand: one of the two jobs alone (inputs.jobs), or both.
     expect(qa.if).toContain("inputs.jobs != 'evals'");
     expect(load("nightly-live.yml").jobs["live"]!.if).toContain("inputs.jobs != 'qa'");
