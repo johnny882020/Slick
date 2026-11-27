@@ -132,6 +132,18 @@ describe("nightly-live.yml", () => {
   });
 });
 
+describe("nightly-live.yml live QA", () => {
+  const qa = load("nightly-live.yml").jobs["qa"]!;
+  it("runs the shipped daemon on Windows, macOS and Linux, finding each OS's sidecars", () => {
+    expect(qa.strategy?.matrix?.["os"]).toEqual(["ubuntu-latest", "windows-latest", "macos-latest"]);
+    expect(qa["runs-on"]).toBe("${{ matrix.os }}");
+    const r = runs(qa);
+    expect(r).toContain('ls "$bin"/oneseat-daemon-*');
+    expect(r).toContain('ls "$bin"/deno-*');
+    expect(r).toContain("free-tier quota is kept for the Linux run");
+  });
+});
+
 describe("release.yml", () => {
   const wf = load("release.yml");
   it("runs on v* tags after gates 1-6", () => {
