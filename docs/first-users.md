@@ -1,121 +1,120 @@
 # Run OneSeat with your first users
 
-The fastest path from this repo to feedback from real teams, with every step checked
-before anyone outside sees it. Signed installers come later (step 8); the pilot uses the
-unsigned builds CI makes on every push.
+From this repo to feedback from real teams. The desktop app keeps each team's business
+data and model key on their computer; **OneSeat Cloud** (Render + Neon + Stripe) only
+handles the website, plans, licenses and feedback.
 
-## 0. One-time setup (GitHub → Settings → Secrets and variables → Actions)
+```
+Tester's computer                         OneSeat Cloud (Render, Frankfurt)
+  OneSeat app ── model calls ──▶ Claude / OpenAI / Gemini (tester's own key)
+      │  license check, feedback
+      ▼
+  https://oneseat-cloud.onrender.com ◀── Stripe webhooks (Payment Links, test mode)
+      │
+      ▼
+  Neon Postgres "oneseat" (accounts, subscriptions, licenses, computers, feedback)
+```
 
-| Kind | Name | Value |
+## What is already set up
+
+| Piece | Where | State |
 |---|---|---|
-| Secret | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY` | Your keys (done) |
-| Variable | `OPENAI_EVAL_MODEL` | The OpenAI / Codex model id to test |
-| Variable | `GEMINI_EVAL_MODEL` | The Gemini model id to test |
-| Variable | `ANTHROPIC_EVAL_MODEL` | Optional; default `claude-sonnet-5-5` |
+| Website + API | Render service `oneseat-cloud`, https://oneseat-cloud.onrender.com | Live, auto-deploys from the PR branch |
+| Database | Neon project `oneseat` (AWS eu-central-1), branches `main` and `dev` | Live; tables created on start |
+| Plans | Stripe (test mode): OneSeat Pro $19/mo or $182.40/yr, Team $79/mo or $758.40/yr | Live as Payment Links |
+| Pilot code | `ONESEATPILOT`: 100% off Pro or Team for 2 months, 15 uses, no card needed | Live |
+| Billing portal | Stripe customer portal ("Manage billing" on the website) | Live |
+| Webhook | Stripe → `/api/v1/stripe/webhook` (signed) | Live; verified end to end |
+| Free plan | No account needed: 1 computer, the 7 starter skills | In the app |
 
-A provider whose key or model variable is missing is skipped, and the run summary says so.
-Gemini defaults to `gemini-3.8-flash` (the id Google's API recommends; 2.5 models are closed to
-new accounts). Set `OPENAI_EVAL_MODEL` to a model your OpenAI account can use.
+Verified live: a test checkout of Team with the pilot code → Stripe webhook → Render →
+Neon → the welcome page shows the license key (`apps/cloud/scripts/checkout-smoke.mjs`).
 
-**Which accounts work for the API.** OneSeat calls each provider's *API*, which is billed
-separately from chat subscriptions:
+## 1. Finish the cloud setup (5 minutes, once)
 
-| Provider | What works | What does not |
-|---|---|---|
-| Anthropic (Claude) | Console account with prepaid API credit (console.anthropic.com → Plans & Billing) | A Claude Pro or Max subscription: it covers claude.ai and Claude Code, not API keys |
-| OpenAI | Platform account with prepaid credit (platform.openai.com → Billing) | A free account or a ChatGPT subscription |
-| Google Gemini | The free tier works (rate limited); a paid tier for real data | — |
+In the Render dashboard → `oneseat-cloud` → **Environment**, add:
 
-On Gemini's free tier, Google's terms let it use prompts and responses to improve its
-products, and requests per minute and per day are capped. It is fine for trying OneSeat
-and for QA with the sample data; testers working with real customer data should use a
-paid tier with any provider.
+| Key | Value |
+|---|---|
+| `LICENSE_PRIVATE_KEY` | The one line in the file `license-private.escaped` Claude generated (it starts `-----BEGIN PRIVATE KEY-----\n`). It signs licenses; its public half is built into the app. Keep it secret and backed up. |
+| `ADMIN_TOKEN` | Any long password (or the one in `admin-token.txt`). Opens `/admin` with user `admin`. |
+| `DOWNLOAD_WINDOWS_URL`, `DOWNLOAD_MAC_URL` | Where you host the installers (step 3), when you have them. |
 
-**Each provider account needs credit.** A key without credit is accepted, but every call
-fails ("credit balance is too low" / "no credits remaining"). Live QA reports that provider
-as **BLOCKED (account)**, not as a OneSeat failure. Add credit in the provider's billing page
-(Anthropic Console → Plans & Billing; OpenAI Platform → Billing) before step 2.
+Then check https://oneseat-cloud.onrender.com/healthz shows `"licensing":true`, and run:
 
-## 1. Check that CI is green
+```bash
+node apps/cloud/scripts/checkout-smoke.mjs https://buy.stripe.com/test_00wfZi5Dh72g05C9ovgw004
+```
 
-Open the pull request → **Checks**. Everything must be green on Windows, macOS and Linux:
-unit tests and coverage (gate 1), provider parity (2), skill lint (3), security scan (4),
-desktop end-to-end flows (6), the Rust core, and the **unsigned builds with their install
-smoke test**. The install smoke test installs the real installer on a clean machine,
-launches the app, and checks that the background engine (daemon + deno) starts and
-installs all seven starter skills.
+It buys Team with the pilot code in test mode, then activates the key and verifies the
+signed license. The service is on Render's free plan: the first request after 15 idle
+minutes takes about a minute. Use the Starter plan before real customers.
 
-## 2. Run live QA with real models
+## 2. Check that CI and live QA are green
 
-On the pull request, add the label **`live-qa`** (right sidebar → Labels; create it the
-first time). That starts the **Nightly live** workflow on the PR with your keys:
+GitHub Actions needs minutes: Settings → Billing and plans → Usage (private repos count
+macOS minutes 10× and Windows 2×). Raise the spending limit or make the repo public.
 
-- **Live QA of the shipped daemon** — the exact daemon binary that ships, driven the way
-  the app drives it, through 8 scenarios on each provider: top customers by lifetime value;
-  an invoice whose total must come out at exactly $487.13 from the sandboxed totals script;
-  a thank-you email that must not claim to be sent; support triage that must not close
-  tickets; a LinkedIn post; the weekly report (revenue $2,499 vs $0); an on-brand app that
-  is pinned and then calls a skill through the app bridge (and is refused a skill it does
-  not list); and a delete that must wait for approval and stay undone when denied.
-- **Gate 5** — every starter skill against a no-skill baseline on 10 cases each.
+1. Pull request → **Checks**: all green on Windows, macOS and Linux, including the unsigned
+   builds with their **install smoke test** and the cloud store on Postgres.
+2. Add the label **`live-qa`** to the pull request. It runs the shipped engine through 8
+   real-model scenarios on each provider that has a key and a model variable, then gate 5.
+   Optional secret `ONESEAT_QA_LICENSE_KEY` (a pilot Team key) also tests license
+   activation and pinned apps against OneSeat Cloud.
+3. Ship to testers only when every Live QA row is PASS. A `BLOCKED (account)` row means a
+   provider account ran out of credit or quota, not a OneSeat failure.
 
-Read the run's **Summary** page. Ship to testers only when every Live QA row is PASS.
-To run it again after a fix, remove and re-add the label. After merging, the same jobs run
-every night and can be started from **Actions → Nightly live → Run workflow**.
+Accounts: Claude and OpenAI API keys need prepaid API credit (a Claude Max or ChatGPT
+plan does not include it). Gemini's free tier works but its daily quota is small.
 
-Cost: live QA is 8 short tasks per provider. Gate 5 is about 140 runs per provider plus
-judging, so it costs more; run it before each pilot build rather than on every push.
+## 3. Get and host the installers
 
-## 3. Get the installers
+Pull request → **Checks** → latest **CI** run → **Artifacts**:
+`unsigned-windows-latest` (`nsis/OneSeat_<version>_x64-setup.exe`) and
+`unsigned-macos-latest` (`dmg/OneSeat_<version>_aarch64.dmg`, Apple silicon). Upload both to
+a file host you control (Google Drive, Dropbox, S3/R2) with public links, and put the links
+in `DOWNLOAD_WINDOWS_URL` / `DOWNLOAD_MAC_URL`. The website's Download page then works.
 
-Pull request → **Checks** → any job of the latest **CI** run → **Summary** → **Artifacts**:
+## 4. Try it yourself (15 minutes)
 
-- `unsigned-windows-latest` → `nsis/OneSeat_<version>_x64-setup.exe` (per-user, no admin rights;
-  give testers this one) and `msi/…msi`
-- `unsigned-macos-latest` → `dmg/OneSeat_<version>_aarch64.dmg` (Apple silicon)
+On one Windows PC and one Mac: install, paste a model key, then
 
-Artifacts are kept for 30 days and need a GitHub login with access to the repo, so
-download them and share them from your own drive.
-
-## 4. Try it yourself first (15 minutes)
-
-Install on one Windows PC and one Mac, then:
-
-1. Paste a key. The model list appears.
-2. "Add a customer: Jane Smith, jane@acme.com, Acme Ltd." Then "Who are my customers?"
-3. "Draft an invoice for Jane: 3 hours at $150/hour, 8.25% tax." The total is $487.13.
-4. "Write a thank-you email to Jane." It drafts and does not send.
-5. "Delete Jane." An **Approve / Deny** box appears. Deny it; Jane is still there.
-6. "Make a small app that lists my customers." Then **Pin as app**: it opens in its own window and shows data.
-7. **Skills → Add skill** with a GitHub skill such as `owner/repo`. The scan report appears before anything installs.
-8. **Activity** lists every action, with approvals.
+1. "Add a customer: Jane Smith, jane@acme.com." → "Who are my customers?"
+2. "Draft an invoice for Jane: 3 hours at $150/hour, 8.25% tax." The total is $487.13.
+3. "Write a thank-you email to Jane." It drafts and does not send.
+4. "Delete Jane." An **Approve / Deny** box appears; deny it and Jane stays.
+5. **Plan**: Free. Try **Pin as app** on a made app: it asks for Pro or Team.
+6. Buy Team on https://oneseat-cloud.onrender.com/pilot with code `ONESEATPILOT`, paste the
+   key in **Plan → Activate**. Pin the app; it opens in its own window and shows data.
+7. **Plan → Send feedback**, then open https://oneseat-cloud.onrender.com/admin to see it.
 
 ## 5. Invite the first teams
 
-Send each team the installer for their computer and `docs/pilot-tester-guide.md`
-(it covers keys, the unsigned-app warnings, what to try, and how to report). Start with
-2–3 teams for a week, then widen to 10 for the two-week pilot (gate 7).
+Send each team https://oneseat-cloud.onrender.com/pilot, the installer link, the code
+`ONESEATPILOT`, and `docs/pilot-tester-guide.md`. Start with 2–3 teams for a week, then
+widen to 10 for the two-week pilot (gate 7). Each team's Team license covers 15 computers.
 
 ## 6. Collect feedback
 
-- Testers report through the **Pilot feedback** issue form (`.github/ISSUE_TEMPLATE`), or
-  your own form or email if they don't use GitHub. The form never asks for keys or data.
-- Track each team in `docs/pilot.md`: first-run minutes, data loss, unapproved actions,
-  seats cancelled.
-- Any report of an action without approval stops the pilot until it is fixed.
+- In the app: **Plan → Send feedback** (rating, topic, message). It lands in Neon and on
+  `/admin` with the team's license, OS and app version. No keys or business data.
+- The GitHub issue form "Pilot feedback" for teams that use GitHub.
+- Track each team in `docs/pilot.md`. Any action without approval stops the pilot.
 
 ## 7. Ship fixes during the pilot
 
-Fix on a branch → open a PR → CI builds new installers → add `live-qa` → share the new
-build. Testers install over the old version; their data and keys are kept (they live in
-the app data folder and the OS keychain, not in the install folder).
+Fix on a branch → PR → CI builds new installers → `live-qa` label → upload the new
+installers → tell testers. Data, keys and licenses survive reinstalling. The cloud
+redeploys itself on every push to the branch Render tracks.
 
-## 8. After the pilot: signed releases
+## 8. Before charging real money
 
-Add the signing secrets used by `.github/workflows/release.yml` (Apple certificate and
-notarization, Windows code-signing certificate, Tauri updater key), then push a `v*` tag.
-That builds signed `.msi` / `.exe` and a universal `.dmg` (Apple silicon and Intel) as a
-draft GitHub release, after gates 1–6 pass.
+1. Merge the PR and point Render at `main` (Render → Settings → Branch).
+2. Create a Stripe account for OneSeat (this one is "Integrity.si", and that name shows on
+   checkout and receipts), set up Stripe Tax (e.g. EU VAT registrations), recreate the
+   products, prices, links, portal and webhook in live mode, and update the Render env.
+3. Move Render to a paid plan (no cold starts) and enable Neon backups you are happy with.
+4. Sign the installers: add the release secrets and push a `v*` tag (`.github/workflows/release.yml`).
 
 ## Running it from source (developers)
 
@@ -128,4 +127,10 @@ pnpm --filter @oneseat/desktop tauri dev
 ```bash
 pnpm test
 pnpm gates
+```
+
+Cloud locally (in-memory store, no Stripe):
+
+```bash
+pnpm --filter @oneseat/cloud build && node apps/cloud/dist/main.js
 ```
