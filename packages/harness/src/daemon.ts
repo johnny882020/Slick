@@ -7,8 +7,11 @@ import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import type { Readable, Writable } from "node:stream";
 import {
+  freeEntitlement,
   parseSkillSource,
   PROVIDER_IDS,
+  upgradeMessage,
+  type Feature,
   RPC_ERRORS,
   type ApprovalDecision,
   type ApprovalHandler,
@@ -29,6 +32,7 @@ import { AppError, AppStore, bridgeResult } from "./apps.js";
 import { CronError } from "./cron.js";
 import { OneSeatDb } from "./db.js";
 import { Harness, type HarnessOptions } from "./harness.js";
+import { LicenseError, type LicenseManager } from "./license.js";
 import { McpManager, type McpServerStatus } from "./mcp/manager.js";
 import { RpcError, serveLines, type LineConnection } from "./rpc.js";
 import { ScriptSandbox, findDeno } from "./sandbox.js";
@@ -57,6 +61,11 @@ export interface DaemonOptions {
   log?: (line: string) => void;
   /** Overrides for the harness (maxTurns, retry, sleep, budgets...). */
   harness?: Partial<Omit<HarnessOptions, "store" | "db" | "provider" | "workspaceDir" | "redactor" | "logger">>;
+  /**
+   * The computer's OneSeat plan. When set, paid features (importing skills, pinned apps,
+   * schedules, MCP connectors) need a plan that includes them. When unset nothing is gated.
+   */
+  license?: LicenseManager;
 }
 
 /** Methods the daemon adds beyond the contract (see the stream B report). */
@@ -140,6 +149,7 @@ export function createDaemon(opts: DaemonOptions): Daemon {
   let mcp: McpManager | undefined;
   let lastModel: { provider: ProviderId; model: string } | undefined;
   let closed = false;
+  let licenseTimer: ReturnType<typeof setInterval> | undefined;
 
   const denoPath = opts.denoPath ?? findDeno();
   const sandbox = new ScriptSandbox({
@@ -198,7 +208,13 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     workspaceDir,
     sandbox,
     mcp: { tools: () => mcp?.tools() ?? [] },
-    schedules: scheduler,
+    // schedule_task (the model's tool) follows the same plan rule as schedules.upsert.
+    schedules: {
+      upsert: (input) => {
+        if (opts.license && !opts.license.has("schedules")) throw new Error(upgradeMessage("schedules"));
+        return scheduler.upsert(input);
+      },
+    },
     appAllowedSkills: (appId) => apps.allowedSkills(appId),
     redactor,
     logger,
@@ -277,6 +293,20 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     });
   };
 
+  const requireFeature = (feature: Feature) => {
+    if (opts.license && !opts.license.has(feature))
+      throw new RpcError(RPC_ERRORS.upgradeRequired, upgradeMessage(feature), { feature, tier: opts.license.status().tier });
+  };
+  const licenseCall = async <T>(fn: () => Promise<T>): Promise<T> => {
+    if (!opts.license) throw new RpcError(RPC_ERRORS.notFound, "licensing is not configured in this build");
+    try {
+      return await fn();
+    } catch (e) {
+      if (e instanceof LicenseError) throw new RpcError(RPC_ERRORS.blocked, e.message, e.code ? { code: e.code } : undefined);
+      throw e;
+    }
+  };
+
   const methods: { [M in keyof AllMethods]: (p: Record<string, unknown>) => Promise<AllMethods[M]["result"]> } = {
     "daemon.hello": async () => ({ version: DAEMON_VERSION, protocol: 1 }),
     "auth.set": async (p) => {
@@ -333,11 +363,13 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     "skills.list": async () => ({ skills: await opts.store.list() }),
     "skills.inspect": async (p) => opts.store.inspect(parseSkillSource(str(p, "source")!)),
     "skills.install": async (p) => {
+      requireFeature("import_skills");
       if (p["allowWarnings"] !== undefined && typeof p["allowWarnings"] !== "boolean") invalid("allowWarnings must be a boolean");
       return opts.store.install(parseSkillSource(str(p, "source")!), { allowWarnings: p["allowWarnings"] === true });
     },
     "skills.remove": async (p) => ({ ok: await opts.store.remove(str(p, "name")!) }),
     "apps.pin": async (p) => {
+      requireFeature("pinned_apps");
       try {
         return { app: apps.pin(p as unknown as ArtifactBundle, opts.now?.() ?? new Date()) };
       } catch (e) {
@@ -358,6 +390,7 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     }),
     "schedules.list": async () => ({ schedules: scheduler.list() }),
     "schedules.upsert": async (p) => {
+      requireFeature("schedules");
       const id = str(p, "id")!;
       const cron = str(p, "cron")!;
       if (typeof p["enabled"] !== "boolean") invalid("enabled must be a boolean");
@@ -377,17 +410,51 @@ export function createDaemon(opts: DaemonOptions): Daemon {
       return { entries: harness.actions.list(typeof limit === "number" ? limit : 100) };
     },
     "mcp.status": async () => ({ servers: mcp?.status() ?? [] }),
+    "license.status": async () => (opts.license ? opts.license.status() : freeEntitlement("licensing is not configured in this build")),
+    "license.activate": async (p) =>
+      licenseCall(async () => {
+        const ent = await opts.license!.activate(str(p, "licenseKey")!);
+        await startMcp();
+        return ent;
+      }),
+    "license.deactivate": async () => licenseCall(() => opts.license!.deactivate()),
+    "feedback.send": async (p) => {
+      const message = str(p, "message")!;
+      const rating = p["rating"];
+      if (rating !== undefined && (typeof rating !== "number" || !Number.isInteger(rating) || rating < 1 || rating > 5)) invalid("rating must be 1 to 5");
+      return licenseCall(() =>
+        opts.license!.sendFeedback({
+          message,
+          ...(typeof rating === "number" ? { rating } : {}),
+          ...(str(p, "email", { optional: true }) ? { email: str(p, "email", { optional: true })! } : {}),
+          ...(str(p, "topic", { optional: true }) ? { topic: str(p, "topic", { optional: true })! } : {}),
+        }),
+      );
+    },
   };
 
-  const init = async () => {
-    if (opts.mcpConfigPath) {
-      try {
-        mcp = await McpManager.fromFile(opts.mcpConfigPath, { logger });
-        await mcp.start();
-      } catch (e) {
-        logger.error("could not load MCP servers", errorMessage(e));
-      }
+  /** Connect MCP servers when the plan includes them (also after a license is activated). */
+  async function startMcp() {
+    if (!opts.mcpConfigPath || mcp || closed) return;
+    if (opts.license && !opts.license.has("mcp_connectors")) {
+      logger.info("MCP connectors need OneSeat Pro or Team; not loading mcp.json");
+      return;
     }
+    try {
+      mcp = await McpManager.fromFile(opts.mcpConfigPath, { logger });
+      await mcp.start();
+    } catch (e) {
+      logger.error("could not load MCP servers", errorMessage(e));
+    }
+  }
+
+  const init = async () => {
+    if (opts.license) {
+      await opts.license.refreshIfDue().catch(() => undefined);
+      licenseTimer = setInterval(() => void opts.license!.refreshIfDue().catch(() => undefined), 6 * 3600_000);
+      (licenseTimer as { unref?: () => void }).unref?.();
+    }
+    await startMcp();
     if (closed) {
       await mcp?.close();
       return;
@@ -441,6 +508,7 @@ export function createDaemon(opts: DaemonOptions): Daemon {
       if (closed) return;
       closed = true;
       scheduler.stop();
+      if (licenseTimer) clearInterval(licenseTimer);
       for (const id of harness.activeRuns()) harness.cancel(id);
       await ready.catch(() => undefined);
       await Promise.allSettled([...pumps]);

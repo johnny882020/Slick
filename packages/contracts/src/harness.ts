@@ -3,6 +3,7 @@
 // Pinned apps reach the harness only through apps.run.
 
 import type { AppJson, ArtifactBundle, BridgeResult } from "./artifact.js";
+import type { Entitlement } from "./license.js";
 import type { Effort, ProviderId, Usage, StopReason } from "./model.js";
 import type { InstalledSkill, SkillIndexEntry, SkillIssue, SkillPermissions, SkillSource } from "./skill.js";
 import type { ToolCall, ToolEffect, ToolResult } from "./tool.js";
@@ -158,6 +159,23 @@ export interface DaemonMethods {
   "apps.draft": { params: { draftId: string }; result: ArtifactBundle };
   "apps.drafts": { params: Record<string, never>; result: { drafts: ArtifactDraftInfo[] } };
   "mcp.status": { params: Record<string, never>; result: { servers: McpServerStatus[] } };
+  /** The plan this computer is on. Free when no license is active. */
+  "license.status": { params: Record<string, never>; result: Entitlement };
+  /** Activate a license key with OneSeat Cloud for this computer. */
+  "license.activate": { params: { licenseKey: string }; result: Entitlement };
+  /** Free this computer's slot on the license and return to Free. */
+  "license.deactivate": { params: Record<string, never>; result: Entitlement };
+  /** Send pilot feedback to OneSeat Cloud. Never includes keys or business data unless typed. */
+  "feedback.send": { params: FeedbackInput; result: { ok: boolean; id?: string } };
+}
+
+export interface FeedbackInput {
+  message: string;
+  /** 1 (bad) .. 5 (great). */
+  rating?: number;
+  email?: string;
+  /** Free-form area, e.g. "invoices", "install", "approvals". */
+  topic?: string;
 }
 
 export interface ArtifactDraftInfo {
@@ -221,4 +239,6 @@ export const RPC_ERRORS = {
   notAuthorised: -32001,
   blocked: -32002,
   notFound: -32004,
+  /** The feature needs a paid plan (see license.ts UPGRADE_ERROR_CODE). */
+  upgradeRequired: -32003,
 } as const;

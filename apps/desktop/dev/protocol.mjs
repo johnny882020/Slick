@@ -29,6 +29,10 @@ export const UI_METHODS = [
   "apps.draft",
   "apps.drafts",
   "mcp.status",
+  "license.status",
+  "license.activate",
+  "license.deactivate",
+  "feedback.send",
 ];
 
 export const SHELL_ONLY_METHODS = ["auth.set", "apps.run"];

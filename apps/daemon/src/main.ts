@@ -30,6 +30,7 @@ async function main() {
     dataDir: defaultDataDir(),
     ...(process.env.ONESEAT_BUNDLED_SKILLS ? { bundledSkillsDir: process.env.ONESEAT_BUNDLED_SKILLS } : {}),
     ...(defaultModel ? { defaultModel } : {}),
+    ...(process.env.ONESEAT_CLOUD_URL ? { cloudUrl: process.env.ONESEAT_CLOUD_URL } : {}),
     ...((process.env.ONESEAT_DENO ?? siblingDeno()) ? { denoPath: (process.env.ONESEAT_DENO ?? siblingDeno())! } : {}),
   });
   process.stderr.write(`oneseat-daemon ready (data: ${dataDir}${seeded.length ? `, seeded: ${seeded.join(", ")}` : ""})\n`);

@@ -134,6 +134,9 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      # Optional: a OneSeat license key (e.g. a pilot Team key). With it, live QA also covers
+      # activation against OneSeat Cloud and the paid features; without it, that Free blocks them.
+      ONESEAT_QA_LICENSE_KEY: ${{ secrets.ONESEAT_QA_LICENSE_KEY }}
     steps:
       - uses: actions/checkout@v4
 

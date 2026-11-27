@@ -1,0 +1,45 @@
+# OneSeat Cloud on Render: website, Stripe billing webhooks, licenses and pilot feedback.
+# The desktop app keeps customer data and model keys on each computer; none of it comes here.
+services:
+  - type: web
+    name: oneseat-cloud
+    runtime: node
+    region: frankfurt          # next to the Neon database (AWS eu-central-1)
+    plan: free                 # pilot; use starter or above for production (no cold starts)
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm exec turbo run build --filter=@oneseat/cloud...
+    startCommand: node apps/cloud/dist/main.js
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Neon pooled connection string (Neon console → Connect). Secret.
+      - key: DATABASE_URL
+        sync: false
+      # whsec_... from the Stripe webhook endpoint for /api/v1/stripe/webhook. Secret.
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # ed25519 private key (PEM, newlines as \n) that signs license tokens. Secret.
+      # The matching public key is built into the desktop daemon.
+      - key: LICENSE_PRIVATE_KEY
+        sync: false
+      # Password for /admin (user "admin"). Secret.
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: PAYMENT_LINK_PRO_MONTHLY
+        sync: false
+      - key: PAYMENT_LINK_PRO_YEARLY
+        sync: false
+      - key: PAYMENT_LINK_TEAM_MONTHLY
+        sync: false
+      - key: PAYMENT_LINK_TEAM_YEARLY
+        sync: false
+      # plink_... ids of the four links, comma-separated; other checkouts on the Stripe account are ignored.
+      - key: PAYMENT_LINK_IDS
+        sync: false
+      - key: BILLING_PORTAL_URL
+        sync: false
+      - key: DOWNLOAD_WINDOWS_URL
+        sync: false
+      - key: DOWNLOAD_MAC_URL
+        sync: false

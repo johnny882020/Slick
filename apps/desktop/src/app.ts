@@ -6,6 +6,7 @@ import type { DaemonStatus } from "./protocol";
 import { Store } from "./store";
 import type { Transport } from "./transport";
 import { activityView } from "./views/activity";
+import { planView } from "./views/plan";
 import { appsView } from "./views/apps";
 import { createApprovalDialog } from "./views/approval";
 import { ROUTES, type Ctx, type Route, type View } from "./views/context";
@@ -100,6 +101,7 @@ export async function startApp(root: HTMLElement, transport: Transport): Promise
     apps: appsView,
     schedules: schedulesView,
     activity: activityView,
+    plan: planView,
   };
 
   function show(r: Route): void {

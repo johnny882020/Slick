@@ -4,7 +4,8 @@ import { join, resolve } from "node:path";
 import { existsSync, readdirSync } from "node:fs";
 import { PROVIDER_IDS, type ProviderId } from "@oneseat/contracts";
 import { PROVIDER_FACTORIES } from "@oneseat/gateway";
-import { createDaemon, type Daemon, type DaemonOptions } from "@oneseat/harness";
+import { createDaemon, LicenseManager, type Daemon, type DaemonOptions } from "@oneseat/harness";
+import { DEFAULT_CLOUD_URL, ONESEAT_LICENSE_PUBLIC_KEY } from "./license-key.js";
 import { createSkillStore, type RegistrySkillStore } from "@oneseat/registry";
 
 export interface StartOptions {
@@ -16,6 +17,10 @@ export interface StartOptions {
   log?: (line: string) => void;
   harness?: DaemonOptions["harness"];
   startScheduler?: boolean;
+  /** OneSeat Cloud for licenses and feedback. Default DEFAULT_CLOUD_URL. */
+  cloudUrl?: string;
+  /** Turn plan gates off (tests that predate plans). Default on. */
+  plans?: boolean;
 }
 
 export interface StartedDaemon {
@@ -70,7 +75,10 @@ export async function startDaemon(opts: StartOptions = {}): Promise<StartedDaemo
   const log = opts.log ?? ((l: string) => process.stderr.write(`${l}\n`));
   const store = createSkillStore({ dataDir });
   const seeded = opts.bundledSkillsDir ? await seedBundledSkills(store, opts.bundledSkillsDir, log) : [];
+  const license =
+    opts.plans === false ? undefined : new LicenseManager({ dataDir, publicKeyPem: ONESEAT_LICENSE_PUBLIC_KEY, cloudUrl: opts.cloudUrl ?? DEFAULT_CLOUD_URL, log });
   const daemon = createDaemon({
+    ...(license ? { license } : {}),
     store,
     providers: PROVIDER_FACTORIES,
     dataDir,

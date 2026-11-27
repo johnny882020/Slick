@@ -69,3 +69,4 @@ export { RpcError, serveLines, type LineConnection, type RpcHandler } from "./rp
 export { Redactor, REDACTED, createLogger, AsyncQueue, truncateText, type Logger } from "./util.js";
 export { resolveInside, normaliseRelativePath, PathError } from "./workspace.js";
 export { createEvalHarness, type EvalHarnessContext } from "./eval.js";
+export { LicenseManager, LicenseError, type LicenseManagerOptions } from "./license.js";

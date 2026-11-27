@@ -26,6 +26,10 @@ export const UI_METHODS = [
   "apps.draft",
   "apps.drafts",
   "mcp.status",
+  "license.status",
+  "license.activate",
+  "license.deactivate",
+  "feedback.send",
 ] as const satisfies readonly DaemonMethod[];
 
 /** Only the Rust core calls these: keys go through key_save, apps.run through bridge_run. */

@@ -249,6 +249,15 @@ function validateCron(cron) {
   return parts.every((p) => /^(\*|[a-z0-9]+(-[a-z0-9]+)?)(\/\d+)?(,(\*|[a-z0-9]+(-[a-z0-9]+)?)(\/\d+)?)*$/i.test(p));
 }
 
+const FREE = { tier: "free", status: "none", features: [], computers: 1 };
+let license = FREE;
+const feedback = [];
+/** FAKE_DAEMON_GATES=1: paid features need a license, like the real daemon. */
+const GATES = process.env.FAKE_DAEMON_GATES === "1";
+function requireFeature(f, label) {
+  if (GATES && !license.features.includes(f)) throw new RpcError(-32003, `${label} is part of OneSeat Pro and Team. Add a license key under Plan, or see the plans at the OneSeat website.`, { feature: f });
+}
+
 const drafts = new Map();
 
 function artifactBundle() {
@@ -515,6 +524,7 @@ const methods = {
     return { scan, lint };
   },
   "skills.install": (p) => {
+    requireFeature("import_skills", "Import skills from GitHub and skills.sh");
     requireObject(p);
     const sourceText = requireString(p, "source");
     const { source, scan, lint } = inspect(sourceText);
@@ -531,6 +541,7 @@ const methods = {
     return { ok: skills.delete(name) };
   },
   "apps.pin": (p) => {
+    requireFeature("pinned_apps", "Pin apps as their own windows");
     requireObject(p);
     if (typeof p.html !== "string" || !p.app || typeof p.app !== "object") throw new RpcError(ERR.invalidParams, "expected an ArtifactBundle");
     const app = p.app;
@@ -558,6 +569,32 @@ const methods = {
     drafts: [...drafts.entries()].map(([id, d]) => ({ id, appId: d.bundle.app.id, name: d.bundle.app.name, createdAt: d.createdAt })),
   }),
   "mcp.status": () => ({ servers: [] }),
+  // Plans: an in-memory license. Keys starting OS-9999 are "already used on every computer".
+  "license.status": () => license,
+  "license.activate": (p) => {
+    const key = requireString(requireObject(p), "licenseKey").trim().toUpperCase();
+    if (!/^OS(-[0-9A-HJKMNP-TV-Z]{4}){4}$/.test(key)) throw new RpcError(ERR.blocked ?? -32002, "that does not look like a OneSeat license key (OS-XXXX-XXXX-XXXX-XXXX)", { code: "bad_key" });
+    if (key.startsWith("OS-9999")) throw new RpcError(ERR.blocked ?? -32002, "this license is already used on 3 of 3 computers; deactivate one in OneSeat → Plan on that computer", { code: "computer_limit" });
+    const team = key.startsWith("OS-TEAM");
+    license = {
+      tier: team ? "team" : "pro",
+      status: "active",
+      features: team ? ["import_skills", "pinned_apps", "schedules", "mcp_connectors", "priority_support"] : ["import_skills", "pinned_apps", "schedules", "mcp_connectors"],
+      computers: team ? 15 : 3,
+      email: "pilot@example.com",
+      expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString(),
+    };
+    return license;
+  },
+  "license.deactivate": () => (license = FREE),
+  "feedback.send": (p) => {
+    const o = requireObject(p);
+    const message = requireString(o, "message");
+    if (o.rating !== undefined && !(Number.isInteger(o.rating) && o.rating >= 1 && o.rating <= 5)) throw new RpcError(ERR.invalidParams, "rating must be 1 to 5");
+    feedback.push({ message, rating: o.rating ?? null, topic: o.topic ?? null });
+    log(`feedback ${JSON.stringify({ message, rating: o.rating ?? null })}`);
+    return { ok: true, id: `fb_${feedback.length}` };
+  },
   "apps.unpin": (p) => {
     const id = requireString(requireObject(p), "id");
     const had = apps.delete(id);
@@ -582,6 +619,7 @@ const methods = {
   },
   "schedules.list": () => ({ schedules: [...schedules.values()] }),
   "schedules.upsert": (p) => {
+    requireFeature("schedules", "Scheduled tasks");
     requireObject(p);
     const id = requireString(p, "id");
     if (!validateCron(p.cron)) throw new RpcError(ERR.invalidParams, "cron must have 5 fields");

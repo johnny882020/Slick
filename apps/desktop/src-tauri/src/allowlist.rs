@@ -32,6 +32,10 @@ pub const UI_METHODS: &[&str] = &[
     "apps.draft",
     "apps.drafts",
     "mcp.status",
+    "license.status",
+    "license.activate",
+    "license.deactivate",
+    "feedback.send",
 ];
 
 /// Methods only the Rust core may call.

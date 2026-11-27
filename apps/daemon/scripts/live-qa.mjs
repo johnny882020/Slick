@@ -134,7 +134,16 @@ export const SCENARIOS = [
       if (!made) return [];
       const { draftId } = JSON.parse(made.result.content);
       const bundle = await rpc.call("apps.draft", { draftId });
-      const { app } = await rpc.call("apps.pin", bundle);
+      const plan = await rpc.call("license.status");
+      let app;
+      try {
+        ({ app } = await rpc.call("apps.pin", bundle));
+      } catch (e) {
+        // On Free, pinning must be refused with the upgrade error; that is the check then.
+        if (plan.tier === "free") return e.code === -32003 ? [] : [`Free plan: pinning failed with the wrong error (${e.code}: ${e.message})`];
+        return [`pinning failed on ${plan.tier}: ${e.message}`];
+      }
+      if (plan.tier === "free") return ["Free plan allowed pinning an app (a paid feature)"];
       if (!app.app.allowedSkills.includes("customers")) return ["pinned app does not allow the customers skill"];
       const r = await rpc.call("apps.run", { appId: app.app.id, skill: "customers", input: { action: "top_ltv", limit: 3 } });
       const problems = r.ok ? [] : [`pinned app bridge call failed: ${r.error ?? "no error text"}`];
@@ -177,7 +186,7 @@ class Rpc {
         if (msg.id !== undefined && this.pending.has(msg.id)) {
           const { res, rej } = this.pending.get(msg.id);
           this.pending.delete(msg.id);
-          msg.error ? rej(new Error(msg.error.message)) : res(msg.result);
+          msg.error ? rej(Object.assign(new Error(msg.error.message), { code: msg.error.code })) : res(msg.result);
         } else if (msg.method) for (const l of this.listeners) l(msg);
       }
     });
@@ -264,6 +273,7 @@ async function qaProvider(p, opts) {
     ONESEAT_BUNDLED_SKILLS: join(repo, "skills"),
     ONESEAT_DEFAULT_MODEL: `${p.provider}:${p.model}`,
     ...(opts.deno ? { ONESEAT_DENO: opts.deno } : {}),
+    ...(process.env.ONESEAT_CLOUD_URL ? { ONESEAT_CLOUD_URL: process.env.ONESEAT_CLOUD_URL } : {}),
   };
   const child = spawn(isJs ? process.execPath : opts.daemon, isJs ? [opts.daemon] : [], { env, stdio: ["pipe", "pipe", "pipe"] });
   let stderr = "";
@@ -275,6 +285,12 @@ async function qaProvider(p, opts) {
     // ONESEAT_QA_BASE_URL_<PROVIDER> points a provider at a test server (used to test this script).
     const baseUrl = process.env[`ONESEAT_QA_BASE_URL_${p.provider.toUpperCase()}`];
     await rpc.call("auth.set", { provider: p.provider, apiKey: p.key, ...(baseUrl ? { baseUrl } : {}) });
+    // With a QA license (e.g. a pilot Team key) the run also covers OneSeat Cloud activation
+    // and the paid features; without one it checks that Free blocks them.
+    if (process.env.ONESEAT_QA_LICENSE_KEY) {
+      const ent = await rpc.call("license.activate", { licenseKey: process.env.ONESEAT_QA_LICENSE_KEY });
+      console.log(`license: ${ent.tier} (${ent.status})`);
+    }
     const { skills } = await rpc.call("skills.list");
     if (skills.length < 7) throw new Error(`only ${skills.length} starter skills were seeded`);
     const db = new DatabaseSync(join(home, "oneseat.db"));

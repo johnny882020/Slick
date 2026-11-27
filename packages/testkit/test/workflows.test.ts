@@ -85,7 +85,9 @@ describe("ci.yml", () => {
     expect(e2e.strategy!.matrix!["os"]).toEqual(["ubuntu-latest", "windows-latest", "macos-latest"]);
     expect(runs(e2e)).toContain("playwright install --with-deps");
     const gates = wf.jobs["gates"]!;
-    expect(gates.needs).toEqual(["test", "rust", "desktop-build", "e2e"]);
+    expect(gates.needs).toEqual(["test", "rust", "desktop-build", "e2e", "cloud-db"]);
+    // The cloud store is tested on a real Postgres service, on Linux.
+    expect(wf.jobs["cloud-db"]!.env?.["ONESEAT_TEST_PG_URL"]).toMatch(/^postgres:\/\//);
     expect(gates.if).toBe("${{ always() }}");
   });
 

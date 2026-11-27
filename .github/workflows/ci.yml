@@ -72,6 +72,38 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  # OneSeat Cloud's Postgres store against a real Postgres (production runs on Neon).
+  cloud-db:
+    name: Cloud store on Postgres
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: oneseat_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ONESEAT_TEST_PG_URL: postgres://postgres:postgres@localhost:5432/oneseat_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Cloud tests (memory and Postgres stores)
+        run: pnpm --filter @oneseat/cloud test
+
   rust:
     name: Rust core (cargo test)
     runs-on: ubuntu-latest
@@ -230,7 +262,7 @@ jobs:
   gates:
     name: Gates 1-6
     if: ${{ always() }}
-    needs: [test, rust, desktop-build, e2e]
+    needs: [test, rust, desktop-build, e2e, cloud-db]
     runs-on: ubuntu-latest
     steps:
       - name: Summary
@@ -239,6 +271,7 @@ jobs:
           RUST: ${{ needs.rust.result }}
           BUILD: ${{ needs.desktop-build.result }}
           E2E: ${{ needs.e2e.result }}
+          CLOUD: ${{ needs.cloud-db.result }}
         run: |
           {
             echo "## Gates 1-6"
@@ -249,9 +282,10 @@ jobs:
             echo "| Rust core | $RUST |"
             echo "| Tauri build | $BUILD |"
             echo "| Gate 6 e2e | $E2E |"
+            echo "| Cloud store on Postgres | $CLOUD |"
             echo ""
             echo "Gate 7 (pilot) is MANUAL: copy packages/testkit/templates/pilot.md to docs/pilot.md and track it there."
           } >> "$GITHUB_STEP_SUMMARY"
-          for r in "$TEST" "$RUST" "$BUILD" "$E2E"; do
+          for r in "$TEST" "$RUST" "$BUILD" "$E2E" "$CLOUD"; do
             if [ "$r" != "success" ]; then echo "A required gate job did not succeed ($r)."; exit 1; fi
           done
