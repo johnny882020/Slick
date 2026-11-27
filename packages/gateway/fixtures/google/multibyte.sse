@@ -1,0 +1,4 @@
+data: {"candidates": [{"content": {"parts": [{"text": "Grüße aus München — 東京は雨 🌧️"}],"role": "model"},"index": 0}],"modelVersion": "gemini-2.5-flash","responseId": "multibyte0resp"}
+
+data: {"candidates": [{"content": {"parts": [{"text": ", 18°C 👩‍💻"}],"role": "model"},"finishReason": "STOP","index": 0}],"usageMetadata": {"promptTokenCount": 20,"candidatesTokenCount": 21,"totalTokenCount": 41},"modelVersion": "gemini-2.5-flash","responseId": "multibyte0resp"}
+

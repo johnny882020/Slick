@@ -1,0 +1,12 @@
+data: {"id":"chatcmpl-413","object":"chat.completion.chunk","created":1764250802,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"It is 18"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-413","object":"chat.completion.chunk","created":1764250802,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"°C in"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-413","object":"chat.completion.chunk","created":1764250802,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":" Paris."},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-413","object":"chat.completion.chunk","created":1764250802,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":"stop"}]}
+
+data: {"id":"chatcmpl-413","object":"chat.completion.chunk","created":1764250802,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[],"usage":{"prompt_tokens":190,"completion_tokens":9,"total_tokens":199}}
+
+data: [DONE]
+

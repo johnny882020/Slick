@@ -1,0 +1,6 @@
+data: {"candidates": [{"content": {"parts": [{"text": "**Planning the lookup**\n\nThe user wants Paris weather. ","thought": true}],"role": "model"},"index": 0}],"usageMetadata": {"promptTokenCount": 61,"totalTokenCount": 61},"modelVersion": "gemini-2.5-pro","responseId": "thinking0resp0id"}
+
+data: {"candidates": [{"content": {"parts": [{"text": "I will call get_weather.","thought": true}],"role": "model"},"index": 0}],"usageMetadata": {"promptTokenCount": 61,"totalTokenCount": 61},"modelVersion": "gemini-2.5-pro","responseId": "thinking0resp0id"}
+
+data: {"candidates": [{"content": {"parts": [{"functionCall": {"name": "get_weather","args": {"city": "Paris"}},"thoughtSignature": "CiQBVKhc7nRoaW5raW5nX3RoZW5fY2FsbF9zaWduYXR1cmU="}],"role": "model"},"finishReason": "STOP","index": 0}],"usageMetadata": {"promptTokenCount": 61,"candidatesTokenCount": 15,"totalTokenCount": 160,"thoughtsTokenCount": 84},"modelVersion": "gemini-2.5-pro","responseId": "thinking0resp0id"}
+

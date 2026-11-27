@@ -1,0 +1,2 @@
+data: {"candidates": [{"content": {"parts": [{"functionCall": {"name": "get_weather","args": {"city": "Paris"}},"thoughtSignature": "CiQBVKhc7nBhcmFsbGVsX2ZpcnN0X2NhbGxfc2lnbmF0dXJl"},{"functionCall": {"name": "get_weather","args": {"city": "London"}}}],"role": "model"},"finishReason": "STOP","index": 0}],"usageMetadata": {"promptTokenCount": 70,"candidatesTokenCount": 30,"totalTokenCount": 180,"thoughtsTokenCount": 80},"modelVersion": "gemini-2.5-pro","responseId": "parallel0resp0id"}
+

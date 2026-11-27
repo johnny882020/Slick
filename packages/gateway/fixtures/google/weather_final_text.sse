@@ -1,0 +1,4 @@
+data: {"candidates": [{"content": {"parts": [{"text": "It is 18"}],"role": "model"},"index": 0}],"usageMetadata": {"promptTokenCount": 98,"totalTokenCount": 98,"promptTokensDetails": [{"modality": "TEXT","tokenCount": 98}]},"modelVersion": "gemini-2.5-pro","responseId": "lZ0oaa2hNsWkqtsP_vWxqAk"}
+
+data: {"candidates": [{"content": {"parts": [{"text": "°C in Paris."}],"role": "model"},"finishReason": "STOP","index": 0}],"usageMetadata": {"promptTokenCount": 98,"candidatesTokenCount": 9,"totalTokenCount": 129,"promptTokensDetails": [{"modality": "TEXT","tokenCount": 98}],"thoughtsTokenCount": 22},"modelVersion": "gemini-2.5-pro","responseId": "lZ0oaa2hNsWkqtsP_vWxqAk"}
+

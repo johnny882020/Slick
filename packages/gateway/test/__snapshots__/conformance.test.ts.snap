@@ -1,0 +1,253 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`gate 2: weather tool call conformance > anthropic > turn 2 sends the tool result back and streams the final answer > anthropic turn 2 request body 1`] = `
+{
+  "max_tokens": 1024,
+  "messages": [
+    {
+      "content": [
+        {
+          "text": "What's the weather in Paris?",
+          "type": "text",
+        },
+      ],
+      "role": "user",
+    },
+    {
+      "content": [
+        {
+          "id": "toolu_01A09q90qw90lq917835lq9",
+          "input": {
+            "city": "Paris",
+          },
+          "name": "get_weather",
+          "type": "tool_use",
+        },
+      ],
+      "role": "assistant",
+    },
+    {
+      "content": [
+        {
+          "content": "{"city":"Paris","temperature_c":18,"conditions":"partly cloudy"}",
+          "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+          "type": "tool_result",
+        },
+      ],
+      "role": "user",
+    },
+  ],
+  "model": "claude-opus-5-5",
+  "stream": true,
+  "system": "You are a weather bot",
+  "tools": [
+    {
+      "description": "Get the current weather for a city",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "description": "City name, e.g. Paris",
+            "type": "string",
+          },
+        },
+        "required": [
+          "city",
+        ],
+        "type": "object",
+      },
+      "name": "get_weather",
+    },
+  ],
+}
+`;
+
+exports[`gate 2: weather tool call conformance > google > turn 2 sends the tool result back and streams the final answer > google turn 2 request body 1`] = `
+{
+  "contents": [
+    {
+      "parts": [
+        {
+          "text": "What's the weather in Paris?",
+        },
+      ],
+      "role": "user",
+    },
+    {
+      "parts": [
+        {
+          "functionCall": {
+            "args": {
+              "city": "Paris",
+            },
+            "name": "get_weather",
+          },
+          "thoughtSignature": "CiQBVKhc7mVhMjU2X3NpZ25hdHVyZV9mb3JfcGFyaXNfd2VhdGhlcl9jYWxs",
+        },
+      ],
+      "role": "model",
+    },
+    {
+      "parts": [
+        {
+          "functionResponse": {
+            "name": "get_weather",
+            "response": {
+              "result": "{"city":"Paris","temperature_c":18,"conditions":"partly cloudy"}",
+            },
+          },
+        },
+      ],
+      "role": "user",
+    },
+  ],
+  "generationConfig": {
+    "maxOutputTokens": 1024,
+  },
+  "systemInstruction": {
+    "parts": [
+      {
+        "text": "You are a weather bot",
+      },
+    ],
+  },
+  "tools": [
+    {
+      "functionDeclarations": [
+        {
+          "description": "Get the current weather for a city",
+          "name": "get_weather",
+          "parameters": {
+            "properties": {
+              "city": {
+                "description": "City name, e.g. Paris",
+                "type": "string",
+              },
+            },
+            "required": [
+              "city",
+            ],
+            "type": "object",
+          },
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`gate 2: weather tool call conformance > local > turn 2 sends the tool result back and streams the final answer > local turn 2 request body 1`] = `
+{
+  "max_tokens": 1024,
+  "messages": [
+    {
+      "content": "You are a weather bot",
+      "role": "system",
+    },
+    {
+      "content": "What's the weather in Paris?",
+      "role": "user",
+    },
+    {
+      "content": null,
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "function": {
+            "arguments": "{"city":"Paris"}",
+            "name": "get_weather",
+          },
+          "id": "call_9h1kq2x7",
+          "type": "function",
+        },
+      ],
+    },
+    {
+      "content": "{"city":"Paris","temperature_c":18,"conditions":"partly cloudy"}",
+      "role": "tool",
+      "tool_call_id": "call_9h1kq2x7",
+    },
+  ],
+  "model": "qwen3:8b",
+  "stream": true,
+  "stream_options": {
+    "include_usage": true,
+  },
+  "tools": [
+    {
+      "function": {
+        "description": "Get the current weather for a city",
+        "name": "get_weather",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "city": {
+              "description": "City name, e.g. Paris",
+              "type": "string",
+            },
+          },
+          "required": [
+            "city",
+          ],
+          "type": "object",
+        },
+      },
+      "type": "function",
+    },
+  ],
+}
+`;
+
+exports[`gate 2: weather tool call conformance > openai > turn 2 sends the tool result back and streams the final answer > openai turn 2 request body 1`] = `
+{
+  "input": [
+    {
+      "content": [
+        {
+          "text": "What's the weather in Paris?",
+          "type": "input_text",
+        },
+      ],
+      "role": "user",
+      "type": "message",
+    },
+    {
+      "arguments": "{"city":"Paris"}",
+      "call_id": "call_Kp3Dq1ZtWm8xVb2Ln5Rs",
+      "name": "get_weather",
+      "type": "function_call",
+    },
+    {
+      "call_id": "call_Kp3Dq1ZtWm8xVb2Ln5Rs",
+      "output": "{"city":"Paris","temperature_c":18,"conditions":"partly cloudy"}",
+      "type": "function_call_output",
+    },
+  ],
+  "instructions": "You are a weather bot",
+  "max_output_tokens": 1024,
+  "model": "gpt-5-codex",
+  "store": false,
+  "stream": true,
+  "tools": [
+    {
+      "description": "Get the current weather for a city",
+      "name": "get_weather",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "city": {
+            "description": "City name, e.g. Paris",
+            "type": "string",
+          },
+        },
+        "required": [
+          "city",
+        ],
+        "type": "object",
+      },
+      "strict": false,
+      "type": "function",
+    },
+  ],
+}
+`;
