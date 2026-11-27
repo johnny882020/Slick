@@ -1,0 +1,11 @@
+{
+  "permissions": {},
+  "effects": [],
+  "reasons": {},
+  "scripts": {
+    "deltas": {
+      "file": "scripts/deltas.ts",
+      "description": "Last full Monday-Sunday week and the week before for a given date, plus week-over-week deltas and formatted lines for a list of metrics. No permissions."
+    }
+  }
+}

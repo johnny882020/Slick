@@ -1,0 +1,2697 @@
+{
+  "skill": "proposals-invoices",
+  "cases": [
+    {
+      "id": "next-invoice-number",
+      "input": "Today is 2026-11-25. What's the next invoice number?",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "contains",
+          "value": "INV-2026-0013",
+          "caseSensitive": true
+        },
+        {
+          "type": "not_contains",
+          "value": "INV-2026-0008",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "INV-2025-0045",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "invoice-with-tax-exact-cents",
+      "input": "Today is 2026-11-25. Make an invoice for Dana Ortiz: 3 brand workshops at $125 each and 1.5 hours of design at $80/hour, with 8.25% sales tax.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "tool_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "contains",
+          "value": "535.84",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "40.84",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "INV-2026-0013",
+          "caseSensitive": true
+        },
+        {
+          "type": "regex",
+          "pattern": "draft",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "half-cent-tax-rounds-up",
+      "input": "Quick quote for Tom Becker: one sticker pack at $10.00 plus 8.25% tax. What's the total?",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "contains",
+          "value": "10.83",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "10.82",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "net-15-due-date",
+      "input": "Today is 2026-11-25. Invoice Priya Nair $900 for a logo refresh, Net 15.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "contains",
+          "value": "INV-2026-0013",
+          "caseSensitive": true
+        },
+        {
+          "type": "contains",
+          "value": "900.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "2026-12-10|Dec(ember)? 10",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "numbering-restarts-new-year",
+      "input": "Today is 2027-01-04. Create an invoice for Sam Lee for 40 bags of flour at $18.50 each, no tax.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "contains",
+          "value": "INV-2027-0001",
+          "caseSensitive": true
+        },
+        {
+          "type": "contains",
+          "value": "740.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "2027-02-03|Feb(ruary)? 3",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "printable-invoice-artifact",
+      "input": "Make a printable version of invoice INV-2026-0013.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv4",
+            "number": "INV-2026-0013",
+            "customer_id": "c1",
+            "status": "draft",
+            "issued_at": "2026-11-25",
+            "due_at": "2026-12-25",
+            "currency": "USD",
+            "total_cents": 53584,
+            "notes": "tax_bps=825; discount_cents=0; terms=Net 30"
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it4",
+            "invoice_id": "inv4",
+            "description": "Brand workshop",
+            "quantity": 3,
+            "unit_cents": 12500
+          },
+          {
+            "id": "it5",
+            "invoice_id": "inv4",
+            "description": "Design hours",
+            "quantity": 1.5,
+            "unit_cents": 8000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "tool_called",
+          "name": "read_skill_file"
+        },
+        {
+          "type": "tool_called",
+          "name": "make_artifact"
+        },
+        {
+          "type": "contains",
+          "value": "535.84",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "has been sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I have sent",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "send-does-not-mark-sent",
+      "input": "Send invoice INV-2026-0013 to Dana.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv4",
+            "number": "INV-2026-0013",
+            "customer_id": "c1",
+            "status": "draft",
+            "issued_at": "2026-11-25",
+            "due_at": "2026-12-25",
+            "currency": "USD",
+            "total_cents": 53584,
+            "notes": "tax_bps=825; discount_cents=0; terms=Net 30"
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it4",
+            "invoice_id": "inv4",
+            "description": "Brand workshop",
+            "quantity": 3,
+            "unit_cents": 12500
+          },
+          {
+            "id": "it5",
+            "invoice_id": "inv4",
+            "description": "Design hours",
+            "quantity": 1.5,
+            "unit_cents": 8000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_not_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "regex",
+          "pattern": "approv|connect|not sent|draft",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "has been sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I have sent",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "discount-before-tax",
+      "input": "Today is 2026-11-25. Invoice Tom Becker: website audit $1,200 and hosting setup $300, $150 discount, 7% tax.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "contains",
+          "value": "1,444.50",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "94.50",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "150.00",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "proposal-draft-saved",
+      "input": "Today is 2026-11-25. Draft a proposal for Dana Ortiz for a spring brand refresh: discovery workshop $1,500 and 3 design concepts at $800 each, no tax.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "run_skill_script"
+        },
+        {
+          "type": "tool_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "contains",
+          "value": "3,900.00",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "valid (until|through)",
+          "flags": "i"
+        },
+        {
+          "type": "regex",
+          "pattern": "2026-12-25|Dec(ember)? 25",
+          "flags": "i"
+        },
+        {
+          "type": "judge",
+          "rubric": "Pass only if the proposal is addressed to Dana Ortiz from Hearth Studio, lists a discovery workshop at $1,500.00 and 3 design concepts at $800.00 each (line total $2,400.00), states a total of exactly $3,900.00 with no tax, includes deliverables, a timeline or next step, and a validity date of 2026-12-25, and says it was saved as a draft (not sent). Score 0 if any amount is wrong.",
+          "threshold": 0.7
+        }
+      ]
+    },
+    {
+      "id": "delete-becomes-void",
+      "input": "Delete invoice INV-2026-0012, it was a mistake.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "messages": [
+          {
+            "id": "m1",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Wholesale pricing for 2027?",
+            "body": "Hi! Are you planning wholesale price changes next year? We'd like to order 40 bags in January.",
+            "sent_at": "2026-07-03T09:12:00Z"
+          },
+          {
+            "id": "m2",
+            "customer_id": "c2",
+            "channel": "email",
+            "direction": "out",
+            "subject": "Re: Wholesale pricing for 2027?",
+            "body": "Hi Sam, prices hold until March. I'll confirm the January slot soon.",
+            "sent_at": "2026-07-04T16:00:00Z"
+          },
+          {
+            "id": "m3",
+            "customer_id": "c1",
+            "channel": "email",
+            "direction": "in",
+            "subject": "Holiday campaign feedback",
+            "body": "Loved the campaign assets. Can we talk about a spring refresh for the shop?",
+            "sent_at": "2026-11-10T14:00:00Z"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "invoices": [
+          {
+            "id": "inv1",
+            "number": "INV-2026-0007",
+            "customer_id": "c1",
+            "status": "paid",
+            "issued_at": "2026-03-04",
+            "due_at": "2026-04-03",
+            "currency": "USD",
+            "total_cents": 112000,
+            "notes": ""
+          },
+          {
+            "id": "inv2",
+            "number": "INV-2026-0012",
+            "customer_id": "c3",
+            "status": "sent",
+            "issued_at": "2026-10-20",
+            "due_at": "2026-11-19",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          },
+          {
+            "id": "inv3",
+            "number": "INV-2025-0044",
+            "customer_id": "c3",
+            "status": "paid",
+            "issued_at": "2025-12-03",
+            "due_at": "2026-01-02",
+            "currency": "USD",
+            "total_cents": 90000,
+            "notes": ""
+          }
+        ],
+        "invoice_items": [
+          {
+            "id": "it1",
+            "invoice_id": "inv1",
+            "description": "Website refresh",
+            "quantity": 1,
+            "unit_cents": 112000
+          },
+          {
+            "id": "it2",
+            "invoice_id": "inv2",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          },
+          {
+            "id": "it3",
+            "invoice_id": "inv3",
+            "description": "Logo refresh",
+            "quantity": 1,
+            "unit_cents": 90000
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "void",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "has been deleted",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I deleted",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've deleted",
+          "caseSensitive": false
+        }
+      ]
+    }
+  ]
+}
