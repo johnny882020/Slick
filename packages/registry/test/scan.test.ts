@@ -28,7 +28,8 @@ const CASES: Case[] = [
   { name: "node:http import", files: { "a.mjs": 'import http from "node:http";\nhttp.get(addr);' }, verdict: "block", blocks: ["undeclared-network"] },
   { name: "axios with a URL", files: { "a.js": 'const axios = require("axios");\naxios.post("https://api.example.com/x", data);' }, verdict: "block", blocks: ["undeclared-network-host"] },
   { name: "fetch mentioned only in comments", files: { "a.ts": '// TODO: call fetch("https://later.example.com")\n/* fetch() here too */\nconsole.log("hi");' }, verdict: "pass", absent: ["undeclared-network", "undeclared-network-host", "url-in-code"] },
-  { name: "URL in code without a network call", files: { "a.ts": 'console.log("see https://docs.example.com/guide");' }, verdict: "warn", warns: ["url-in-code"] },
+  { name: "URL in code without a network call", files: { "a.ts": 'console.log("see https://docs.acme-tools.io/guide");' }, verdict: "warn", warns: ["url-in-code"] },
+  { name: "reserved documentation domain in code is info", files: { "a.ts": 'console.log("see https://docs.example.com/guide");' }, verdict: "pass", infos: ["url-in-code"] },
   { name: "wildcard host declaration", files: { "a.ts": 'await fetch("https://api.example.com/x");', "oneseat.json": perms({ permissions: { net: ["*.example.com"] }, reasons: { "*.example.com": "The company's own API servers." } }) }, verdict: "pass", infos: ["network-declared"] },
   { name: "host and port must match", files: { "a.ts": 'await fetch("http://localhost:9090/x");', "oneseat.json": perms({ permissions: { net: ["localhost:8080"] }, reasons: { "localhost:8080": "Local development server only." } }) }, verdict: "block", blocks: ["undeclared-network-host"] },
   { name: "declared host with port", files: { "a.ts": 'await fetch("http://localhost:8080/x");', "oneseat.json": perms({ permissions: { net: ["localhost:8080"] }, reasons: { "localhost:8080": "Local development server only." } }) }, verdict: "pass" },
@@ -329,5 +330,14 @@ describe("helpers", () => {
     expect(executableFormat(new Uint8Array([1, 2]))).toBeUndefined();
     expect(isBinary(new Uint8Array([0xff, 0xfe, 0x41]))).toBe(true);
     expect(isBinary(new TextEncoder().encode("héllo"))).toBe(false);
+  });
+});
+
+import { isReservedHost } from "../src/scan.js";
+describe("isReservedHost", () => {
+  it("treats RFC 2606 documentation domains as reserved", () => {
+    for (const h of ["example.com", "www.example.org", "api.example.net", "foo.test", "x.invalid", "a.localhost", "shop.example"])
+      expect(isReservedHost(h)).toBe(true);
+    for (const h of ["evil.example.co", "example.com.evil.io", "notexample.com", "api.stripe.com"]) expect(isReservedHost(h)).toBe(false);
   });
 });

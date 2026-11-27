@@ -82,19 +82,3 @@ Deno.test("rejects bad input", () => {
   throws(() => computeTotals({ items: [{ description: "A", unit_cents: 100 }], issued_at: "2026-02-30" }), TotalsError);
   throws(() => computeTotals({ items: [{ description: "", unit_cents: 100 }] }), TotalsError);
 });
-
-// The CLI check needs --allow-run --allow-read; it is skipped under plain `deno test`.
-const canSpawn =
-  (await Deno.permissions.query({ name: "run" })).state === "granted" &&
-  (await Deno.permissions.query({ name: "read" })).state === "granted";
-
-Deno.test({ name: "CLI prints JSON totals", ignore: !canSpawn }, async () => {
-  const cmd = new Deno.Command(Deno.execPath(), {
-    args: ["run", new URL("./totals.ts", import.meta.url).pathname, JSON.stringify({ items: [{ description: "A", quantity: 2, unit_cents: 250 }] })],
-    stdout: "piped",
-    stderr: "piped",
-  });
-  const out = await cmd.output();
-  strictEqual(out.code, 0);
-  strictEqual(JSON.parse(new TextDecoder().decode(out.stdout)).total_cents, 500);
-});

@@ -100,7 +100,7 @@ Fill [assets/brief-template.md](assets/brief-template.md). Rules:
 
 - **HTML one-pager**: offer it. `read_skill_file` [assets/one-pager-template.html](assets/one-pager-template.html),
   set the brand tokens (`SELECT key, value FROM brand`), replace the JSON in `report-data` (the
-  `metrics` array is the deltas output; escape `<` as `<`), then `make_artifact` with
+  `metrics` array is the deltas output; escape every `<` as `\u003c`), then `make_artifact` with
   `name: "Weekly report <current.label>"`, `allowedSkills: []`, `window: {"width": 900, "height": 1000}`.
 - **Every Monday**: offer once. `memory_search` "weekly-report schedule" first. On a yes,
   `schedule_task` with `cron: "0 8 * * 1"`, `skill: "weekly-report"`,

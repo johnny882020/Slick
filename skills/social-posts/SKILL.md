@@ -72,7 +72,7 @@ Quote any field with a comma, quote or line break, and double inner quotes (`"He
 **HTML calendar**: `read_skill_file` [assets/calendar-template.html](assets/calendar-template.html),
 put the brand tokens in the `BRAND:START` block, replace the JSON in `calendar-data` with
 `{"title": ..., "posts": [{"id","date","time","channel","status","campaign","text"}]}` (escape
-every `<` in text as `<`), then `make_artifact` with `name: "Content calendar <month>"`,
+every `<` in text as `\u003c`), then `make_artifact` with `name: "Content calendar <month>"`,
 `allowedSkills: []`, `window: {"width": 1100, "height": 800}`.
 
 ## Hard rules

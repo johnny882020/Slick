@@ -426,6 +426,15 @@ function sortFindings(f: ScanFinding[]): ScanFinding[] {
   );
 }
 
+/** RFC 2606 / RFC 6761 names that never resolve to a real third party. */
+export function isReservedHost(host: string): boolean {
+  const h = host.toLowerCase().replace(/\.$/, "");
+  return (
+    /^(.+\.)?example\.(com|net|org)$/.test(h) ||
+    /(^|\.)(example|test|invalid|localhost)$/.test(h)
+  );
+}
+
 function judgeCode(
   files: CodeFile[],
   declared: SkillPermissions,
@@ -452,7 +461,9 @@ function judgeCode(
         const entry = declared.net.find((d) => hostAllowed(u.host, u.port, [d]));
         if (entry) c.add("info", "network-declared", f.path, u.line, `Reaches declared host ${label} (${reasons[entry] ?? "no reason given"}).`);
         else c.add("block", "undeclared-network-host", f.path, u.line, `Reaches ${label}, which oneseat.json does not declare.`);
-      } else if (!hostAllowed(u.host, u.port, declared.net))
+      } else if (isReservedHost(u.host))
+        c.add("info", "url-in-code", f.path, u.line, `Names ${label}, a reserved documentation domain (RFC 2606); no network call seen.`);
+      else if (!hostAllowed(u.host, u.port, declared.net))
         c.add("warn", "url-in-code", f.path, u.line, `Names ${label} in code (no network call seen); it is not declared.`);
     }
     // Templated URLs ("https://${host}/") yield no host, so they land here too.
