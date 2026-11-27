@@ -154,6 +154,9 @@ export function buildOpenAICountRequest(req: ChatRequest): Record<string, unknow
 const ERROR_CODES: Record<string, ProviderErrorKind> = {
   rate_limit_exceeded: "rate_limit",
   insufficient_quota: "rate_limit",
+  // No credit left on the account: an account limit, not a server fault (never retried).
+  credit_balance_exhausted: "rate_limit",
+  billing_hard_limit_reached: "rate_limit",
   server_error: "server",
   server_is_overloaded: "overloaded",
   slow_down: "overloaded",

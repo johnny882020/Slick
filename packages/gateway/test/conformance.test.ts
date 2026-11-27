@@ -12,7 +12,7 @@
 import { describe, expect, it } from "vitest";
 import { collect, type ChatEvent, type ToolCall } from "@oneseat/contracts";
 import { fixtureFetch } from "../src/index.js";
-import { all, assertStreamShape, PROVIDER_CASES, weatherTurn1, weatherTurn2, type ProviderCase } from "./helpers.js";
+import { accountBlocked, all, assertStreamShape, PROVIDER_CASES, weatherTurn1, weatherTurn2, type ProviderCase } from "./helpers.js";
 
 function recording(c: ProviderCase): string | undefined {
   if (process.env["ONESEAT_RECORD"] !== "1" || !c.envKey) return undefined;
@@ -26,6 +26,7 @@ interface Turn1Result {
 }
 
 const turn1Results = new Map<string, Turn1Result>();
+const blockedProviders = new Set<string>();
 
 describe("gate 2: weather tool call conformance", () => {
   for (const c of PROVIDER_CASES) {
@@ -33,10 +34,16 @@ describe("gate 2: weather tool call conformance", () => {
       const liveKey = recording(c);
       const model = liveKey && process.env[`ONESEAT_RECORD_${c.id.toUpperCase()}_MODEL`] ? (process.env[`ONESEAT_RECORD_${c.id.toUpperCase()}_MODEL`] as string) : c.model;
 
-      it("turn 1 yields one get_weather tool call with stopReason tool_use", async () => {
+      it("turn 1 yields one get_weather tool call with stopReason tool_use", async (ctx) => {
         const f = fixtureFetch(c.dir, { record: Boolean(liveKey), ...(liveKey ? { secrets: [liveKey] } : {}) }).queue("weather_tool_call");
         const p = c.make(f, liveKey);
         const events = await all(p.send(weatherTurn1(model)));
+        // Recording against a live account with no credit or quota left: not a contract failure.
+        const blocked = liveKey ? accountBlocked(events) : undefined;
+        if (blocked) {
+          blockedProviders.add(c.id);
+          return ctx.skip(blocked);
+        }
         assertStreamShape(events);
         expect(events[0]).toEqual({ type: "message_start", model: expect.any(String) });
         const calls = events.flatMap((e) => (e.type === "tool_call" ? [e.call] : []));
@@ -54,7 +61,8 @@ describe("gate 2: weather tool call conformance", () => {
         expect(JSON.stringify(sent?.headers)).not.toContain(liveKey ?? "sk-test-SECRET");
       });
 
-      it("turn 2 sends the tool result back and streams the final answer", async () => {
+      it("turn 2 sends the tool result back and streams the final answer", async (ctx) => {
+        if (blockedProviders.has(c.id)) return ctx.skip("turn 1 was blocked by the provider account");
         const t1 = turn1Results.get(c.id);
         expect(t1, "turn 1 must pass first").toBeDefined();
         const { events, call } = t1 as Turn1Result;
@@ -78,22 +86,28 @@ describe("gate 2: weather tool call conformance", () => {
   }
 
   it("all providers agree on the normalised tool call", () => {
-    const normalised = PROVIDER_CASES.map((c) => {
+    const normalised = PROVIDER_CASES.filter((c) => !blockedProviders.has(c.id)).map((c) => {
       const r = turn1Results.get(c.id);
       return r ? { name: r.call.name, input: r.call.input, stopReason: r.stopReason } : undefined;
     });
-    expect(normalised).toHaveLength(4);
+    expect(normalised).toHaveLength(PROVIDER_CASES.length - blockedProviders.size);
     for (const n of normalised) expect(n).toEqual({ name: "get_weather", input: { city: "Paris" }, stopReason: "tool_use" });
   });
 });
 
 describe("gate 2: turn 2 request bodies link the tool result to the call", () => {
+  // These replay the weather_tool_call fixture. With ONESEAT_RECORD=1 the first describe has just
+  // re-recorded it from the live API, so ids and signatures are the live ones: compare against
+  // the call that was replayed, not against the hand-written fixture's values.
+  const RECORDED = process.env["ONESEAT_RECORD"] === "1";
+  let lastCallId = "";
   async function turn2Body(id: string): Promise<Record<string, unknown>> {
     const c = PROVIDER_CASES.find((x) => x.id === id) as ProviderCase;
     const f1 = fixtureFetch(c.dir, { record: false }).queue("weather_tool_call");
     const r1 = await collect(c.make(f1).send(weatherTurn1(c.model)));
     const call = r1.message.content.find((p) => p.type === "tool_use");
     if (!call || call.type !== "tool_use") throw new Error("no call");
+    lastCallId = call.id;
     const f2 = fixtureFetch(c.dir, { record: false }).queue("weather_final_text");
     await collect(c.make(f2).send(weatherTurn2(c.model, r1.message, call.id)));
     return f2.requests[0]?.body as Record<string, unknown>;
@@ -104,10 +118,10 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
     expect(body["system"]).toBe("You are a weather bot");
     expect(body["messages"]).toEqual([
       { role: "user", content: [{ type: "text", text: "What's the weather in Paris?" }] },
-      { role: "assistant", content: [{ type: "tool_use", id: "toolu_01A09q90qw90lq917835lq9", name: "get_weather", input: { city: "Paris" } }] },
+      { role: "assistant", content: [{ type: "tool_use", id: lastCallId, name: "get_weather", input: { city: "Paris" } }] },
       {
         role: "user",
-        content: [{ type: "tool_result", tool_use_id: "toolu_01A09q90qw90lq917835lq9", content: expect.stringContaining("temperature_c") }],
+        content: [{ type: "tool_result", tool_use_id: lastCallId, content: expect.stringContaining("temperature_c") }],
       },
     ]);
   });
@@ -118,8 +132,8 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
     expect(body["store"]).toBe(false);
     expect(body["input"]).toEqual([
       { type: "message", role: "user", content: [{ type: "input_text", text: "What's the weather in Paris?" }] },
-      { type: "function_call", call_id: "call_Kp3Dq1ZtWm8xVb2Ln5Rs", name: "get_weather", arguments: '{"city":"Paris"}' },
-      { type: "function_call_output", call_id: "call_Kp3Dq1ZtWm8xVb2Ln5Rs", output: expect.stringContaining("temperature_c") },
+      { type: "function_call", call_id: lastCallId, name: "get_weather", arguments: '{"city":"Paris"}' },
+      { type: "function_call_output", call_id: lastCallId, output: expect.stringContaining("temperature_c") },
     ]);
   });
 
@@ -133,7 +147,7 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
         parts: [
           {
             functionCall: { name: "get_weather", args: { city: "Paris" } },
-            thoughtSignature: "CiQBVKhc7mVhMjU2X3NpZ25hdHVyZV9mb3JfcGFyaXNfd2VhdGhlcl9jYWxs",
+            thoughtSignature: RECORDED ? expect.any(String) : "CiQBVKhc7mVhMjU2X3NpZ25hdHVyZV9mb3JfcGFyaXNfd2VhdGhlcl9jYWxs",
           },
         ],
       },
@@ -149,9 +163,9 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
       {
         role: "assistant",
         content: null,
-        tool_calls: [{ id: "call_9h1kq2x7", type: "function", function: { name: "get_weather", arguments: '{"city":"Paris"}' } }],
+        tool_calls: [{ id: lastCallId, type: "function", function: { name: "get_weather", arguments: '{"city":"Paris"}' } }],
       },
-      { role: "tool", tool_call_id: "call_9h1kq2x7", content: expect.stringContaining("temperature_c") },
+      { role: "tool", tool_call_id: lastCallId, content: expect.stringContaining("temperature_c") },
     ]);
   });
 });

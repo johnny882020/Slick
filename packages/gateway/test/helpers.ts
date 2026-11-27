@@ -7,6 +7,7 @@ import {
   createLocalProvider,
   createOpenAIProvider,
   fixtureFetch,
+  OUT_OF_CREDIT,
   type FixtureFetch,
   type FixtureFetchOptions,
 } from "../src/index.js";
@@ -133,4 +134,18 @@ export function sseResponse(body: string, init: ResponseInit = {}): Response {
 
 export function jsonResponse(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", ...headers } });
+}
+
+/**
+ * Live runs only: the provider account itself is blocked (no credit, or a quota that will not
+ * clear within the run). That is not a OneSeat failure, so live tests skip with the provider's
+ * words instead of failing. Returns the reason, or undefined when the account is fine.
+ */
+export function accountBlocked(events: ChatEvent[]): string | undefined {
+  for (const e of events) {
+    if (e.type !== "error") continue;
+    const m = e.error.message;
+    if (OUT_OF_CREDIT.test(m) || (e.error.kind === "rate_limit" && /RESOURCE_EXHAUSTED|exceeded your current quota/i.test(m))) return `blocked by the provider account: ${m.slice(0, 160)}`;
+  }
+  return undefined;
 }

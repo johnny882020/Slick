@@ -9,7 +9,7 @@
 import { describe, expect, it } from "vitest";
 import { collect, type ProviderId } from "@oneseat/contracts";
 import { createProvider } from "../src/index.js";
-import { all, assertStreamShape, textRequest, weatherTurn1, weatherTurn2 } from "./helpers.js";
+import { accountBlocked, all, assertStreamShape, textRequest, weatherTurn1, weatherTurn2 } from "./helpers.js";
 
 const LIVE = process.env["ONESEAT_LIVE"] === "1";
 
@@ -34,17 +34,22 @@ for (const c of CASES) {
       expect(await provider().countTokens(weatherTurn1(c.model))).toBeGreaterThan(0);
     }, 60_000);
 
-    it("streams text", async () => {
+    it("streams text", async (ctx) => {
       const events = await all(provider().send({ ...textRequest(c.model, "Reply with the single word: pong"), maxTokens: 256 }));
+      const blocked = accountBlocked(events);
+      if (blocked) return ctx.skip(blocked);
       assertStreamShape(events);
       const res = await collect((async function* () { yield* events; })());
       expect(res.error).toBeUndefined();
       expect(JSON.stringify(res.message.content).toLowerCase()).toContain("pong");
     }, 60_000);
 
-    it("runs the gate 2 weather scenario end to end", async () => {
+    it("runs the gate 2 weather scenario end to end", async (ctx) => {
       const p = provider();
-      const t1 = await collect(p.send({ ...weatherTurn1(c.model), toolChoice: "any" }));
+      const e1 = await all(p.send({ ...weatherTurn1(c.model), toolChoice: "any" }));
+      const blocked = accountBlocked(e1);
+      if (blocked) return ctx.skip(blocked);
+      const t1 = await collect((async function* () { yield* e1; })());
       expect(t1.error).toBeUndefined();
       expect(t1.stopReason).toBe("tool_use");
       const call = t1.message.content.find((x) => x.type === "tool_use");

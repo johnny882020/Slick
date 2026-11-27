@@ -137,6 +137,16 @@ describe("OpenAI stream decoding", () => {
     expect(res.usage).toEqual({ inputTokens: 25, outputTokens: 10, cacheReadTokens: 2048 });
   });
 
+  it("reports a mid-stream 'no credits' error as an account limit that is never retried", async () => {
+    // As seen live: OpenAI sends credit_balance_exhausted as a stream error event.
+    const body = sse([
+      { type: "response.created", response: {} },
+      { type: "error", code: "credit_balance_exhausted", message: "You have no credits remaining. Add credits to continue using the API." },
+    ]);
+    const events = await all(createOpenAIProvider({ apiKey: "k", fetch: stubFetch(() => sseResponse(body)) }).send(textRequest(MODEL)));
+    expect(events[events.length - 1]).toMatchObject({ type: "error", error: { kind: "rate_limit", retryable: false } });
+  });
+
   it("maps response.failed and stream error events to one error", async () => {
     const failed = await all(createOpenAIProvider({ apiKey: "k", fetch: fixtureFetch(DIR, { record: false }).queue("failed") }).send(textRequest(MODEL)));
     assertStreamShape(failed);
