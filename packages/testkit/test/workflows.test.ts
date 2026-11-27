@@ -141,6 +141,7 @@ describe("nightly-live.yml live QA", () => {
     expect(r).toContain('ls "$bin"/oneseat-daemon-*');
     expect(r).toContain('ls "$bin"/deno-*');
     expect(r).toContain("free-tier quota is kept for the Linux run");
+    expect(r).toContain('--repeat "$QA_REPEAT"');
   });
 });
 
