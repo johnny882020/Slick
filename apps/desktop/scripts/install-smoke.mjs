@@ -29,6 +29,17 @@ function find(dir, pred) {
   return out;
 }
 
+/** A short listing of a folder, `depth` levels deep, for failure messages. */
+function tree(dir, depth, prefix = "") {
+  if (!existsSync(dir)) return [`${prefix}(missing: ${dir})`];
+  const out = [];
+  for (const e of readdirSync(dir, { withFileTypes: true }).slice(0, 40)) {
+    out.push(`${prefix}${e.name}${e.isDirectory() ? "/" : ""}`);
+    if (e.isDirectory() && depth > 1) out.push(...tree(join(dir, e.name), depth - 1, `${prefix}  `));
+  }
+  return out;
+}
+
 /** Where the installed app keeps its data and log (Tauri app_data_dir / app_log_dir). */
 export function appPaths(platform = process.platform, env = process.env, home = homedir()) {
   if (platform === "win32")
@@ -83,6 +94,10 @@ function installMac(bundle) {
     if (!existsSync(join(macos, side))) throw new Error(`app bundle does not ship ${side} in Contents/MacOS`);
   const main = readdirSync(macos).find((n) => n !== "oneseat-daemon" && n !== "deno");
   if (!main) throw new Error("no main binary in Contents/MacOS");
+  const resources = join(dest, "Contents", "Resources");
+  console.log(`Contents/Resources:\n${tree(resources, 2).map((l) => `  ${l}`).join("\n")}`);
+  if (!existsSync(join(resources, "skills", "customers", "SKILL.md")))
+    throw new Error("app bundle does not ship the starter skills in Contents/Resources/skills (see the listing above)");
   return join(macos, main);
 }
 

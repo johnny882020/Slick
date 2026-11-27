@@ -46,7 +46,10 @@ export async function seedDatabase(path: string, db: EvalCase["db"]): Promise<{ 
   const conn = await openDb(path);
   let rows = 0;
   try {
-    conn.exec(BUSINESS_SCHEMA_SQL);
+    // A throwaway eval database: no fsync per statement (seconds per folder on Windows).
+    // The schema commits on its own so a bad row rolls back only the rows.
+    conn.exec("PRAGMA journal_mode = MEMORY; PRAGMA synchronous = OFF;");
+    conn.exec(`BEGIN; ${BUSINESS_SCHEMA_SQL}; COMMIT;`);
     conn.exec("BEGIN");
     try {
       const tables = Object.keys(db ?? {});

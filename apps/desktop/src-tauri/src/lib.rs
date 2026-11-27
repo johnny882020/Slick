@@ -169,12 +169,20 @@ pub fn run() {
             );
             match spec {
                 Ok(mut spec) => {
-                    if let Some(dir) = bundled_skills_dir(
+                    let resource_dir = app.path().resource_dir().ok();
+                    match bundled_skills_dir(
                         cfg!(debug_assertions),
-                        app.path().resource_dir().ok(),
+                        resource_dir.clone(),
                         Path::new(env!("CARGO_MANIFEST_DIR")),
                     ) {
-                        spec.env.push(("ONESEAT_BUNDLED_SKILLS".to_string(), dir.into_os_string()));
+                        Some(dir) => {
+                            log::info!("starter skills: {}", dir.display());
+                            spec.env.push(("ONESEAT_BUNDLED_SKILLS".to_string(), dir.into_os_string()));
+                        }
+                        None => log::warn!(
+                            "no starter skills folder (resource dir: {})",
+                            resource_dir.map(|d| d.display().to_string()).unwrap_or_else(|| "unknown".into())
+                        ),
                     }
                     log::info!("starting daemon: {}", spec.description);
                     let events = Arc::new(ShellEvents {
