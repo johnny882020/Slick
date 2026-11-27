@@ -46,7 +46,8 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": ["binaries/oneseat-daemon"],
+    "externalBin": ["binaries/oneseat-daemon", "binaries/deno"],
+    "resources": { "../../../skills/": "skills/" },
     "createUpdaterArtifacts": false,
     "windows": {
       "certificateThumbprint": null,

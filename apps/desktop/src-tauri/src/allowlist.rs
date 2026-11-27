@@ -29,6 +29,9 @@ pub const UI_METHODS: &[&str] = &[
     "schedules.upsert",
     "schedules.remove",
     "actions.log",
+    "apps.draft",
+    "apps.drafts",
+    "mcp.status",
 ];
 
 /// Methods only the Rust core may call.

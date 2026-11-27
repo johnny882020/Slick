@@ -122,7 +122,9 @@ describe("fake daemon", () => {
   it("pins apps to ONESEAT_HOME and enforces allowedSkills in apps.run", async () => {
     const { runId } = await c.call("harness.run", { input: "make an invoice tracker app", provider: "anthropic", model: "m" });
     const end = await c.waitFor((e) => e.runId === runId && e.event.type === "tool_end");
-    const bundle = JSON.parse((end.event as Extract<HarnessEvent, { type: "tool_end" }>).result.content);
+    const { draftId } = JSON.parse((end.event as Extract<HarnessEvent, { type: "tool_end" }>).result.content);
+    const bundle = await c.call("apps.draft", { draftId });
+    expect((await c.call("apps.drafts", {})).drafts.map((d) => d.id)).toContain(draftId);
     const { app } = await c.call("apps.pin", bundle);
     expect(existsSync(join(home, "apps", "invoice-tracker", "index.html"))).toBe(true);
     expect(JSON.parse(readFileSync(join(home, "apps", "invoice-tracker", "app.json"), "utf8")).id).toBe("invoice-tracker");

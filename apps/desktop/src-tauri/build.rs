@@ -25,12 +25,22 @@ pub const COMMANDS: &[&str] = &[
     "bridge_run",
 ];
 
-fn ensure_sidecar() {
+/// Sidecars in tauri.conf.json `bundle.externalBin`: the daemon and the Deno binary its
+/// script sandbox runs (installed side by side; the daemon finds `deno` next to itself).
+const SIDECARS: &[&str] = &["oneseat-daemon", "deno"];
+
+fn ensure_sidecars() {
+    for name in SIDECARS {
+        ensure_sidecar(name);
+    }
+}
+
+fn ensure_sidecar(name: &str) {
     let target = std::env::var("TARGET").expect("cargo sets TARGET");
     let profile = std::env::var("PROFILE").unwrap_or_default();
     let ext = if target.contains("windows") { ".exe" } else { "" };
     let dir = PathBuf::from("binaries");
-    let file = dir.join(format!("oneseat-daemon-{target}{ext}"));
+    let file = dir.join(format!("{name}-{target}{ext}"));
     println!("cargo:rerun-if-changed={}", file.display());
     let is_placeholder = std::fs::read(&file)
         .map(|b| {
@@ -49,7 +59,7 @@ fn ensure_sidecar() {
                 return;
             }
             panic!(
-                "missing daemon sidecar {}.\nBuild it first: pnpm --filter @oneseat/daemon run build:sidecar\n(it writes apps/desktop/src-tauri/binaries/oneseat-daemon-<target-triple>[.exe])",
+                "missing sidecar {}.\nBuild it first: pnpm --filter @oneseat/daemon run build:sidecar\n(it writes apps/desktop/src-tauri/binaries/oneseat-daemon-<target-triple>[.exe] and deno-<target-triple>[.exe])",
                 file.display()
             );
         }
@@ -72,7 +82,7 @@ fn write_placeholder(dir: &PathBuf, file: &PathBuf) {
 }
 
 fn main() {
-    ensure_sidecar();
+    ensure_sidecars();
     tauri_build::try_build(
         tauri_build::Attributes::new().app_manifest(tauri_build::AppManifest::new().commands(COMMANDS)),
     )

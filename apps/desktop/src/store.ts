@@ -1,9 +1,9 @@
 // App-wide state shared by the views: key status, daemon status, runs, drafts.
 
-import type { HarnessEvent } from "@oneseat/contracts";
-import type { ArtifactDraft } from "./artifacts";
+import type { ArtifactBundle, HarnessEvent } from "@oneseat/contracts";
+import { makeDraft, type ArtifactDraft } from "./artifacts";
 import type { DaemonNotification, DaemonStatus, KeyStatus } from "./protocol";
-import { initialRun, pendingApprovals, reduceRun, type ApprovalItem, type RunState } from "./run-state";
+import { addDrafts, draftIdFromToolResult, initialRun, pendingApprovals, reduceRun, type ApprovalItem, type RunState } from "./run-state";
 
 export type Change =
   | { type: "keys" }
@@ -88,6 +88,35 @@ export class Store {
       this.emit({ type: "approvals" });
     }
     if (after.artifacts.length !== before.artifacts.length) this.emit({ type: "drafts" });
+    if (event.type === "tool_end" && this.draftFetcher) {
+      const id = draftIdFromToolResult(event.result.name, event.result.content, event.result.isError);
+      if (id) void this.fetchDraft(runId, id);
+    }
+  }
+
+  private draftFetcher: ((draftId: string) => Promise<ArtifactBundle>) | undefined;
+
+  /** make_artifact results carry a draft id; this loads the bundle (daemon apps.draft). */
+  setDraftFetcher(fetcher: (draftId: string) => Promise<ArtifactBundle>): void {
+    this.draftFetcher = fetcher;
+  }
+
+  private async fetchDraft(runId: string, draftId: string): Promise<void> {
+    try {
+      const bundle = await this.draftFetcher!(draftId);
+      this.addDraftBundle(runId, bundle);
+    } catch {
+      /* the draft stays reachable from the daemon's apps.drafts list */
+    }
+  }
+
+  addDraftBundle(runId: string, bundle: ArtifactBundle): void {
+    const run = this.runs.get(runId) ?? initialRun(runId);
+    const next = addDrafts(run, [makeDraft(runId, bundle)]);
+    if (next === run) return;
+    this.runs.set(runId, next);
+    this.emit({ type: "run", runId });
+    this.emit({ type: "drafts" });
   }
 
   handleNotification(n: DaemonNotification): void {

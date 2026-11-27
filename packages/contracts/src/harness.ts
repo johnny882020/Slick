@@ -154,6 +154,24 @@ export interface DaemonMethods {
   "schedules.upsert": { params: Omit<Schedule, "lastRunAt" | "nextRunAt">; result: { schedule: Schedule } };
   "schedules.remove": { params: { id: string }; result: { ok: boolean } };
   "actions.log": { params: { limit?: number }; result: { entries: ActionLogEntry[] } };
+  /** A make_artifact draft. The tool result carries only { draftId }; the shell fetches the bundle. */
+  "apps.draft": { params: { draftId: string }; result: ArtifactBundle };
+  "apps.drafts": { params: Record<string, never>; result: { drafts: ArtifactDraftInfo[] } };
+  "mcp.status": { params: Record<string, never>; result: { servers: McpServerStatus[] } };
+}
+
+export interface ArtifactDraftInfo {
+  id: string;
+  appId: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface McpServerStatus {
+  id: string;
+  connected: boolean;
+  tools: number;
+  error?: string;
 }
 
 /** Notifications the daemon sends (no id). */

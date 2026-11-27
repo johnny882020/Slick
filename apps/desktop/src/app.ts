@@ -165,6 +165,7 @@ export async function startApp(root: HTMLElement, transport: Transport): Promise
     if (c.type === "daemon" || c.type === "keys") renderBanner();
   });
 
+  store.setDraftFetcher((draftId) => api.call("apps.draft", { draftId }));
   await api.onNotification((n) => store.handleNotification(n));
   await api.onStatus((s) => {
     store.setDaemon(s);

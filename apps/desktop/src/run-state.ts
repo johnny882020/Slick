@@ -93,7 +93,7 @@ function push(s: RunState, item: WithoutKey<RunItem>): RunState {
   return { ...s, seq: s.seq + 1, items: [...s.items, { ...item, key } as RunItem] };
 }
 
-function addDrafts(s: RunState, drafts: ArtifactDraft[]): RunState {
+export function addDrafts(s: RunState, drafts: ArtifactDraft[]): RunState {
   const fresh = drafts.filter((d) => !s.artifacts.some((a) => a.key === d.key));
   return fresh.length ? { ...s, artifacts: [...s.artifacts, ...fresh] } : s;
 }
@@ -215,4 +215,15 @@ export function runText(s: RunState): string {
     .filter((i): i is TextItem => i.kind === "text")
     .map((i) => i.text)
     .join("");
+}
+
+/** The draft id in a make_artifact result ({ draftId, ... }), if any. */
+export function draftIdFromToolResult(name: string, content: string, isError: boolean): string | null {
+  if (isError || name !== "make_artifact") return null;
+  try {
+    const v = JSON.parse(content) as { draftId?: unknown };
+    return typeof v.draftId === "string" && v.draftId ? v.draftId : null;
+  } catch {
+    return null;
+  }
 }

@@ -23,6 +23,9 @@ export const UI_METHODS = [
   "schedules.upsert",
   "schedules.remove",
   "actions.log",
+  "apps.draft",
+  "apps.drafts",
+  "mcp.status",
 ] as const satisfies readonly DaemonMethod[];
 
 /** Only the Rust core calls these: keys go through key_save, apps.run through bridge_run. */

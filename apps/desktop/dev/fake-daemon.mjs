@@ -249,6 +249,8 @@ function validateCron(cron) {
   return parts.every((p) => /^(\*|[a-z0-9]+(-[a-z0-9]+)?)(\/\d+)?(,(\*|[a-z0-9]+(-[a-z0-9]+)?)(\/\d+)?)*$/i.test(p));
 }
 
+const drafts = new Map();
+
 function artifactBundle() {
   const html = `<!doctype html>
 <html lang="en">
@@ -379,14 +381,18 @@ async function runScript(runId, task) {
   } else if (/\b(app|dashboard|tracker)\b/.test(lower)) {
     const skill = forced ? task.skill : "invoice-chaser";
     if (!task.disableSkills) await emit(runId, { type: "skill_loaded", name: skill, reason: forced ? "forced" : "router" });
+    // Like the real harness: make_artifact stores a draft and returns only its id;
+    // the shell fetches the bundle with apps.draft.
     const bundle = artifactBundle();
-    await emit(runId, { type: "tool_start", call: { id: "call_a1", name: "artifact_create", input: { name: bundle.app.name } }, effects: ["write"] });
+    const draftId = `draft_${runId}`;
+    drafts.set(draftId, { bundle, createdAt: new Date().toISOString() });
+    await emit(runId, { type: "tool_start", call: { id: "call_a1", name: "make_artifact", input: { name: bundle.app.name } }, effects: ["write"] });
     await emit(runId, {
       type: "tool_end",
-      result: { callId: "call_a1", name: "artifact_create", content: JSON.stringify(bundle), isError: false },
+      result: { callId: "call_a1", name: "make_artifact", content: JSON.stringify({ draftId, appId: bundle.app.id, name: bundle.app.name }), isError: false },
       durationMs: 41,
     });
-    logAction(runId, "artifact_create", ["write"], null, false, "Drafted the Invoice tracker app");
+    logAction(runId, "make_artifact", ["write"], null, false, "Drafted the Invoice tracker app");
     text = "I made a small Invoice tracker app. Pin it to open it in its own window.";
     if (!(await streamText(run, runId, text))) return finishCancelled(runId, text);
     await emit(runId, { type: "turn_end", turn: 1, usage: usage(2410, 1630) });
@@ -541,6 +547,15 @@ const methods = {
     return { app: pinned };
   },
   "apps.list": () => ({ apps: [...apps.values()] }),
+  "apps.draft": (p) => {
+    const d = drafts.get(requireString(requireObject(p), "draftId"));
+    if (!d) throw new RpcError(ERR.notFound ?? -32004, "no such draft");
+    return d.bundle;
+  },
+  "apps.drafts": () => ({
+    drafts: [...drafts.entries()].map(([id, d]) => ({ id, appId: d.bundle.app.id, name: d.bundle.app.name, createdAt: d.createdAt })),
+  }),
+  "mcp.status": () => ({ servers: [] }),
   "apps.unpin": (p) => {
     const id = requireString(requireObject(p), "id");
     const had = apps.delete(id);

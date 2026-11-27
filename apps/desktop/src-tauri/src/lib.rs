@@ -21,6 +21,17 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use tauri::{Manager, RunEvent};
 
+/// Starter skills the daemon installs on first run (each still goes through scan + lint).
+/// Release: the `skills` resource folder. Debug: the repo's top-level `skills/`.
+fn bundled_skills_dir(debug: bool, resource_dir: Option<PathBuf>, manifest_dir: &Path) -> Option<PathBuf> {
+    let dir = if debug {
+        manifest_dir.join("..").join("..").join("..").join("skills")
+    } else {
+        resource_dir?.join("skills")
+    };
+    dir.is_dir().then_some(dir)
+}
+
 /// Single-app export: a pinned app bundled as resources `pinned/index.html` + `pinned/app.json`.
 fn bundled_app(resource_dir: Option<PathBuf>) -> Option<BundledApp> {
     let dir = resource_dir?.join("pinned");
@@ -157,7 +168,14 @@ pub fn run() {
                 &data_dir,
             );
             match spec {
-                Ok(spec) => {
+                Ok(mut spec) => {
+                    if let Some(dir) = bundled_skills_dir(
+                        cfg!(debug_assertions),
+                        app.path().resource_dir().ok(),
+                        Path::new(env!("CARGO_MANIFEST_DIR")),
+                    ) {
+                        spec.env.push(("ONESEAT_BUNDLED_SKILLS".to_string(), dir.into_os_string()));
+                    }
                     log::info!("starting daemon: {}", spec.description);
                     let events = Arc::new(ShellEvents {
                         app: handle.clone(),
@@ -219,6 +237,18 @@ mod tests {
             PathBuf::from("/home/u/.local/share/app.oneseat")
         );
         assert_eq!(data_dir_for(own.clone(), false), own);
+    }
+
+    #[test]
+    fn finds_bundled_skills() {
+        let manifest = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let debug = bundled_skills_dir(true, None, manifest).expect("repo skills/ in debug");
+        assert!(debug.join("customers").join("SKILL.md").is_file());
+        let tmp = std::env::temp_dir().join(format!("oneseat-res-{}", std::process::id()));
+        std::fs::create_dir_all(tmp.join("skills")).unwrap();
+        assert_eq!(bundled_skills_dir(false, Some(tmp.clone()), manifest), Some(tmp.join("skills")));
+        assert_eq!(bundled_skills_dir(false, None, manifest), None);
+        std::fs::remove_dir_all(&tmp).unwrap();
     }
 
     #[test]

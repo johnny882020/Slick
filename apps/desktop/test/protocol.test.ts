@@ -64,7 +64,8 @@ describe("protocol surface", () => {
     expect(conf.identifier).toBe("app.oneseat");
     expect(conf.productName).toBe("OneSeat");
     expect(conf.bundle.targets).toEqual(["msi", "nsis", "dmg", "app"]);
-    expect(conf.bundle.externalBin).toEqual(["binaries/oneseat-daemon"]);
+    expect(conf.bundle.externalBin).toEqual(["binaries/oneseat-daemon", "binaries/deno"]);
+    expect(conf.bundle.resources).toEqual({ "../../../skills/": "skills/" });
     expect(conf.bundle.windows.certificateThumbprint).toBeNull();
     expect(conf.bundle.macOS.signingIdentity).toBeNull();
     expect(conf.app.security.capabilities).toEqual(["main", "pinned-apps"]);

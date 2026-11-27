@@ -77,3 +77,29 @@ describe("Store", () => {
     expect(ok).toBe(true);
   });
 });
+
+describe("make_artifact draft ids", () => {
+  it("fetches the bundle for a { draftId } result and adds it once", async () => {
+    const s = new Store();
+    const b = { html: "<!doctype html><html><body>x</body></html>", app: { id: "tracker", name: "Tracker", version: "1.0.0", window: { width: 800, height: 600 }, allowedSkills: [] } };
+    const asked: string[] = [];
+    s.setDraftFetcher(async (id) => (asked.push(id), b));
+    const ev = { type: "tool_end" as const, result: { callId: "c", name: "make_artifact", content: JSON.stringify({ draftId: "draft_1", appId: "tracker" }), isError: false }, durationMs: 1 };
+    s.applyEvent("r", ev);
+    s.applyEvent("r", ev);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(asked).toEqual(["draft_1", "draft_1"]);
+    expect(s.drafts().map((d) => d.bundle.app.id)).toEqual(["tracker"]);
+  });
+  it("ignores errors, other tools and fetch failures", async () => {
+    const s = new Store();
+    s.setDraftFetcher(async () => {
+      throw new Error("gone");
+    });
+    s.applyEvent("r", { type: "tool_end", result: { callId: "c", name: "make_artifact", content: JSON.stringify({ draftId: "d" }), isError: false }, durationMs: 1 });
+    s.applyEvent("r", { type: "tool_end", result: { callId: "c", name: "make_artifact", content: "{bad", isError: false }, durationMs: 1 });
+    s.applyEvent("r", { type: "tool_end", result: { callId: "c", name: "db_query", content: JSON.stringify({ draftId: "d" }), isError: false }, durationMs: 1 });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(s.drafts()).toEqual([]);
+  });
+});

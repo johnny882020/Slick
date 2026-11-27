@@ -26,6 +26,9 @@ export const UI_METHODS = [
   "schedules.upsert",
   "schedules.remove",
   "actions.log",
+  "apps.draft",
+  "apps.drafts",
+  "mcp.status",
 ];
 
 export const SHELL_ONLY_METHODS = ["auth.set", "apps.run"];
