@@ -6,7 +6,7 @@ services:
     runtime: node
     region: frankfurt          # next to the Neon database (AWS eu-central-1)
     plan: free                 # pilot; use starter or above for production (no cold starts)
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm exec turbo run build --filter=@oneseat/cloud...
+    buildCommand: corepack enable && pnpm install --frozen-lockfile --filter "@oneseat/cloud..." && pnpm --filter @oneseat/contracts build && pnpm --filter @oneseat/cloud build
     startCommand: node apps/cloud/dist/main.js
     healthCheckPath: /healthz
     autoDeploy: true
