@@ -1,0 +1,37 @@
+{
+  "name": "@oneseat/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OneSeat desktop app: Tauri 2 shell (Rust core) and a small vanilla TypeScript UI.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:bridge": "vite build && node dev/bridge.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "test": "vitest run",
+    "e2e": "vite build && playwright test --trace off",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "icons": "node scripts/make-icon.mjs && tauri icon src-tauri/icons/source.png -o src-tauri/icons && node -e \"for (const d of ['ios','android']) require('node:fs').rmSync('src-tauri/icons/'+d,{recursive:true,force:true})\"",
+    "export-app": "node scripts/export-app.mjs",
+    "signing-config": "node scripts/signing-config.mjs",
+    "smoke:native": "cargo build --manifest-path src-tauri/Cargo.toml && node scripts/native-smoke.mjs",
+    "clean": "rm -rf dist test-results playwright-report"
+  },
+  "dependencies": {
+    "@oneseat/contracts": "workspace:*",
+    "@tauri-apps/api": "2.12.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@tauri-apps/cli": "2.12.6",
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.18.0",
+    "happy-dom": "^20.0.0",
+    "typescript": "^5.8.0",
+    "vite": "^6.4.0",
+    "vitest": "^3.2.0",
+    "ws": "^8.18.0"
+  }
+}
