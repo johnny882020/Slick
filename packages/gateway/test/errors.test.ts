@@ -118,3 +118,17 @@ describe("errorFromResponse / errorFromThrown", () => {
     expect(errorFromThrown({ name: 3 }, { provider: "P", secrets: [] }).kind).toBe("network");
   });
 });
+
+import { providerError as pe } from "../src/errors.js";
+describe("out-of-credit errors are final", () => {
+  it("never retries an empty balance or exhausted quota, whatever the kind", () => {
+    // The exact messages the three providers returned for accounts with no credit (2026-11-27).
+    expect(pe("invalid_request", "Anthropic API error 400: invalid_request_error: Your credit balance is too low to access the Anthropic API.").retryable).toBe(false);
+    expect(pe("server", "OpenAI stream error: credit_balance_exhausted: You have no credits remaining.").retryable).toBe(false);
+    expect(pe("rate_limit", "OpenAI API error 429: insufficient_quota: You exceeded your current quota, please check your plan and billing details.").retryable).toBe(false);
+    expect(pe("rate_limit", "Too many requests").retryable).toBe(true);
+    // Gemini's per-minute free-tier limit uses "quota" wording but clears in seconds.
+    expect(pe("rate_limit", "Gemini API error 429: RESOURCE_EXHAUSTED: You exceeded your current quota, please check your plan and billing details.").retryable).toBe(true);
+    expect(pe("server", "Internal error").retryable).toBe(true);
+  });
+});

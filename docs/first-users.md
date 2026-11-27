@@ -14,6 +14,13 @@ unsigned builds CI makes on every push.
 | Variable | `ANTHROPIC_EVAL_MODEL` | Optional; default `claude-sonnet-5-5` |
 
 A provider whose key or model variable is missing is skipped, and the run summary says so.
+Gemini defaults to `gemini-3.8-flash` (the id Google's API recommends; 2.5 models are closed to
+new accounts). Set `OPENAI_EVAL_MODEL` to a model your OpenAI account can use.
+
+**Each provider account needs credit.** A key without credit is accepted, but every call
+fails ("credit balance is too low" / "no credits remaining"). Live QA reports that provider
+as **BLOCKED (account)**, not as a OneSeat failure. Add credit in the provider's billing page
+(Anthropic Console → Plans & Billing; OpenAI Platform → Billing) before step 2.
 
 ## 1. Check that CI is green
 

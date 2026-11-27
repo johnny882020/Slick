@@ -78,6 +78,12 @@ const RETRYABLE: Record<ProviderErrorKind, boolean> = {
   unknown: false,
 };
 
+/**
+ * Provider messages that mean the account has no credit left. Not "exceeded your current
+ * quota" on its own: Gemini uses that wording for per-minute limits that clear in seconds.
+ */
+export const OUT_OF_CREDIT = /credit balance is too low|credit_balance_exhausted|no credits remaining|insufficient_quota|billing_hard_limit/i;
+
 export function isRetryableKind(kind: ProviderErrorKind): boolean {
   return RETRYABLE[kind];
 }
@@ -87,7 +93,10 @@ export function providerError(
   message: string,
   extra: { status?: number; retryAfter?: number; retryable?: boolean } = {},
 ): ProviderError {
-  const err: ProviderError = { kind, message, retryable: extra.retryable ?? RETRYABLE[kind] };
+  // An empty balance or exhausted quota never fixes itself on retry, whatever the status
+  // (OpenAI even reports it mid-stream as a server error). Fail at once with the provider's words.
+  const outOfCredit = OUT_OF_CREDIT.test(message);
+  const err: ProviderError = { kind, message, retryable: outOfCredit ? false : (extra.retryable ?? RETRYABLE[kind]) };
   if (extra.status !== undefined) err.status = extra.status;
   if (extra.retryAfter !== undefined && Number.isFinite(extra.retryAfter) && extra.retryAfter >= 0)
     err.retryAfter = extra.retryAfter;

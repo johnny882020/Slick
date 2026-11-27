@@ -59,7 +59,7 @@ jobs:
         env:
           ANTHROPIC_EVAL_MODEL: ${{ vars.ANTHROPIC_EVAL_MODEL || 'claude-sonnet-5-5' }}
           OPENAI_EVAL_MODEL: ${{ vars.OPENAI_EVAL_MODEL }}
-          GEMINI_EVAL_MODEL: ${{ vars.GEMINI_EVAL_MODEL }}
+          GEMINI_EVAL_MODEL: ${{ vars.GEMINI_EVAL_MODEL || 'gemini-3.8-flash' }}
         run: |
           list=()
           add() {
@@ -78,6 +78,13 @@ jobs:
       # Adapters skip providers whose key is empty. ONESEAT_RECORD=1 re-records fixtures.
       - name: Gateway live tests (re-record fixtures)
         id: gateway
+        env:
+          ONESEAT_LIVE_ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_EVAL_MODEL || 'claude-haiku-5-5' }}
+          ONESEAT_LIVE_OPENAI_MODEL: ${{ vars.OPENAI_EVAL_MODEL || 'gpt-5-mini' }}
+          ONESEAT_LIVE_GOOGLE_MODEL: ${{ vars.GEMINI_EVAL_MODEL || 'gemini-3.8-flash' }}
+          ONESEAT_RECORD_ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_EVAL_MODEL || 'claude-haiku-5-5' }}
+          ONESEAT_RECORD_OPENAI_MODEL: ${{ vars.OPENAI_EVAL_MODEL || 'gpt-5-mini' }}
+          ONESEAT_RECORD_GOOGLE_MODEL: ${{ vars.GEMINI_EVAL_MODEL || 'gemini-3.8-flash' }}
         run: pnpm --filter @oneseat/gateway test
 
       - name: "Gate 5: live evals (skill vs no-skill baseline)"
@@ -147,7 +154,7 @@ jobs:
         env:
           ANTHROPIC_EVAL_MODEL: ${{ vars.ANTHROPIC_EVAL_MODEL || 'claude-sonnet-5-5' }}
           OPENAI_EVAL_MODEL: ${{ vars.OPENAI_EVAL_MODEL }}
-          GEMINI_EVAL_MODEL: ${{ vars.GEMINI_EVAL_MODEL }}
+          GEMINI_EVAL_MODEL: ${{ vars.GEMINI_EVAL_MODEL || 'gemini-3.8-flash' }}
         run: |
           list=()
           add() {

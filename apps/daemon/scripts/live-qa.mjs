@@ -46,6 +46,8 @@ INSERT INTO brand (key, value) VALUES ('company_name','Northwind Studio'),('prim
 `;
 
 const words = (t) => (t.match(/\S+/g) ?? []).length;
+/** Same rule as @oneseat/gateway OUT_OF_CREDIT: the provider account has no credit left. */
+const OUT_OF_CREDIT = /credit balance is too low|credit_balance_exhausted|no credits remaining|insufficient_quota|billing_hard_limit/i;
 const has = (t, re) => re.test(t);
 
 /** Scenarios. `check` gets { text, events, tools, loaded, db, approvals } and returns problems. */
@@ -286,6 +288,11 @@ async function qaProvider(p, opts) {
       if (run.timeout) problems.push(run.timeout);
       if (done && done.stopReason !== "end_turn") problems.push(`run ended with ${done.stopReason}`);
       const err = run.events.find((e) => e.type === "error");
+      if (err && OUT_OF_CREDIT.test(err.message)) {
+        results.push({ provider: p.provider, model: p.model, scenario: "account", pass: false, blocked: true, problems: [`BLOCKED by the provider account, not OneSeat: ${err.message}`], seconds: 0, tools: [], usage: { inputTokens: 0, outputTokens: 0 }, text: "" });
+        console.log(`BLOCKED  ${p.provider}: the account has no credit; skipping its scenarios\n      - ${err.message}`);
+        break;
+      }
       if (err) problems.push(`error: ${err.message}`);
       if (!loaded.includes(s.skill)) problems.push(`router loaded [${loaded.join(", ") || "nothing"}], expected ${s.skill}`);
       problems.push(...s.check({ text, events: run.events, tools, loaded, db, approvals: run.approvals }));
@@ -312,9 +319,11 @@ async function qaProvider(p, opts) {
 }
 
 export function renderMarkdown(results) {
-  const rows = results.map((r) => `| ${r.provider} | ${r.scenario} | ${r.pass ? "PASS" : "FAIL"} | ${r.seconds}s | ${r.usage.inputTokens + r.usage.outputTokens} | ${r.problems.join("; ").replace(/\|/g, "/").replace(/\n/g, " ").slice(0, 300)} |`);
+  const rows = results.map((r) => `| ${r.provider} | ${r.scenario} | ${r.pass ? "PASS" : r.blocked ? "BLOCKED (account)" : "FAIL"} | ${r.seconds}s | ${r.usage.inputTokens + r.usage.outputTokens} | ${r.problems.join("; ").replace(/\|/g, "/").replace(/\n/g, " ").slice(0, 300)} |`);
   const passed = results.filter((r) => r.pass).length;
-  return [`## Live QA: ${passed}/${results.length} passed`, "", "| Provider | Scenario | Result | Time | Tokens | Problems |", "|---|---|---|---|---|---|", ...rows, ""].join("\n");
+  const blocked = results.filter((r) => r.blocked).map((r) => r.provider);
+  const note = blocked.length ? [`> Not tested: ${blocked.join(", ")} — the provider account has no credit. Add credit and run again.`, ""] : [];
+  return [`## Live QA: ${passed}/${results.length} passed`, "", ...note, "", "| Provider | Scenario | Result | Time | Tokens | Problems |", "|---|---|---|---|---|---|", ...rows, ""].join("\n");
 }
 
 async function main() {

@@ -15,6 +15,10 @@ Pick one:
 - OpenAI: platform.openai.com → API keys
 - Gemini: aistudio.google.com → Get API key
 
+Your account with that provider needs some prepaid credit (a few dollars is plenty to
+start). Without it the key is accepted but every task fails with the provider's message,
+such as "credit balance is too low".
+
 The key is stored in your computer's own keychain (Windows Credential Manager or macOS
 Keychain). It is never written to a file or sent anywhere except to that provider.
 

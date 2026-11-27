@@ -16,7 +16,7 @@ const LIVE = process.env["ONESEAT_LIVE"] === "1";
 const CASES: { id: ProviderId; envKey: string; model: string }[] = [
   { id: "anthropic", envKey: "ANTHROPIC_API_KEY", model: process.env["ONESEAT_LIVE_ANTHROPIC_MODEL"] ?? "claude-haiku-5-5" },
   { id: "openai", envKey: "OPENAI_API_KEY", model: process.env["ONESEAT_LIVE_OPENAI_MODEL"] ?? "gpt-5-mini" },
-  { id: "google", envKey: "GEMINI_API_KEY", model: process.env["ONESEAT_LIVE_GOOGLE_MODEL"] ?? "gemini-2.5-flash" },
+  { id: "google", envKey: "GEMINI_API_KEY", model: process.env["ONESEAT_LIVE_GOOGLE_MODEL"] ?? "gemini-3.8-flash" },
 ];
 
 for (const c of CASES) {

@@ -10,6 +10,7 @@ export {
   kindForStatus,
   parseRetryAfter,
   isRetryableKind,
+  OUT_OF_CREDIT,
 } from "./errors.js";
 export { withRetry, retryDelay, type RetryOptions } from "./retry.js";
 export { toGeminiSchema, toObjectSchema } from "./schema.js";

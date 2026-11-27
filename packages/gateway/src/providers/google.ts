@@ -46,9 +46,10 @@ const LABEL = "Gemini";
  * GET /v1beta/models is unreachable. Override it with `fallbackModels`.
  */
 export const GOOGLE_FALLBACK_MODELS: readonly ModelInfo[] = [
-  { id: "gemini-2.5-pro", provider: "google", label: "Gemini 2.5 Pro", supportsTools: true, tier: "frontier" },
-  { id: "gemini-2.5-flash", provider: "google", label: "Gemini 2.5 Flash", supportsTools: true, tier: "balanced" },
-  { id: "gemini-2.5-flash-lite", provider: "google", label: "Gemini 2.5 Flash-Lite", supportsTools: true, tier: "fast" },
+  // Shown only when the models endpoint fails. These are the ids Google's API itself names as
+  // replacements for the retired 2.5 models (checked 2026-11-27); the live list wins otherwise.
+  { id: "gemini-3.1-pro-preview", provider: "google", label: "Gemini 3.1 Pro (preview)", supportsTools: true, tier: "frontier" },
+  { id: "gemini-3.8-flash", provider: "google", label: "Gemini 3.8 Flash", supportsTools: true, tier: "balanced" },
 ];
 
 export interface GoogleProviderOptions extends ProviderConfig {
