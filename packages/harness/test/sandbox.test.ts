@@ -232,7 +232,8 @@ describe.skipIf(!DENO)("ScriptSandbox (Deno)", () => {
   });
 
   it("runs skill scripts from the harness, asking first when the skill can send", async () => {
-    const s = makeSkill({ effects: ["send"] }, "mailer");
+    // A skill that can really send: it declares a mail API host for its scripts.
+    const s = makeSkill({ effects: ["send"], permissions: { net: ["api.mail.test"] }, reasons: { "api.mail.test": "Sends the email." } }, "mailer");
     const script = [
       { steps: [{ tool: "load_skill", input: { name: "mailer" } }] },
       { steps: [{ tool: "run_skill_script", input: { skill: "mailer", script: "probe", args: ["stdin"], input: "hi" } }] },
@@ -243,7 +244,7 @@ describe.skipIf(!DENO)("ScriptSandbox (Deno)", () => {
     const events = await collect(ok.harness.run(task("mail"), approveAll));
     const reqs = ofType(events, "approval_request");
     expect(reqs).toHaveLength(2);
-    expect(reqs[0]!.effects).toEqual(["send"]);
+    expect(reqs[0]!.effects).toEqual(["network", "send"]);
     expect(reqs[0]!.summary).toBe('Run script "probe" of skill mailer - Probe with stdin (can send)');
     const ends = ofType(events, "tool_end");
     expect(JSON.parse(ends[1]!.result.content)).toMatchObject({ exitCode: 0 });
@@ -253,6 +254,20 @@ describe.skipIf(!DENO)("ScriptSandbox (Deno)", () => {
     const denied = setup(script.slice(0, 2).concat([{ steps: [{ text: "ok" }] }]), { store: s.store, sandbox: s.sandbox });
     const ev2 = await collect(denied.harness.run(task("mail"), denyAll("no")));
     expect(ofType(ev2, "tool_end")[1]!.result.content).toContain("The person declined");
+  });
+
+  it("runs a script with no network, write or program access without asking, even in a sending skill", async () => {
+    // Like proposals-invoices: the skill sends through a connected tool; its totals script only computes.
+    const s = makeSkill({ effects: ["send", "delete"] }, "invoicer");
+    const script = [
+      { steps: [{ tool: "load_skill", input: { name: "invoicer" } }] },
+      { steps: [{ tool: "run_skill_script", input: { skill: "invoicer", script: "probe", args: ["stdin"], input: "total" } }] },
+      { steps: [{ text: "done" }] },
+    ];
+    const r = setup(script, { store: s.store, sandbox: s.sandbox });
+    const events = await collect(r.harness.run(task("invoice"), denyAll("should not be asked")));
+    expect(ofType(events, "approval_request")).toHaveLength(0);
+    expect(JSON.parse(JSON.parse(ofType(events, "tool_end")[1]!.result.content).stdout)).toEqual({ ok: true, value: "TOTAL" });
   });
 });
 

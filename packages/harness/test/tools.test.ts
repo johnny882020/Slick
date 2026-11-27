@@ -216,6 +216,17 @@ describe("skill tools", () => {
     expect(scriptEffects({ ...base, permissions: { ...perms, run: ["git"] }, effects: ["delete"] })).toEqual(["write", "delete"]);
   });
 
+  it("applies a skill's outward effects to scripts only when the sandbox lets them happen", () => {
+    const base = { frontmatter: { name: "x", description: "x" }, body: "", dir: "", files: [], linkedFiles: [], reasons: {}, scripts: {} };
+    const perms = { net: [], read: [], write: [], env: [], run: [] };
+    // proposals-invoices: sends invoices via a connected tool; its totals script has no access at all.
+    expect(scriptEffects({ ...base, permissions: perms, effects: ["send", "delete"] })).toEqual(["read"]);
+    expect(scriptEffects({ ...base, permissions: { ...perms, net: ["api.mail.test"] }, effects: ["send"] })).toEqual(["network", "send"]);
+    expect(scriptEffects({ ...base, permissions: { ...perms, net: ["api.pay.test"] }, effects: ["pay"] })).toEqual(["network", "pay"]);
+    expect(scriptEffects({ ...base, permissions: { ...perms, write: ["$WORKSPACE/out"] }, effects: ["delete", "send"] })).toEqual(["write", "delete"]);
+    expect(scriptEffects({ ...base, permissions: { ...perms, run: ["curl"] }, effects: ["send"] })).toEqual(["write", "send"]);
+  });
+
   it("read_skill_file reports a store failure", async () => {
     const { call, store, ctx } = services();
     store.add({ name: "broken", description: "b", files: { "a.md": "x" } });

@@ -86,12 +86,25 @@ export function readSkillFileTool(store: SkillStore, maxChars = 100_000): Regist
 }
 
 /** What running one of the skill's scripts can do, from its oneseat.json. */
+/**
+ * What running one of a skill's scripts can do. A skill's outward effects count only when
+ * the sandbox gives its scripts a way to cause them: "send" and "pay" need network or
+ * program access, "delete" needs write or program access. A script with none of these
+ * (e.g. a totals calculator) cannot send, pay or delete anything, so it needs no approval
+ * even in a skill that sends invoices through a connected tool (which is gated itself).
+ */
 export function scriptEffects(m: SkillManifest): ToolEffect[] {
   const out = new Set<ToolEffect>(["read"]);
-  if (m.permissions.write.length > 0) out.add("write");
-  if (m.permissions.net.length > 0) out.add("network");
-  if (m.permissions.run.length > 0) out.add("write");
-  for (const e of m.effects) out.add(e);
+  const net = m.permissions.net.length > 0;
+  const run = m.permissions.run.length > 0;
+  const write = m.permissions.write.length > 0;
+  if (write) out.add("write");
+  if (net) out.add("network");
+  if (run) out.add("write");
+  for (const e of m.effects) {
+    if ((e === "send" || e === "pay") && (net || run)) out.add(e);
+    if (e === "delete" && (write || run)) out.add(e);
+  }
   if ([...out].some((e) => e === "write" || e === "send" || e === "pay" || e === "delete")) out.delete("read");
   return (["read", "write", "network", "send", "pay", "delete"] as ToolEffect[]).filter((e) => out.has(e));
 }
