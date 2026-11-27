@@ -1,0 +1,8 @@
+data: {"id":"chatcmpl-700","object":"chat.completion.chunk","created":1764251200,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"","reasoning":"The user greets me. "},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-700","object":"chat.completion.chunk","created":1764251200,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"","reasoning":"Reply briefly."},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-700","object":"chat.completion.chunk","created":1764251200,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"Hi there!"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-700","object":"chat.completion.chunk","created":1764251200,"model":"qwen3:8b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":"stop"}]}
+

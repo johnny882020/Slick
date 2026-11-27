@@ -1,0 +1,12 @@
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_multibyte_0001","object":"response","created_at":1764250700,"status":"in_progress","model":"gpt-5","output":[],"usage":null}}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","sequence_number":1,"item_id":"msg_multibyte_0002","output_index":0,"content_index":0,"delta":"Grüße aus München — 東京は雨 🌧️"}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","sequence_number":2,"item_id":"msg_multibyte_0002","output_index":0,"content_index":0,"delta":", 18°C 👩‍💻"}
+
+event: response.completed
+data: {"type":"response.completed","sequence_number":3,"response":{"id":"resp_multibyte_0001","object":"response","created_at":1764250700,"status":"completed","model":"gpt-5","output":[],"usage":{"input_tokens":20,"input_tokens_details":{"cached_tokens":0},"output_tokens":21,"output_tokens_details":{"reasoning_tokens":0},"total_tokens":41}}}
+

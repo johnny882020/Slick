@@ -1,0 +1,6 @@
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_error_0001","object":"response","created_at":1764250600,"status":"in_progress","model":"gpt-5-codex","output":[],"usage":null}}
+
+event: error
+data: {"type":"error","sequence_number":1,"code":"rate_limit_exceeded","message":"Rate limit reached for requests","param":null}
+
