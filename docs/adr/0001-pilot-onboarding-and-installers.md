@@ -132,3 +132,12 @@ choice reversible.
 3. [x] Cloud: `/download/windows` and `/download/mac` redirects; the Download and pilot pages rewritten.
 4. [ ] Lead: run the pilot release, set `DOWNLOAD_*_URL` on Render, create the first team's license, send the invitation.
 5. [ ] Later: retire the `ONESEATPILOT` Stripe coupon once no pilot depends on it.
+
+## Addendum (2026-11-28): self-serve Team trial
+
+The first pilot feedback ("Didn't receive a License key") showed that Free users who find OneSeat
+on their own have no way to try Team. So, alongside option B, **Plan → Start free trial** now lets
+anyone start a **14-day Team trial** (`license.trial` → `POST /api/v1/trials`). It is one per email
+and one per computer, and it ends by itself like a pilot license. This is option C's self-serve
+idea, without a shared code: the trial is tied to a computer, so it can't be shared out to many
+people. Admin-issued pilot licenses stay in place for teams the lead invites.
