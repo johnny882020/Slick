@@ -1,5 +1,5 @@
 id: it.packaging_epr
-version: 2026.11.1
+version: 2026.11.2
 jurisdiction: IT
 obligation: packaging_epr
 title: Packaging take-back and labelling in Italy
@@ -24,13 +24,14 @@ openQuestions:
   - "PPWR art. 44(1) gives Member States 18 months from the first implementing act under art. 44(14) (due by 12 Feb 2026) to set up the register. The adoption date of that implementing act was not confirmed, so the latest date Italy's register must exist is unknown."
   - "Amazon study 'two-step' registration: the study says several countries need both a PRO and a national registry. For Italy it documents one 17-field registration naming CONAI. Today Italy appears to need only CONAI; the second step (RENAP packaging register) does not exist yet. Confirm."
   - "Authorised representative: PPWR art. 45(3) applies directly from 12 Aug 2026, but Italy has no national procedure, register entry, form or sanction for it, and the Austrian chamber of commerce (WKO, 12 Aug 2026) says there is no Italian legal basis that makes a formal AR mandatory. Confirm the formal mandate requirements in Italy (written form, language, notarisation or apostille, whether the AR needs an Italian VAT number and PEC address, liability) and whether CONAI's 'domicilio speciale' appointment for foreign members satisfies art. 45(3)."
-  - "Authorised representative for sellers outside the EU: art. 45(3) first sentence names producers under art. 3(1)(15)(c), which covers sellers established 'in un paese terzo' selling directly to consumers, but the second sentence makes AR appointment for third-country producers a Member State option, and the Council's 21 Oct 2026 mandate (recital 6) reads the third-country rule as that option. Confirm whether non-EU distance sellers must appoint an Italian AR now or only if Italy chooses to require it."
+  - "Authorised representative for sellers outside the EU: art. 45(3) first sentence names producers under art. 3(1)(15)(c), which covers sellers established 'in un paese terzo' selling directly to consumers, but the second sentence makes AR appointment for third-country producers a Member State option, and the Council's 21 Oct 2026 mandate (recital 6) reads the third-country rule as that option. Confirm whether non-EU distance sellers must appoint an Italian AR now or only if Italy chooses to require it. Verifier note (2026-11-28): the Council mandate's recitals 6 and 7 describe the current art. 45(3) as mandatory only for EU-established producers and an option for third-country producers, and the Dutch pack follows that reading; Spain's MITECO note reads art. 3(1)(15)(c)-(d) as requiring an AR for third-country producers too. This rule still applies to non-EU sellers; align the packs once a reviewer decides."
+  - "CONAI Guide 2026: conai.org returned HTTP 403 again on 2026-11-28 (curl and web fetch), the Wayback Machine was unreachable, and no official mirror was found (Assolombarda hosts its own copy). The quotes were confirmed in the certifico.com copy of CONAI's document. Replace the url with the conai.org download once it can be read."
   - "EU suspension of the AR duty: the Commission proposed (COM(2025) 982) to suspend art. 45(3) for EU-established producers until 2035. Parliament adopted its position on 20 Oct 2026 (micro and small enterprises) and the Council its mandate on 21 Oct 2026 (EU producers placing less than 1 tonne per Member State per year, until 1 Jan 2032). The Council's four-column table of 4 Nov 2026 has no draft agreement yet. Update the AR rule when the regulation is adopted; neither position covers non-EU producers."
   - "Foreign sellers and CONAI: the CONAI Guide 2026 says a foreign company has no obligation towards CONAI unless it sells packaged goods in Italy through an e-commerce platform; otherwise membership is voluntary. WKO reports that CONAI treats all direct B2C distance sales by foreign companies as requiring CONAI registration, and PPWR art. 3(1)(15)(c) makes such sellers producers in Italy. The rule applies to all channels, including own web shops. Confirm with CONAI (aziendaestera@conai.org)."
   - "Marketplace simplified routes (D.Lgs. 152/2006 art. 178-quater): which marketplaces have signed agreements with CONAI, and does using them (for example eBay's or Amazon's 'Pay on Behalf') satisfy the membership and declaration rules? The engine has no predicate for 'covered by a marketplace service', so these rules flag such sellers as missing membership. eBay's Italy page asks for an EPR number before Pay on Behalf can be used."
   - "Fiscal representative: no requirement for a VAT fiscal representative was found for CONAI membership. Foreign members must elect a 'domicilio speciale' in Italy, and members established outside the EU without an Italian branch must give a guarantee covering the CAC expected over the next 12 months. Confirm the accepted forms and amount of the guarantee."
   - "Registration number format: no official CONAI document describing the member number (codice consorziato / numero di iscrizione) format was found, so numberFormat is omitted. Also confirm which number marketplaces accept as the Italian packaging 'EPR registration number'."
-  - "CAC declarations: the rule uses CONAI membership as a stand-in for 'declarations filed', so it overstates compliance once a seller is a member. Italian sellers who buy goods or packaging from other EU countries are 'importers' for CONAI (UE e extra UE), but the seller role 'importer' only means non-EU imports; add a supplier-country field. Italian manufacturers who import empty packaging also declare and are not captured."
+  - "CAC declarations: the rule uses CONAI membership as a stand-in for 'declarations filed', so it overstates compliance once a seller is a member. Contracts v1.2 adds a 'declared' predicate, but it was not adopted here (verifier, 2026-11-28): CAC filings are monthly, quarterly or annual, members in the exempt class (up to 200 euro per material) file nothing, and new members have no previous-year filing, so 'declared' would flag compliant sellers. Decide whether to add an exempt-class seller attribute and switch to 'declared'. Italian sellers who buy goods or packaging from other EU countries are 'importers' for CONAI (UE e extra UE), but the seller role 'importer' only means non-EU imports; add a supplier-country field. Italian manufacturers who import empty packaging also declare and are not captured."
   - "CAC thresholds and deadlines come from the CONAI Guide 2026 (exempt up to EUR 200 per material, annual up to EUR 3,000, quarterly up to EUR 31,000, monthly above; deadline the 20th of the following month). They were read from a copy hosted by certifico.com because conai.org returned HTTP 403. Verify against conai.org."
   - "Labelling after the PPWR: art. 219(5) Italian labelling stays relevant in the transition (MASE page of 15 Oct 2026). PPWR art. 12 harmonised labelling applies from 12 Aug 2028 or 24 months after its implementing acts. Confirm whether and when the Italian labelling duty is replaced, and whether the Italian decree changes it."
   - "Labelling guidelines: the MASE PDF read is the 'Linee Guida sull’etichettatura degli imballaggi' (file dated 27-09-2022, cover dated 27/7/2022), understood to be the version adopted by DM 360 of 28 Sep 2022. Confirm it is the current version."
@@ -515,7 +516,8 @@ rules:
       material codes (for example PAP 20 or PET 1). Packaging that reaches consumers must also
       tell them how to sort it for disposal. You can give this information on the pack
       or online, for example by QR code or on the product page, as long as the pack or the
-      listing tells the buyer where to find it.
+      listing tells the buyer where to find it. Record that your packaging is labelled as the
+      product attribute it_environmental_label.
     severity: high
     consequence: >
       A fine of 5,000 to 25,000 euro for anyone who puts unlabelled packaging on the Italian
@@ -527,10 +529,7 @@ rules:
         - { eq: [ product.shipsPackaged, true ] }
     requires:
       - key: it_environmental_label
-        label: >
-          Italian environmental label: material code for each packaging part and, for
-          consumer packaging, disposal instructions, on the pack or online (record it as
-          product attribute it_environmental_label)
+        label: Italian environmental label on packaging (material codes, plus disposal instructions for consumer packaging)
         kind: label
         satisfiedWhen: { exists: product.attributes.it_environmental_label }
         whoMayFile: [producer]
