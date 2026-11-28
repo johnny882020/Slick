@@ -65,6 +65,7 @@ describe("ci.yml", () => {
   it("tests on all three OSes with node 22 and pnpm from packageManager", () => {
     const t = wf.jobs["test"]!;
     expect(t.strategy!.matrix!["os"]).toEqual(["ubuntu-latest", "windows-latest", "macos-latest"]);
+    expect(steps(t).find((s) => s.name === "Audit shipped dependencies")?.run).toBe("pnpm audit --prod --audit-level high");
     const pnpm = steps(t).find((s) => s.uses === "pnpm/action-setup@v4")!;
     expect(pnpm.with?.["version"]).toBeUndefined();
     expect(steps(t).find((s) => s.uses === "actions/setup-node@v4")!.with).toEqual({ "node-version": 22, cache: "pnpm" });
