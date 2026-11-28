@@ -307,7 +307,8 @@ export class Harness implements HarnessApi {
       const runTools = opts.onQuestion ? [createAskUserTool(opts.onQuestion, this.redactor)] : [];
       const maxTurns = Math.max(1, Math.min(200, task.maxTurns ?? this.opts.maxTurns ?? DEFAULT_MAX_TURNS));
       let turn = 0;
-      let finalText = "";
+      // Each turn's text, in order. See resultText for what the run returns.
+      const texts: string[] = [];
       let stop: Extract<HarnessEvent, { type: "done" }>["stopReason"];
       let error: ProviderError | undefined;
 
@@ -343,7 +344,7 @@ export class Harness implements HarnessApi {
         addUsage(total, resp.usage);
         emit({ type: "turn_end", turn, usage: resp.usage });
         if (resp.parts.length > 0) append({ role: "assistant", content: resp.parts });
-        finalText = resp.text;
+        if (resp.text.trim()) texts.push(resp.text.trim());
         if (resp.calls.length === 0) {
           stop = resp.stopReason;
           break;
@@ -372,7 +373,7 @@ export class Harness implements HarnessApi {
       }
       this.sessions.setLoadedSkills(sid, [...skills.loaded]);
       if (error) emit({ type: "error", message: error.message, retryable: error.retryable });
-      finish(stop, finalText);
+      finish(stop, resultText(texts));
     } finally {
       this.busySessions.delete(sid);
     }
@@ -647,4 +648,20 @@ export class Harness implements HarnessApi {
 
 export function createHarness(opts: HarnessOptions): Harness {
   return new Harness(opts);
+}
+
+/** Earlier-turn text at least this long is a deliverable (a draft, a table), not narration. */
+export const RESULT_KEEP_CHARS = 160;
+
+/**
+ * A run's result text (done.text). A model often writes the deliverable, a draft or a report, and
+ * then makes one more tool call (memory_save) before a short closing line such as "the draft is
+ * above". Pinned apps and schedules get only done.text, so the final turn alone would lose the
+ * draft. The result is the final turn's text plus each earlier turn's text that is long enough to
+ * be a deliverable; one-line narration ("Adding the customer.") is left out.
+ */
+export function resultText(texts: readonly string[]): string {
+  if (texts.length === 0) return "";
+  const last = texts.length - 1;
+  return texts.filter((t, i) => i === last || t.length >= RESULT_KEEP_CHARS).join("\n\n");
 }

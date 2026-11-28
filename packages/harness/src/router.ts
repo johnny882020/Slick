@@ -76,13 +76,12 @@ Ask one short question at a time, with short options when there are natural choi
 
 export function buildSystemPrompt(input: SystemPromptInput): string {
   const parts = [input.preamble ?? DEFAULT_PREAMBLE, `Today is ${formatLocalDate(input.now)}.`];
-  if (input.canAsk) parts.push(ASKING_SECTION);
   if (input.skillsEnabled && input.index.length > 0) {
     parts.push(
       [
         "## Skills",
         "Skills are folders of instructions for specific tasks. Only their names and descriptions are listed below.",
-        "When the task clearly matches a skill's description, call load_skill with its name first, then follow its instructions.",
+        "When the task clearly matches a skill's description, call load_skill with its name before any other tool, then follow its instructions. Do this even for a small change such as adding or deleting one record: skills carry the business's rules for that data.",
         "Do not load a skill that does not match, and do not load skills just to look. Open a skill's linked files with read_skill_file only when its instructions call for them; run its declared scripts with run_skill_script.",
         "<skills>",
         formatSkillIndex(input.index),
@@ -95,6 +94,8 @@ export function buildSystemPrompt(input: SystemPromptInput): string {
     parts.push(
       `## Earlier skills\nThese skills were loaded earlier in this conversation: ${input.reloadHints.join(", ")}. Call load_skill again if you need their instructions.`,
     );
+  // After the skills: asking is a fallback, never a reason to skip a matching skill.
+  if (input.canAsk) parts.push(ASKING_SECTION);
   return parts.join("\n\n");
 }
 

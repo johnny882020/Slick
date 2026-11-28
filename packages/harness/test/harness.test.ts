@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { ChatRequest, HarnessEvent, ToolResultPart } from "@oneseat/contracts";
 import { createScriptedProvider } from "@oneseat/contracts";
 import type { RegisteredTool } from "../src/tools/registry.js";
+import { RESULT_KEEP_CHARS, resultText } from "../src/harness.js";
 import { sleep } from "../src/util.js";
 import { approveAll, collect, denyAll, done, MemorySkillStore, ofType, setup, task } from "./helpers.js";
 
@@ -254,6 +255,18 @@ describe("tool loop", () => {
     const assistant = provider.requests[1]!.messages[1]!;
     expect(assistant.content.map((p) => p.type)).toEqual(["text", "tool_use"]);
     expect((db.db.prepare("SELECT count(*) AS n FROM customers").get() as { n: number }).n).toBe(1);
+  });
+
+  it("keeps a draft written before the last tool call in the result, and drops short narration", async () => {
+    const draft = `To: Bo Chen <bo@example.com>\nSubject: Re: Quick question\n---\nHi Bo,\n\nThanks for asking about a discount for small studios. [Fill in the studio rate.]\n\nThanks,\n[Your name]\n\n**Draft only - not sent.**`;
+    expect(draft.length).toBeGreaterThanOrEqual(RESULT_KEEP_CHARS);
+    const { harness } = setup([
+      { steps: [{ text: "Looking up Bo." }, { tool: "db_query", input: { sql: "SELECT 1 AS one" } }] },
+      { steps: [{ text: draft }, { tool: "memory_save", input: { text: "Drafted a reply for Bo, not sent." } }] },
+      { steps: [{ text: "I've drafted the reply to Bo above. I haven't sent it." }] },
+    ]);
+    const text = done(await collect(harness.run(task("Draft a reply to Bo"), approveAll))).text;
+    expect(text).toBe(`${draft}\n\nI've drafted the reply to Bo above. I haven't sent it.`);
   });
 
   it("runs read-only calls in parallel and others in order", async () => {
@@ -822,5 +835,16 @@ describe("misc", () => {
     ]);
     await collect(harness.run(task("x"), approveAll));
     expect(provider.requests[1]!.messages[1]!.content.map((p) => p.type)).toEqual(["reasoning", "tool_use"]);
+  });
+});
+
+describe("resultText", () => {
+  it("is the final turn's text plus earlier deliverables", () => {
+    const long = "x".repeat(RESULT_KEEP_CHARS);
+    expect(resultText([])).toBe("");
+    expect(resultText(["Only."])).toBe("Only.");
+    expect(resultText(["Checking.", "Done."])).toBe("Done.");
+    expect(resultText([long, "Checking.", "See above."])).toBe(`${long}\n\nSee above.`);
+    expect(resultText(["Checking.", long])).toBe(long);
   });
 });
