@@ -1,5 +1,5 @@
 id: es.packaging_epr
-version: 2026.11.1
+version: 2026.11.2
 jurisdiction: ES
 obligation: packaging_epr
 title: Packaging registration and take-back in Spain
@@ -7,9 +7,25 @@ effectiveFrom: "2022-12-29"
 effectiveTo: null
 confidence: medium
 review:
-  status: draft
+  status: verified
   notes: >
-    Researched 2026-11-28. Since 12 Aug 2026 the EU Packaging Regulation (EU) 2025/40 (PPWR)
+    Independent verification 2026-11-28. The script confirmed 26 citations. The verifier re-read
+    the other 15 and found every quote in its source: the eight PPWR quotes in the BOE copy of the
+    Official Journal PDF; both MITECO interpretive notes (19/05/2026 and v2 of 13/08/2026); the
+    register page's platforms passage (an italic tag inside the word "Marketplace" made the script
+    miss it); the MITECO e-office access FAQ; and the Spanish-language Amazon.es page (the script
+    was served the English page). No quote or url needed correcting. One new citation was added and
+    checked: Zalando's packaging EPR page, which says Spanish details can be entered and assortments
+    without EPR details are blocked from 1 January 2027 (blocksListing stays false until then; see
+    openQuestions). Logic fix: the annual reports to the MITECO register and to the take-back scheme
+    were treated as met as soon as a seller was registered or in a scheme; they now need the filed
+    report (contracts v1.2 'declared'). Applicability, the authorised-representative rule (MITECO
+    requires one for producers in another member state or outside the EU), severities, the 31 March
+    and 28 February deadlines, the 15-tonne simplified report, fines and the effective date (RD
+    1055/2022 in force 29 Dec 2022) were checked against the sources. No label exceeded 120
+    characters. Open judgement calls: the PPWR 1 June vs Spanish 31 March deadline, the legal basis
+    for requiring non-EU sellers to appoint a representative, and Amazon.es enforcement.
+    Original research notes: researched 2026-11-28. Since 12 Aug 2026 the EU Packaging Regulation (EU) 2025/40 (PPWR)
     applies directly in Spain; Real Decreto 1055/2022 still applies where it is not
     incompatible, and MITECO is drafting a new royal decree. The rules follow MITECO's own
     reading (interpretive note of 13/08/2026 and the register page). PPWR quotes were read
@@ -25,7 +41,8 @@ openQuestions:
   - "Fulfilment providers that unpack packaged goods (PPWR art. 3(1)(15)(e)) and the micro-enterprise brand-owner exception in the PPWR 'fabricante' definition are not modelled."
   - "Registration lead time and fees: MITECO lists no registration fee and assigns the number when the application is signed; PPWR art. 44.11 allows up to 12 weeks and cost-based fees. Sellers outside Spain first need a Spanish NIF (starting with N) and a digital certificate, which can take weeks. Confirm typical lead times."
   - "Register name used in seller data: the rules use register 'RPP' (Registro de Productores de Producto). Confirm this is the value stored in Seller.registrations."
-  - "The engine has no predicate for 'declaration filed' or 'number printed on invoices', so those requirements use registered / inScheme as a stand-in and rely on recurring deadlines. They will show as met once the seller is registered, which overstates compliance."
+  - "Declarations (verifier change, 2026-11-28): the two annual-report requirements now use the contracts v1.2 'declared' predicate (kinds annual_declaration and scheme_report, previous calendar year) instead of registered / inScheme, which overstated compliance. From 1 January the check asks for last year's reports although they are due on 28 February (scheme) and 31 March (register). Confirm the kind names sellers will record. 'Number printed on invoices' and 'number given to marketplaces' still use the registration as a stand-in and will show as met once the seller is registered."
+  - "Zalando: its packaging EPR page (updated 15 Jun 2026) says Spanish EPR details can already be entered in zDirect and that 'From 1 January 2027, if you do not provide EPR details your assortment will be blocked.' blocksListing stays false because the block is not active on 2026-11-28; set it to true for the Zalando checks from 1 Jan 2027 (partners headquartered in Spain are not asked for the number)."
   - "Individual systems (SIRAP) must be recognised by the seller's Comunidad Autónoma (Registro de Producción y Gestión de Residuos); lead time and practicality for small sellers not researched."
   - "Simplified annual report: Spain keeps the 15-tonne threshold until the PPWR art. 44.14 implementing act is in place (PPWR uses 10 tonnes). Confirm status of that implementing act."
   - "eBay: its help page (read on ebay.co.uk; ebay.es returned a bot check) still says eBay files under its own number ENV/2023/000034242 for international business sellers, which matches the pre-PPWR rule that platforms act as subsidiary producers. MITECO says platforms stop being subsidiary producers from 12 Aug 2026. Confirm eBay's current Spain policy."
@@ -314,6 +331,13 @@ citations:
     kind: marketplace_policy
     retrieved: "2026-11-28"
     quote: "partners headquartered in Spain do not need to submit their EPR registration number to Zalando."
+  - id: zalando-ppwr
+    title: Zalando Partner University - What are the EPR requirements for packaging and what do I need to do? (updated 15 Jun 2026)
+    url: https://partner.zalando.com/university/article/what-is-ppwr-and-what-to-do
+    publisher: Zalando SE
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "From 1 January 2027, if you do not provide EPR details your assortment will be blocked."
   - id: press-amazon-es-blocks
     title: NutraIngredients - Amazon Spain blocks listings and suspends accounts in compliance crackdown (05-Aug-2026)
     url: https://www.nutraingredients.com/Article/2026/08/05/amazon-spain-blocks-listings-and-imposes-fines-over-rap-number-compliance/
@@ -384,8 +408,10 @@ rules:
         note: >
           Zalando asks partners not headquartered in Spain for the number in zDirect and says a
           missing number "could potentially suspend you from selling in Spain" (page dated July
-          2024). Partners headquartered in Spain do not have to send it.
-        citations: [zalando-spain-suspend, zalando-spain-hq]
+          2024). Partners headquartered in Spain do not have to send it. Zalando's packaging EPR
+          page (updated June 2026) says Spanish details can already be entered and that from
+          1 January 2027 assortments without EPR details will be blocked.
+        citations: [zalando-spain-suspend, zalando-spain-hq, zalando-ppwr]
       - channel: ebay
         blocksListing: false
         note: >
@@ -466,7 +492,7 @@ rules:
       - key: register_annual_report
         label: Annual packaging report to the MITECO register (by 31 March)
         kind: declaration
-        satisfiedWhen: { registered: { obligation: packaging_epr, register: RPP } }
+        satisfiedWhen: { declared: { obligation: packaging_epr, kind: annual_declaration } }
         whoMayFile: [producer, authorised_representative, compliance_scheme]
         filing:
           channel: portal_eid
@@ -482,7 +508,7 @@ rules:
       - key: scheme_annual_report
         label: Packaging data sent to your take-back scheme (by 28 February)
         kind: declaration
-        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        satisfiedWhen: { declared: { obligation: packaging_epr, kind: scheme_report } }
         whoMayFile: [producer, authorised_representative]
         filing:
           channel: scheme
@@ -586,8 +612,8 @@ rules:
         citations: [etsy-spain-number]
       - channel: zalando
         blocksListing: false
-        note: Partners not headquartered in Spain submit the number in their zDirect Business Profile; Spain-based partners do not need to.
-        citations: [zalando-spain-suspend, zalando-spain-hq]
+        note: Partners not headquartered in Spain submit the number in their zDirect Business Profile; Spain-based partners do not need to. Zalando says assortments without EPR details will be blocked from 1 January 2027.
+        citations: [zalando-spain-suspend, zalando-spain-hq, zalando-ppwr]
       - channel: ebay
         blocksListing: false
         note: eBay's page tells international business sellers without their own number to print eBay's number ENV/2023/000034242 on invoices for goods shipped to Spain; sellers with their own number use it. May be outdated after August 2026.

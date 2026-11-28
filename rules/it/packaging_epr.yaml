@@ -7,9 +7,24 @@ effectiveFrom: "2006-04-29"
 effectiveTo: null
 confidence: medium
 review:
-  status: draft
+  status: verified
   notes: >
-    Researched 2026-11-28. Italy still runs packaging take-back through CONAI under D.Lgs.
+    Independent verification 2026-11-28. The script confirmed 12 citations. The verifier re-read
+    the other 30 and found every quote in its source: the ten PPWR quotes in the Italian Official
+    Journal text from the Publications Office (Cellar), because eur-lex.europa.eu served a bot
+    challenge; the four D.Lgs. 152/2006 and Law 36/2026 quotes on normattiva.it (they match the
+    rendered text; inline HTML tags made the script miss them); the Council mandate ST 14765/26;
+    both MASE labelling guideline quotes; the Amazon study; the Amazon.it, Zalando and Kaufland.it
+    pages; and the nine CONAI Guide 2026 quotes. conai.org still answers 403, so the CONAI quotes
+    were checked in the certifico.com copy of CONAI's document (see openQuestions). No quote or url
+    needed correcting. Rule logic, severities, Amazon/eBay/Kaufland/Zalando blocksListing flags
+    (none of these marketplaces says it blocks listings in Italy; Zalando's list of packaging
+    countries does not include Italy) and the art. 261 fine amounts were checked against the
+    sources. The environmental-label requirement label was shortened to under 120 characters,
+    with the attribute hint moved to the summary. Judgement calls left for the legal reviewer:
+    whether non-EU sellers need an Italian authorised representative now, CONAI membership as a
+    stand-in for CAC declarations, and the certifico copy of the CONAI guide.
+    Original research notes: researched 2026-11-28. Italy still runs packaging take-back through CONAI under D.Lgs.
     152/2006 (Testo Unico Ambientale, Part IV, arts. 217-226 and 261). The EU Packaging
     Regulation (EU) 2025/40 (PPWR) applies directly since 12 Aug 2026, but Italy has not yet
     adopted its implementing decree (delegation in Law 36/2026 art. 14), the national producer

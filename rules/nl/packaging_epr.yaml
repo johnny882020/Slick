@@ -1,5 +1,5 @@
 id: nl.packaging_epr
-version: 2026.11.1
+version: 2026.11.2
 jurisdiction: NL
 obligation: packaging_epr
 title: Packaging registration and take-back in the Netherlands
@@ -7,23 +7,42 @@ effectiveFrom: "2023-01-01"
 effectiveTo: null
 confidence: medium
 review:
-  status: draft
+  status: verified
   notes: >
-    Written from the Besluit beheer verpakkingen 2014 (consolidated text of 2024-01-01, read from the
+    Independent verification 2026-11-28. The script confirmed 7 citations. The verifier re-read the
+    other 22 and found every quote in its source: the six PPWR quotes in the English Official
+    Journal text from the Publications Office (Cellar), because eur-lex.europa.eu served a bot
+    challenge; the seven AVV quotes in the Staatscourant PDF (Stcrt. 2022, 35473); the five Beleid
+    2026 (concept 3.3) and two micro-business factsheet quotes in Verpact's PDFs; business.gov.nl
+    (matches the rendered text; a link boundary made the script miss it); and the Council mandate
+    ST 14765/26, whose recitals 6 and 7 support limiting the representative rule to EU-based
+    sellers. No quote or url needed correcting. Fixes: the Council mandate citation was marked as
+    law although it is not adopted (now regulator_guidance); the sign-up and declaration labels
+    were shortened to under 120 characters, with detail moved to the summaries; and, using
+    contracts v1.2, sellers under 50,000 kg with no single-use plastic or deposit packaging are no
+    longer reported as missing, and the yearly declaration needs a filed declaration instead of a
+    Verpact contract (caveats in openQuestions). Severities, the bol blocksListing flag (bol says it
+    does not yet enforce PPWR obligations), the 1 April and quarterly deadlines and the AVV period
+    were checked. Open judgement calls: role mapping for Dutch distributors, shipping packaging,
+    whether the Netherlands requires representatives for non-EU sellers, and the AVV ending in 2027.
+    Original research notes: written from the Besluit beheer verpakkingen 2014 (consolidated text of 2024-01-01, read from the
     official BWB repository because wetten.overheid.nl served a bot check), the Staatscourant
     publication of the generally binding Verpact agreement for 2023-2027 (Stcrt. 2022, 35473),
     Verpact's Beleid 2026 (concept version 3.3) and PPWR factsheet of September 2026, RVO pages,
     Regulation (EU) 2025/40 (read from the Publications Office Cellar copy of the Official Journal
     text), Council documents on procedure 2025/0395(COD), and bol's own Partnerplatform pages.
-    The 50,000 kg threshold cannot be evaluated with the current evaluation context, so the
-    registration and declaration rules will flag sellers who are in fact below it.
 openQuestions:
   - >
-    The evaluation context has no field for a seller's total packaging weight placed on the Dutch
-    market per year. Rules 1 and 2 therefore apply to every producer and only explain the 50,000 kg
-    threshold in text, which over-reports small sellers. Should the contract add a per-market annual
-    packaging weight (for example seller.packagingKgPerYear.NL) and an SUP/deposit-packaging flag,
-    so the threshold and its exceptions can be evaluated deterministically?
+    Threshold (verifier change, 2026-11-28, using contracts v1.2): the sign-up and declaration
+    requirements are now also met when seller.annualPackagingKg.NL is 50,000 kg or less and the
+    seller attribute nl_sup_or_deposit_packaging is false; the declaration otherwise needs a filed
+    annual_declaration for the previous year (the 'declared' predicate) instead of a Verpact
+    contract. Sellers who have not supplied these fields get "unknown" and are asked. Caveats:
+    annualPackagingKg is last year's total, so the sign-up check uses last year's volume although
+    the duty follows the current year; the AVV says "onder de grens" (below) while Verpact's
+    Beleid 5.2 says sign-up is needed above 50,000 kg, so exactly 50,000 kg is treated as exempt;
+    from 1 January the declaration check asks for last year's declaration although it is due
+    before 1 April. Confirm the attribute name and these choices.
   - >
     Below 50,000 kg the Verpact agreement exempts producers from both the contribution and the duty
     to sign up with Verpact (Bijlage 2, art. 5.1 and 6.4), but they must still document how they
@@ -32,9 +51,10 @@ openQuestions:
     the whole calendar year 2026 despite the change of producer definition on 12 August 2026.
   - >
     The threshold does not apply to single-use plastic (SUP) packaging or deposit (statiegeld)
-    packaging: these must be signed up and declared from the first item. The context cannot detect
-    SUP packaging (product.packaging has material and weight only). Needs a product flag or a
-    separate rule.
+    packaging: these must be signed up and declared from the first item. product.packaging cannot
+    show SUP packaging, so the pack reads the seller-level attribute
+    seller.attributes.nl_sup_or_deposit_packaging (true when the seller puts any SUP or deposit
+    packaging on the Dutch market). Confirm a seller-level flag is the right granularity.
   - >
     The generally binding declaration (AVV) of the Verpact agreement runs from 1 January 2023 to
     31 December 2027. Confirm whether a successor agreement or a PPWR-based national scheme is being
@@ -278,7 +298,7 @@ citations:
     title: Council of the EU, doc. 14765/26, mandate for negotiations on suspending PPWR Article 45(3) (proposal 2025/0395(COD), not adopted)
     url: https://data.consilium.europa.eu/doc/document/ST-14765-2026-INIT/en/pdf
     publisher: Council of the European Union
-    kind: law
+    kind: regulator_guidance
     retrieved: "2026-11-28"
     quote: "The application of Article 45(3) of Regulation (EU) 2025/40 shall be suspended for a producer established in a Member State in respect of each other Member State where that producer makes less than 1 tonne of packaging"
   - id: bol-ppwr
@@ -312,7 +332,9 @@ rules:
       You must sign up with Verpact once you put more than 50,000 kg of packaging on the Dutch
       market in a year, or from the first item if you sell single-use plastic or deposit
       (statiegeld) packaging. Below 50,000 kg you do not need to sign up, but you must keep a record
-      showing how you worked out that you stay below it. From about 2028 you will also have to be
+      showing how you worked out that you stay below it. To check this, tell us how many kilograms
+      of packaging you put on the Dutch market last year and whether any of it is single-use
+      plastic or deposit packaging. From about 2028 you will also have to be
       listed in a new EU producer register run by Rijkswaterstaat; Verpact says it will arrange that
       for the businesses that declare through it.
     severity: medium
@@ -350,12 +372,15 @@ rules:
                 - { not: { eq: [ seller.establishedIn, NL ] } }
     requires:
       - key: verpact_signup
-        label: Verpact sign-up (needed above 50,000 kg of packaging a year, or for any single-use plastic or deposit packaging)
+        label: Verpact sign-up (above 50,000 kg of packaging a year, or any single-use plastic or deposit packaging)
         kind: registration
         satisfiedWhen:
           any:
             - { registered: { obligation: packaging_epr, register: Verpact } }
             - { inScheme: { obligation: packaging_epr } }
+            - all:
+                - { lte: [ seller.annualPackagingKg.$market, 50000 ] }
+                - { eq: [ seller.attributes.nl_sup_or_deposit_packaging, false ] }
         whoMayFile: [producer]
         filing:
           channel: scheme
@@ -382,7 +407,9 @@ rules:
       1 April. You also pay the contribution in advance in four quarterly instalments. The first
       50,000 kg is fee-free, and if you stay below 50,000 kg in a year you need neither declare nor
       pay (except for single-use plastic and deposit packaging), but you must keep records showing
-      how you calculated that you stayed below the threshold.
+      how you calculated that you stayed below the threshold. Record the packaging material and
+      weight of each product: you need them for the declaration, or to show you stay under
+      50,000 kg.
     severity: medium
     consequence: >
       Verpact can fine late or missing declarations and payments, impose an estimated declaration,
@@ -411,9 +438,14 @@ rules:
                 - { not: { eq: [ seller.establishedIn, NL ] } }
     requires:
       - key: annual_declaration
-        label: Yearly packaging declaration to Verpact (needed above 50,000 kg a year, or for any single-use plastic or deposit packaging)
+        label: Yearly packaging declaration to Verpact (above 50,000 kg a year, or any single-use plastic or deposit packaging)
         kind: declaration
-        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        satisfiedWhen:
+          any:
+            - { declared: { obligation: packaging_epr, kind: annual_declaration } }
+            - all:
+                - { lte: [ seller.annualPackagingKg.$market, 50000 ] }
+                - { eq: [ seller.attributes.nl_sup_or_deposit_packaging, false ] }
         whoMayFile: [producer]
         filing:
           channel: portal
@@ -428,7 +460,7 @@ rules:
             advance instalments by the last day of each quarter. If your volume will change a lot,
             send Verpact an updated estimate for the current year.
       - key: packaging_weights
-        label: Packaging material and weight for each product (needed for the declaration, or to show you stay under 50,000 kg)
+        label: Packaging material and weight for each product
         kind: data_field
         satisfiedWhen: { exists: product.packaging }
 
