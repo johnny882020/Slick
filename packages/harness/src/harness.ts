@@ -15,6 +15,7 @@ import {
   type Message,
   type ModelProvider,
   type ProviderError,
+  type QuestionHandler,
   type Schedule,
   type SkillStore,
   type StopReason,
@@ -93,6 +94,8 @@ export interface RunOptions {
   /** Further restrict the skills this run may use. */
   allowedSkills?: string[];
   signal?: AbortSignal;
+  /** Answers ask_user questions. Without it, ask_user is not offered to the model. */
+  onQuestion?: QuestionHandler;
 }
 
 export const DEFAULT_MAX_TURNS = 25;

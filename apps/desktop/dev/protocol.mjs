@@ -15,10 +15,14 @@ export const UI_METHODS = [
   "harness.run",
   "harness.cancel",
   "harness.approve",
+  "harness.answer",
   "skills.list",
   "skills.inspect",
   "skills.install",
   "skills.remove",
+  "skills.search",
+  "skills.restorable",
+  "skills.restore",
   "apps.pin",
   "apps.list",
   "apps.unpin",
@@ -32,6 +36,7 @@ export const UI_METHODS = [
   "license.status",
   "license.activate",
   "license.deactivate",
+  "license.trial",
   "feedback.send",
 ];
 

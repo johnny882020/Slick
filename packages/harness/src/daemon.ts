@@ -297,6 +297,10 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     if (opts.license && !opts.license.has(feature))
       throw new RpcError(RPC_ERRORS.upgradeRequired, upgradeMessage(feature), { feature, tier: opts.license.status().tier });
   };
+  const notYet = (m: string): never => {
+    throw new RpcError(RPC_ERRORS.notFound, `${m} is not available in this build yet`);
+  };
+
   const licenseCall = async <T>(fn: () => Promise<T>): Promise<T> => {
     if (!opts.license) throw new RpcError(RPC_ERRORS.notFound, "licensing is not configured in this build");
     try {
@@ -309,6 +313,12 @@ export function createDaemon(opts: DaemonOptions): Daemon {
 
   const methods: { [M in keyof AllMethods]: (p: Record<string, unknown>) => Promise<AllMethods[M]["result"]> } = {
     "daemon.hello": async () => ({ version: DAEMON_VERSION, protocol: 1 }),
+    // Contract stubs (ADR-0002 work in progress): each is replaced by its implementation.
+    "harness.answer": async () => notYet("harness.answer"),
+    "skills.search": async () => notYet("skills.search"),
+    "skills.restorable": async () => notYet("skills.restorable"),
+    "skills.restore": async () => notYet("skills.restore"),
+    "license.trial": async () => notYet("license.trial"),
     "auth.set": async (p) => {
       const provider = providerId(p["provider"]);
       const apiKey = p["apiKey"];

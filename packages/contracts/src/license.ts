@@ -70,6 +70,8 @@ export function planHas(tier: Tier, feature: Feature): boolean {
 
 /** Days a license token stays valid without reaching the cloud. */
 export const LICENSE_OFFLINE_DAYS = 14;
+/** Free Team trial length, started from the app (license.trial) or the website. */
+export const TRIAL_DAYS = 14;
 /** Refresh when fewer than this many days are left. */
 export const LICENSE_REFRESH_DAYS = 7;
 

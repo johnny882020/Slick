@@ -38,6 +38,9 @@ export type HarnessEvent =
   | { type: "tool_end"; result: ToolResult; durationMs: number }
   | { type: "approval_request"; approvalId: string; call: ToolCall; effects: ToolEffect[]; summary: string }
   | { type: "approval_result"; approvalId: string; approved: boolean }
+  /** The model asked the person something (ask_user tool); the run waits for harness.answer. */
+  | { type: "question"; questionId: string; question: string; options?: string[] }
+  | { type: "question_answered"; questionId: string; answer: string }
   | { type: "turn_end"; turn: number; usage: Usage }
   | { type: "done"; stopReason: StopReason | "max_turns" | "cancelled"; text: string; usage: Usage }
   | { type: "error"; message: string; retryable: boolean };
@@ -55,8 +58,35 @@ export type ApprovalHandler = (req: {
   summary: string;
 }) => Promise<ApprovalDecision>;
 
+/**
+ * Answers a question the model asked mid-run (ask_user). Resolves with the person's words.
+ * An empty answer means "skip": the model is told the person did not answer.
+ */
+export type QuestionHandler = (req: { questionId: string; question: string; options?: string[] }) => Promise<string>;
+
 export interface HarnessApi {
-  run(task: TaskRequest, onApproval: ApprovalHandler): AsyncIterable<HarnessEvent>;
+  /** opts.onQuestion is optional: without it, ask_user is not offered to the model. */
+  run(task: TaskRequest, onApproval: ApprovalHandler, opts?: { onQuestion?: QuestionHandler }): AsyncIterable<HarnessEvent>;
+}
+
+/** A skill found on skills.sh (https://skills.sh/api/search). Install with source `skills.sh:<id>`. */
+export interface SkillSearchResult {
+  /** "owner/repo/skill" as skills.sh names it. */
+  id: string;
+  /** "owner/repo". */
+  repo: string;
+  /** Skill folder name inside the repo. */
+  skill: string;
+  name: string;
+  installs: number;
+  /** Already installed under this name. */
+  installed: boolean;
+}
+
+/** A starter skill shipped with the app that is not installed now (removed by the person). */
+export interface RestorableSkill {
+  name: string;
+  description: string;
 }
 
 // ---- Skill store (implemented by @oneseat/registry, consumed by harness/daemon) ----
@@ -142,10 +172,18 @@ export interface DaemonMethods {
   "harness.run": { params: TaskRequest; result: { runId: string } };
   "harness.cancel": { params: { runId: string }; result: { ok: boolean } };
   "harness.approve": { params: { approvalId: string; approved: boolean; note?: string }; result: { ok: boolean } };
+  /** Answer a question event. An empty answer means the person skipped it. */
+  "harness.answer": { params: { questionId: string; answer: string }; result: { ok: boolean } };
   "skills.list": { params: Record<string, never>; result: { skills: InstalledSkill[] } };
   "skills.inspect": { params: { source: string }; result: { scan: ScanReport; lint: LintReport } };
   "skills.install": { params: { source: string; allowWarnings?: boolean }; result: InstallResult };
   "skills.remove": { params: { name: string }; result: { ok: boolean } };
+  /** Search skills.sh. Installing a result still goes through scan + lint (and the plan gate). */
+  "skills.search": { params: { query: string }; result: { results: SkillSearchResult[] } };
+  /** Starter skills that were removed and can be put back. */
+  "skills.restorable": { params: Record<string, never>; result: { skills: RestorableSkill[] } };
+  /** Reinstall a removed starter skill from the app's bundle (no plan gate: it shipped with the app). */
+  "skills.restore": { params: { name: string }; result: InstallResult };
   "apps.pin": { params: ArtifactBundle; result: { app: PinnedApp } };
   "apps.list": { params: Record<string, never>; result: { apps: PinnedApp[] } };
   "apps.unpin": { params: { id: string }; result: { ok: boolean } };
@@ -163,6 +201,11 @@ export interface DaemonMethods {
   "license.status": { params: Record<string, never>; result: Entitlement };
   /** Activate a license key with OneSeat Cloud for this computer. */
   "license.activate": { params: { licenseKey: string }; result: Entitlement };
+  /**
+   * Start the free Team trial (TRIAL_DAYS) for this email: OneSeat Cloud issues a key, and this
+   * computer is activated with it. One trial per email and per computer.
+   */
+  "license.trial": { params: { email: string }; result: Entitlement & { licenseKey: string } };
   /** Free this computer's slot on the license and return to Free. */
   "license.deactivate": { params: Record<string, never>; result: Entitlement };
   /** Send pilot feedback to OneSeat Cloud. Never includes keys or business data unless typed. */
