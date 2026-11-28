@@ -491,6 +491,7 @@ export const SCENARIOS = [
         name: "email invoice (denied)",
         prompt: `Email that invoice to ${JANE.name} at ${JANE.email} now.`,
         skill: ["proposals-invoices", "outreach"],
+        needsSendTool: true,
         approve: () => false,
         check: ({ text, events, db, before, outbox, sendTool }) => {
           const problems = [];
@@ -722,7 +723,11 @@ async function runStep(env, step, index, history) {
   }
   const before = snapshot(db);
   const sentBefore = readOutbox(outboxPath).length;
-  const run = await runTask(rpc, { input: step.prompt, provider: p.provider, model: p.model }, { timeoutMs: opts.timeoutMs, approve: step.approve });
+  // A journey is one conversation, the way a person replies in the app: later steps continue the
+  // session of the first, so "that invoice" has the earlier turns as context.
+  const sessionId = history.map((h) => h.events.find((e) => e.type === "session_start")?.sessionId).find(Boolean);
+  const task = { input: step.prompt, provider: p.provider, model: p.model, ...(sessionId ? { sessionId } : {}) };
+  const run = await runTask(rpc, task, { timeoutMs: opts.timeoutMs, approve: step.approve });
   const done = run.events.find((e) => e.type === "done");
   const text = done?.text ?? run.events.filter((e) => e.type === "text_delta").map((e) => e.text).join("");
   const tools = run.events.filter((e) => e.type === "tool_start").map((e) => e.call.name);
@@ -737,7 +742,14 @@ async function runStep(env, step, index, history) {
   if (done && done.stopReason !== "end_turn") problems.push(`run ended with ${done.stopReason}`);
   if (err) problems.push(`error: ${err.message}`);
   const expected = step.skill === undefined ? [] : [step.skill].flat();
-  if (expected.length && !expected.some((s) => loaded.includes(s))) problems.push(`router loaded [${loaded.join(", ") || "nothing"}], expected ${expected.join(" or ")}`);
+  // A session keeps the skills it loaded, so a skill loaded by an earlier step counts.
+  const sessionLoaded = [...history.flatMap((h) => h.events.filter((e) => e.type === "skill_loaded").map((e) => e.name)), ...loaded];
+  if (expected.length && !expected.some((s) => sessionLoaded.includes(s))) {
+    const msg = `router loaded [${sessionLoaded.join(", ") || "nothing"}], expected ${expected.join(" or ")}`;
+    // With no send tool connected, answering "I can't send that" without a skill is correct.
+    if (step.needsSendTool && !sendTool) warnings.push(`${msg} (no send tool is connected, so no skill was needed)`);
+    else problems.push(msg);
+  }
   const outbox = readOutbox(outboxPath).slice(sentBefore);
   const ctx = { ...ctxBase, text, events: run.events, tools, loaded, approvals: run.approvals, before, outbox, runId: run.runId };
   try {
