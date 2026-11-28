@@ -40,7 +40,7 @@ function citationsUsed(r: AuditReport): Citation[] {
 
 export function renderMarkdown(r: AuditReport): string {
   const lines: string[] = [];
-  lines.push(`# Compliance gap audit: ${r.seller.legalName}`, "");
+  lines.push(`# Oblige gap audit: ${r.seller.legalName}`, "", "*Compliance by design.*", "");
   lines.push(`Generated ${r.generatedAt.slice(0, 10)} · ${plural(r.summary.products, "product")} · ${plural(r.summary.listings, "listing")} · ${r.summary.markets.map(countryName).join(", ")}`, "");
   lines.push(headline(r), "");
   lines.push("## Can I sell?", "", "| Country | Channel | Products | Ready | Need fixes | Need data | Status |", "|---|---|---|---|---|---|---|");
@@ -119,10 +119,10 @@ export function renderHtml(r: AuditReport): string {
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Compliance gap audit · ${esc(r.seller.legalName)}</title><style>${CSS}</style></head>
+<title>Oblige gap audit · ${esc(r.seller.legalName)}</title><style>${CSS}</style></head>
 <body><main>
 <header style="display:grid;gap:.6rem">
-  <div class="eyebrow">Compliance gap audit · ${esc(r.generatedAt.slice(0, 10))}</div>
+  <div class="eyebrow">Oblige · Compliance gap audit · ${esc(r.generatedAt.slice(0, 10))}</div>
   <h1>${esc(r.seller.legalName)}</h1>
   <p class="lead">${esc(headline(r))}</p>
 </header>
@@ -137,7 +137,7 @@ export function renderHtml(r: AuditReport): string {
 <section><h2>What to fix, most urgent first</h2>${r.fixes.length ? `<ol class="fixes">${fixes}</ol>` : `<p>Nothing to fix in the rules we cover.</p>`}</section>
 ${gaps ? `<section><h2>Data we still need</h2><p class="muted">Add these and we can decide the rows marked "Need data".</p><div class="wrap"><table><thead><tr><th>What</th><th>Products</th></tr></thead><tbody>${gaps}</tbody></table></div></section>` : ""}
 <section><h2>Sources</h2><ul class="sources">${sources}</ul></section>
-<footer>${r.disclaimers.map((d) => `<p>${esc(d)}</p>`).join("")}<p>Rule packs: ${r.rulebook.map((p) => `${esc(p.id)} ${esc(p.version)} (${esc(p.reviewStatus)})`).join(", ")}</p></footer>
+<footer><p><b>Oblige</b> · Compliance by design</p>${r.disclaimers.map((d) => `<p>${esc(d)}</p>`).join("")}<p>Rule packs: ${r.rulebook.map((p) => `${esc(p.id)} ${esc(p.version)} (${esc(p.reviewStatus)})`).join(", ")}</p></footer>
 </main></body></html>
 `;
 }

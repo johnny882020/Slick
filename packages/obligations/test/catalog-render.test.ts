@@ -92,7 +92,7 @@ describe("renderers", () => {
 
   it("renders Markdown with the map, fixes, data gaps, sources and notes", () => {
     const md = renderMarkdown(report());
-    for (const s of ["# Compliance gap audit", "## Can I sell?", "| Germany | Amazon |", "## What to fix", "## Data we still need", "whether it ships in packaging", "## Sources", "[GPSR](https://eur-lex.europa.eu/eli/reg/2023/988/oj)", "eu.gpsr 2026.11.1 (verified)", "not legal advice"]) {
+    for (const s of ["# Oblige gap audit", "## Can I sell?", "| Germany | Amazon |", "## What to fix", "## Data we still need", "whether it ships in packaging", "## Sources", "[GPSR](https://eur-lex.europa.eu/eli/reg/2023/988/oj)", "eu.gpsr 2026.11.1 (verified)", "not legal advice"]) {
       expect(md).toContain(s);
     }
   });

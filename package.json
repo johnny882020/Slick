@@ -2,7 +2,7 @@
   "name": "oneseat",
   "private": true,
   "version": "0.1.0",
-  "description": "Compliance Keeper: can I keep selling this product, in this country, on this marketplace? (built on the OneSeat engine)",
+  "description": "Oblige, compliance by design: can I keep selling this product, in this country, on this marketplace? (built on the OneSeat engine)",
   "type": "module",
   "packageManager": "pnpm@10.28.0",
   "engines": {
@@ -16,7 +16,7 @@
     "gates": "pnpm --filter @oneseat/testkit run gates",
     "clean": "turbo run clean && rm -rf node_modules",
     "lint:rules": "pnpm --filter @oneseat/rulebook lint:rules",
-    "audit:example": "pnpm --filter @oneseat/obligations audit -- --catalog ../../examples/audit/catalog.csv --seller ../../examples/audit/seller.json --rules ../../rules --today 2026-11-28 --html ../../examples/audit/sample-report.html --md ../../examples/audit/sample-report.md"
+    "audit:example": "pnpm --filter @oneseat/obligations gap-audit -- --catalog ../../examples/audit/catalog.csv --seller ../../examples/audit/seller.json --rules ../../rules --today 2026-11-28 --html ../../examples/audit/sample-report.html --md ../../examples/audit/sample-report.md"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

@@ -37,6 +37,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const VERSION = /^\d{4}\.\d{2}\.\d+$/;
 const PACK_ID = /^(eu|[a-z]{2})\.[a-z_]+$/;
 const MAX_QUOTE = 300;
+const MAX_LABEL = 120;
 
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -78,6 +79,17 @@ export function lintPack(raw: unknown, name = "<pack>"): LintIssue[] {
   if (p["openQuestions"] !== undefined && !(Array.isArray(p["openQuestions"]) && p["openQuestions"].every(isStr))) {
     err("openQuestions", "openQuestions must be a list of strings");
   }
+  const fixGroups = p["fixGroups"];
+  const groupIds = new Set<string>();
+  if (fixGroups !== undefined) {
+    if (!isObj(fixGroups)) err("fixGroups", "fixGroups must map group ids to action titles");
+    else for (const [g, title] of Object.entries(fixGroups)) {
+      if (!/^[a-z][a-z0-9_]*$/.test(g)) err(`fixGroups.${g}`, "group ids are lower_snake_case");
+      if (!isStr(title)) err(`fixGroups.${g}`, "each group needs an action title");
+      groupIds.add(g);
+    }
+  }
+  const usedGroups = new Set<string>();
 
   // Citations
   const citationIds = new Set<string>();
@@ -144,6 +156,7 @@ export function lintPack(raw: unknown, name = "<pack>"): LintIssue[] {
           else if (keys.has(q["key"])) err(`${qa}.key`, `duplicate requirement key "${q["key"]}"`);
           else keys.add(q["key"]);
           if (!isStr(q["label"])) err(`${qa}.label`, "label is required");
+          else if (q["label"].length > MAX_LABEL) warn(`${qa}.label`, `label is longer than ${MAX_LABEL} characters; it becomes a fix title, so keep it short and put hints in the rule summary`);
           if (!isStr(q["kind"]) || !KINDS.has(q["kind"])) err(`${qa}.kind`, `kind must be one of ${[...KINDS].join(", ")}`);
           lintPredicate(q["satisfiedWhen"], `${qa}.satisfiedWhen`, err);
           if (q["whoMayFile"] !== undefined && !(Array.isArray(q["whoMayFile"]) && q["whoMayFile"].every((w) => WHO.has(String(w))))) {
@@ -160,6 +173,10 @@ export function lintPack(raw: unknown, name = "<pack>"): LintIssue[] {
               }
             }
           }
+          if (q["group"] !== undefined) {
+            if (!isStr(q["group"]) || !groupIds.has(q["group"])) err(`${qa}.group`, `group "${String(q["group"])}" is not defined in fixGroups`);
+            else usedGroups.add(q["group"]);
+          }
           if (q["numberFormat"] !== undefined) {
             try { new RegExp(String(q["numberFormat"])); } catch { err(`${qa}.numberFormat`, "numberFormat is not a valid regular expression"); }
           }
@@ -170,6 +187,9 @@ export function lintPack(raw: unknown, name = "<pack>"): LintIssue[] {
         });
       }
       const checks = r["marketplaceChecks"];
+      if (i === rules.length - 1) {
+        for (const g of groupIds) if (!usedGroups.has(g)) warn(`fixGroups.${g}`, `group "${g}" is defined but no requirement uses it`);
+      }
       if (checks !== undefined) {
         if (!Array.isArray(checks)) err(`${at}.marketplaceChecks`, "marketplaceChecks must be a list");
         else checks.forEach((m, k) => {

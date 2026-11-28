@@ -1,6 +1,8 @@
-# Compliance Keeper: development plan
+# Oblige: development plan
 
-**Working name:** Compliance Keeper (final name to be chosen in Phase 0)
+*Compliance by design.*
+
+**Name:** Oblige · **Slogan:** "Compliance by design" (chosen 2026-11-28)
 **Version** 0.1 · **Date** 2026-11-28 · **Status** Draft for the lead's approval
 **Builds on:** `reports/OneSeat pivot opportunities.md` and the decision of 2026-11-28 to build a
 cross-obligation EU compliance keeper for small multi-marketplace sellers, entered through packaging
@@ -293,7 +295,7 @@ build for its competitors' channels, is:
 4. a maintained, cited rulebook that regulators trust; and
 5. a verification API that other marketplaces already use.
 
-If Compliance Keeper holds those five assets, then for Amazon buying it means lower compliance costs
+If Oblige holds those five assets, then for Amazon buying it means lower compliance costs
 across its seller base, more sellers able to sell across borders, a ready-made "intermediary"
 capability if the rules allow it, and denial of that infrastructure to rivals.
 

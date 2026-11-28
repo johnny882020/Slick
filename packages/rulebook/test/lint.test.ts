@@ -176,3 +176,29 @@ describe("lintPack", () => {
     expect(errors(p)).toEqual([]);
   });
 });
+
+describe("fix groups", () => {
+  it("accepts defined groups and rejects undefined or malformed ones", () => {
+    const p = base();
+    p.fixGroups = { reg: "Register in Germany" };
+    p.rules[0].requires[0].group = "reg";
+    expect(errors(p)).toEqual([]);
+    p.rules[0].requires[1].group = "nope";
+    expect(errors(p).join("\n")).toContain('group "nope" is not defined');
+    p.fixGroups = { Bad: "", unused: "Unused" };
+    const all = lintPack(p, "t").map((i) => `${i.level} ${i.at}: ${i.message}`).join("\n");
+    expect(all).toContain("lower_snake_case");
+    expect(all).toContain("needs an action title");
+    expect(all).toContain('warning fixGroups.unused: group "unused" is defined but no requirement uses it');
+    p.fixGroups = "x";
+    expect(errors(p).join("\n")).toContain("fixGroups must map");
+  });
+});
+
+describe("labels", () => {
+  it("warns when a label is too long to be a fix title", () => {
+    const p = base();
+    p.rules[0].requires[0].label = "x".repeat(121);
+    expect(lintPack(p, "t").some((i) => i.level === "warning" && i.message.includes("keep it short"))).toBe(true);
+  });
+});

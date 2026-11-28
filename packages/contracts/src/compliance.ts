@@ -1,4 +1,4 @@
-// Compliance Keeper contracts, v1 (frozen 2026-11-28; change only with a lead review).
+// Oblige contracts, v1 (frozen 2026-11-28; change only with a lead review).
 //
 // The rulebook is data: versioned rule packs (one per jurisdiction × obligation) whose
 // predicates are a small, deterministic expression language. The obligations engine
@@ -224,6 +224,11 @@ export interface RequirementSpec {
   };
   /** Regex the registration number must match, when known. */
   numberFormat?: string;
+  /**
+   * Fix group (v1.1): requirements with the same group, in the same pack and scope, are one
+   * action for the seller and become one fix card. Titles come from RulePack.fixGroups.
+   */
+  group?: string;
   recurring?: { every: "month" | "quarter" | "year"; note: string };
 }
 
@@ -288,6 +293,8 @@ export interface RulePack {
   confidence: "low" | "medium" | "high";
   /** Open questions for the legal reviewer. */
   openQuestions?: string[];
+  /** Fix group id → plain-language action title (v1.1), e.g. "Name an EU responsible person". */
+  fixGroups?: Record<string, string>;
 }
 
 // ---------- Engine output ----------
@@ -402,4 +409,4 @@ export interface AuditReport {
   disclaimers: string[];
 }
 
-export const COMPLIANCE_CONTRACTS_VERSION = "1.0.0";
+export const COMPLIANCE_CONTRACTS_VERSION = "1.1.0";

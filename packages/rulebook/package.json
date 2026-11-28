@@ -11,7 +11,7 @@
     }
   },
   "bin": {
-    "keeper-rules": "./dist/bin.js"
+    "oblige-rules": "./dist/bin.js"
   },
   "files": [
     "dist"

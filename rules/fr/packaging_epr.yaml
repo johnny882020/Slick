@@ -9,11 +9,7 @@ confidence: medium
 review:
   status: draft
   notes: >
-    Written by the research agent on 2026-11-28. French law texts were read in the consolidated
-    Code de l'environnement on INERIS AIDA because Légifrance refused automated access (HTTP 403/404);
-    the PPWR text was read from the Publications Office (Cellar) copy of the Official Journal because
-    the EUR-Lex HTML page returned an empty bot-check response. The verifier should re-read every
-    law citation on Légifrance and EUR-Lex.
+    Written by the research agent on 2026-11-28. French law texts were read in the consolidated Code de l'environnement on INERIS AIDA because Légifrance refused automated access (HTTP 403/404); the PPWR text was read from the Publications Office (Cellar) copy of the Official Journal because the EUR-Lex HTML page returned an empty bot-check response. The verifier should re-read every law citation on Légifrance and EUR-Lex.
 openQuestions:
   - "Légifrance could not be fetched (403/404). All Code de l'environnement quotes come from the INERIS AIDA consolidated copy. Re-check each quote on Légifrance, especially the new Article L. 541-10-9-1 created by Loi n° 2026-602 du 8 juillet 2026 (JO n° 159 du 9 juillet 2026, NOR TECX2407166L)."
   - "Start date of the French mandataire duty (L. 541-10-9-1): the law gives no specific date for article 5 I 2° (only 5 I 3° c starts on 1 September 2026), so this pack assumes the normal rule, in force the day after publication, i.e. 10 July 2026. Confirm, and check whether an implementing decree or transitional period was issued."
@@ -295,19 +291,11 @@ rules:
   - id: fr.packaging_epr.registration
     title: Join a packaging scheme and get your French packaging number (UIN) before selling packaged goods in France
     summary: >
-      If you are the first to sell packaged goods to French households, including the boxes you ship
-      orders in, you count as the packaging producer. You must join an approved packaging scheme
-      (Citeo, Adelphe or Léko); the scheme registers you with ADEME, which gives you a unique
-      identification number (UIN, "identifiant unique") for household packaging. Sellers based outside
-      France who ship directly to French customers are producers too. From 12 August 2026 the EU
-      packaging regulation (PPWR) also requires registration in each country's producer register;
-      how France runs that register is still being settled.
+      If you are the first to sell packaged goods to French households, including the boxes you ship orders in, you count as the packaging producer. You must join an approved packaging scheme (Citeo, Adelphe or Léko); the scheme registers you with ADEME, which gives you a unique identification number (UIN, "identifiant unique") for household packaging. Sellers based outside France who ship directly to French customers are producers too. From 12 August 2026 the EU packaging regulation (PPWR) also requires registration in each country's producer register; how France runs that register is still being settled.
     severity: high
     consequence: >
-      Fines from the environment ministry of up to €1,500 (individual) or €7,500 (company) per unit or
-      tonne of packaging concerned, plus a fine of up to €30,000 for not being registered. Marketplaces
-      may restrict your listings, or pay the fees for you and bill you with extra charges.
-    citations: [cenv-l541-10, cenv-l541-10-1, cenv-l541-10-13, cenv-r543-43, cenv-l541-9-5-fines, cenv-l541-9-5, arrete-2022-sydrep, ademe-idu, ecologie-empg, ppwr-art3-15, ppwr-art44-1, ppwr-art44-4, ppwr-art45-4, citeo-tarif-2026]
+      Fines from the environment ministry of up to €1,500 (individual) or €7,500 (company) per unit or tonne of packaging concerned, plus a fine of up to €30,000 for not being registered. Marketplaces may restrict your listings, or pay the fees for you and bill you with extra charges.
+    citations: [ cenv-l541-10, cenv-l541-10-1, cenv-l541-10-13, cenv-r543-43, cenv-l541-9-5-fines, cenv-l541-9-5, arrete-2022-sydrep, ademe-idu, ecologie-empg, ppwr-art3-15, ppwr-art44-1, ppwr-art44-4, ppwr-art45-4, citeo-tarif-2026 ]
     appliesWhen:
       all:
         - { eq: [ market, FR ] }
@@ -323,67 +311,56 @@ rules:
         label: Contract with an approved French household packaging scheme (Citeo, Adelphe or Léko)
         kind: scheme_contract
         satisfiedWhen: { inScheme: { obligation: packaging_epr } }
-        whoMayFile: [producer, authorised_representative]
+        whoMayFile: [ producer, authorised_representative ]
         filing:
           channel: scheme
           feeNote: >
-            Fees depend on the scheme's tariff. Citeo's 2026 minimum is a flat €110 excl. VAT per year
-            if you sell fewer than 10,000 consumer units.
+            Fees depend on the scheme's tariff. Citeo's 2026 minimum is a flat €110 excl. VAT per year if you sell fewer than 10,000 consumer units.
       - key: uin
         label: French household packaging unique identification number (UIN / identifiant unique) from ADEME's SYDEREP register
         kind: registration
         satisfiedWhen: { registered: { obligation: packaging_epr, register: SYDEREP } }
-        whoMayFile: [compliance_scheme]
+        whoMayFile: [ compliance_scheme ]
         filing:
           channel: scheme
           url: https://filieres-rep.ademe.fr/identifiant-unique
-          leadTimeDays: [2, 7]
+          leadTimeDays: [ 2, 7 ]
           feeNote: >
-            Your scheme registers you with ADEME and passes the number on; you cannot register on your
-            own if you use a scheme. ADEME issues the number within two working days once the file is
-            complete.
+            Your scheme registers you with ADEME and passes the number on; you cannot register on your own if you use a scheme. ADEME issues the number within two working days once the file is complete.
     marketplaceChecks:
       - channel: amazon
         blocksListing: false
         note: >
-          Amazon.fr asks for the French UIN on its EPR compliance page. Without a valid UIN, Amazon
-          pays the eco-contributions by default and bills you, and may restrict sales of the products
-          concerned.
-        citations: [amazon-fr-epr, amazon-fr-news-2021]
+          Amazon.fr asks for the French UIN on its EPR compliance page. Without a valid UIN, Amazon pays the eco-contributions by default and bills you, and may restrict sales of the products concerned.
+        citations: [ amazon-fr-epr, amazon-fr-news-2021 ]
       - channel: cdiscount
         blocksListing: false
         note: >
-          Cdiscount's seller terms require your UIN(s). Without a valid UIN, Cdiscount declares and pays
-          the eco-contributions for your Cdiscount sales and bills you, plus a 7.3% admin fee.
-        citations: [cdiscount-cgmad-f1, cdiscount-cgmad-f3]
+          Cdiscount's seller terms require your UIN(s). Without a valid UIN, Cdiscount declares and pays the eco-contributions for your Cdiscount sales and bills you, plus a 7.3% admin fee.
+        citations: [ cdiscount-cgmad-f1, cdiscount-cgmad-f3 ]
       - channel: ebay
         blocksListing: false
         note: >
-          eBay asks business sellers to France to add a UIN for packaging, and may stop new listings
-          or restrict existing ones until you comply.
-        citations: [ebay-fr-epr]
+          eBay asks business sellers to France to add a UIN for packaging, and may stop new listings or restrict existing ones until you comply.
+        citations: [ ebay-fr-epr ]
       - channel: etsy
         blocksListing: false
         note: >
-          Etsy asks sellers who sell to France to add their UIN in Shop Manager (Legal and tax
-          information). Its help page does not say listings are blocked without it.
-        citations: [etsy-fr-epr]
+          Etsy asks sellers who sell to France to add their UIN in Shop Manager (Legal and tax information). Its help page does not say listings are blocked without it.
+        citations: [ etsy-fr-epr ]
       - channel: zalando
         blocksListing: false
         note: >
-          Zalando expects every partner to have a French packaging UIN and says a missing UIN could get
-          you suspended from selling in France.
-        citations: [zalando-fr-epr]
+          Zalando expects every partner to have a French packaging UIN and says a missing UIN could get you suspended from selling in France.
+        citations: [ zalando-fr-epr ]
 
   - id: fr.packaging_epr.show_uin
     title: Show your French packaging number (UIN) in your terms of sale and on your website
-    summary: >
-      Once you have your packaging UIN, put it in your general terms of sale (or another contract
-      document the buyer receives), and on your website alongside your legal company details. Any
-      seller must also give buyers the producer's UIN if they ask.
+    summary: >-
+      Once you have your packaging UIN, put it in your general terms of sale (or another contract document the buyer receives), and on your website alongside your legal company details. Any seller must also give buyers the producer's UIN if they ask. To record it in Oblige: Record where it appears in product.attributes.uin_shown_at, for example the URL of your terms of sale or "shop_policies".
     severity: medium
     consequence: Administrative fine of up to €30,000 for leaving the UIN out of the required documents.
-    citations: [cenv-r541-173, cenv-l541-10-10, cenv-l541-9-5, ademe-idu-display, cdiscount-cgmad-f1, etsy-fr-epr]
+    citations: [ cenv-r541-173, cenv-l541-10-10, cenv-l541-9-5, ademe-idu-display, cdiscount-cgmad-f1, etsy-fr-epr ]
     appliesWhen:
       all:
         - { eq: [ market, FR ] }
@@ -396,37 +373,32 @@ rules:
             - { contains: [ seller.roles, distributor ] }
     requires:
       - key: uin_shown
-        label: >
-          UIN shown in your terms of sale and on your website or shop page. Record where it appears in
-          product.attributes.uin_shown_at, for example the URL of your terms of sale or "shop_policies".
+        label: >-
+          UIN shown in your terms of sale and on your website or shop page
         kind: data_field
         satisfiedWhen:
           all:
             - { registered: { obligation: packaging_epr, register: SYDEREP } }
             - { exists: product.attributes.uin_shown_at }
-        whoMayFile: [producer]
+        whoMayFile: [ producer ]
     marketplaceChecks:
       - channel: etsy
         blocksListing: false
         note: Etsy asks you to show the UIN where buyers can see it, such as your shop policies or Message to Buyers.
-        citations: [etsy-fr-epr]
+        citations: [ etsy-fr-epr ]
       - channel: cdiscount
         blocksListing: false
         note: Cdiscount's seller terms require you to put your UIN(s) in your terms of sale.
-        citations: [cdiscount-cgmad-f1]
+        citations: [ cdiscount-cgmad-f1 ]
 
   - id: fr.packaging_epr.declaration_contribution
     title: Declare your packaging every year and pay the packaging fee (eco-contribution)
     summary: >
-      Each year you tell your packaging scheme how much household packaging you put on the French
-      market the year before, and pay the fee it charges. Citeo's window is January to the end of
-      February; your scheme also passes the data to ADEME for you. If you have no valid UIN, Amazon
-      and Cdiscount declare and pay the fee for sales made on their sites and bill it back to you.
+      Each year you tell your packaging scheme how much household packaging you put on the French market the year before, and pay the fee it charges. Citeo's window is January to the end of February; your scheme also passes the data to ADEME for you. If you have no valid UIN, Amazon and Cdiscount declare and pay the fee for sales made on their sites and bill it back to you.
     severity: high
     consequence: >
-      Fines of up to €1,500 (individual) or €7,500 (company) per unit or tonne of packaging, and daily
-      penalties of up to €20,000 until you comply. Marketplaces that pay for you add their own charges.
-    citations: [cenv-l541-10, cenv-r543-55, cenv-l541-10-13, cenv-l541-10-9, cenv-l541-9-5-fines, citeo-tarif-2026, amazon-fr-news-2021, amazon-fr-news-2026, cdiscount-cgmad-f3]
+      Fines of up to €1,500 (individual) or €7,500 (company) per unit or tonne of packaging, and daily penalties of up to €20,000 until you comply. Marketplaces that pay for you add their own charges.
+    citations: [ cenv-l541-10, cenv-r543-55, cenv-l541-10-13, cenv-l541-10-9, cenv-l541-9-5-fines, citeo-tarif-2026, amazon-fr-news-2021, amazon-fr-news-2026, cdiscount-cgmad-f3 ]
     appliesWhen:
       all:
         - { eq: [ market, FR ] }
@@ -440,48 +412,40 @@ rules:
     requires:
       - key: annual_declaration
         label: >
-          Yearly packaging declaration and eco-contribution paid through your scheme. Sales on Amazon or
-          Cdiscount count as covered when the marketplace pays for you, but your other sales do not.
+          Yearly packaging declaration and eco-contribution paid through your scheme. Sales on Amazon or Cdiscount count as covered when the marketplace pays for you, but your other sales do not.
         kind: declaration
         satisfiedWhen:
           any:
             - { inScheme: { obligation: packaging_epr } }
             - { in: [ channel, [ amazon, cdiscount ] ] }
-        whoMayFile: [producer, authorised_representative, marketplace]
+        whoMayFile: [ producer, authorised_representative, marketplace ]
         filing:
           channel: scheme
           feeNote: >
-            The fee depends on packaging weight and material under your scheme's tariff. Citeo's 2026
-            minimum is €110 excl. VAT per year for fewer than 10,000 consumer units.
+            The fee depends on packaging weight and material under your scheme's tariff. Citeo's 2026 minimum is €110 excl. VAT per year for fewer than 10,000 consumer units.
         recurring:
           every: year
           note: >
-            Declare the previous calendar year's packaging. Citeo's window runs from January to the end
-            of February; check Léko's or Adelphe's calendar if you use them.
+            Declare the previous calendar year's packaging. Citeo's window runs from January to the end of February; check Léko's or Adelphe's calendar if you use them.
     marketplaceChecks:
       - channel: amazon
         blocksListing: false
         note: >
-          Without a valid UIN, Amazon pays the French eco-contributions by default and bills you. Amazon
-          says this pay-on-behalf service continues once you have a PPWR registration number (ERN).
-        citations: [amazon-fr-news-2021, amazon-fr-news-2026]
+          Without a valid UIN, Amazon pays the French eco-contributions by default and bills you. Amazon says this pay-on-behalf service continues once you have a PPWR registration number (ERN).
+        citations: [ amazon-fr-news-2021, amazon-fr-news-2026 ]
       - channel: cdiscount
         blocksListing: false
         note: >
-          Without a valid UIN, Cdiscount declares and pays the eco-contributions for your Cdiscount
-          sales, bills you, and adds a 7.3% admin fee. It may take advance payments.
-        citations: [cdiscount-cgmad-f3]
+          Without a valid UIN, Cdiscount declares and pays the eco-contributions for your Cdiscount sales, bills you, and adds a 7.3% admin fee. It may take advance payments.
+        citations: [ cdiscount-cgmad-f3 ]
 
   - id: fr.packaging_epr.triman_infotri
     title: Print the Triman logo and Info-tri sorting instructions on household packaging
-    summary: >
-      Household packaging sold in France must show the Triman logo together with the Info-tri
-      instructions telling customers how to sort each part. Your scheme supplies the artwork. A
-      sticker is allowed. If the largest side of the pack is under 10 cm² and nothing else comes with
-      the product, both can be given online instead. Glass drinks packaging is exempt.
+    summary: >-
+      Household packaging sold in France must show the Triman logo together with the Info-tri instructions telling customers how to sort each part. Your scheme supplies the artwork. A sticker is allowed. If the largest side of the pack is under 10 cm² and nothing else comes with the product, both can be given online instead. Glass drinks packaging is exempt. To record it in Oblige: Record where they appear in product.attributes.triman_label, for example "on_pack", "sticker", or "digital" for packs whose largest side is under 10 cm². Leave it empty if the packaging does not carry them.
     severity: medium
     consequence: Administrative fine of up to €3,000 (individual) or €15,000 (company).
-    citations: [cenv-l541-9-3, cenv-r541-12-21, cenv-l541-9-4, citeo-infotri, ppwr-art12]
+    citations: [ cenv-l541-9-3, cenv-r541-12-21, cenv-l541-9-4, citeo-infotri, ppwr-art12 ]
     appliesWhen:
       all:
         - { eq: [ market, FR ] }
@@ -494,27 +458,20 @@ rules:
             - { contains: [ seller.roles, distributor ] }
     requires:
       - key: triman_label
-        label: >
-          Triman logo and Info-tri sorting instructions on the packaging. Record where they appear in
-          product.attributes.triman_label, for example "on_pack", "sticker", or "digital" for packs
-          whose largest side is under 10 cm². Leave it empty if the packaging does not carry them.
+        label: >-
+          Triman logo and Info-tri sorting instructions on the packaging
         kind: label
         satisfiedWhen: { exists: product.attributes.triman_label }
-        whoMayFile: [producer]
+        whoMayFile: [ producer ]
 
   - id: fr.packaging_epr.authorised_representative
     title: Appoint a French representative (mandataire) if your business is not based in France
     summary: >
-      Since 10 July 2026, a seller not established in France that has French packaging duties must
-      appoint, in writing, a representative based in France who takes over those duties. This
-      includes sellers based elsewhere in the EU. The EU packaging regulation (PPWR) has required the
-      same since 12 August 2026 for sellers based in another country who sell directly to French
-      customers.
+      Since 10 July 2026, a seller not established in France that has French packaging duties must appoint, in writing, a representative based in France who takes over those duties. This includes sellers based elsewhere in the EU. The EU packaging regulation (PPWR) has required the same since 12 August 2026 for sellers based in another country who sell directly to French customers.
     severity: high
     consequence: >
-      You would be breaking French and EU packaging law, with environment-ministry fines of up to
-      €1,500 (individual) or €7,500 (company) per unit or tonne of packaging.
-    citations: [cenv-l541-10-9-1, loi-2026-602, ppwr-art45-3, ppwr-art3-15, ppwr-art71, cenv-l541-9-5-fines, amazon-fr-news-2026]
+      You would be breaking French and EU packaging law, with environment-ministry fines of up to €1,500 (individual) or €7,500 (company) per unit or tonne of packaging.
+    citations: [ cenv-l541-10-9-1, loi-2026-602, ppwr-art45-3, ppwr-art3-15, ppwr-art71, cenv-l541-9-5-fines, amazon-fr-news-2026 ]
     appliesWhen:
       all:
         - { eq: [ market, FR ] }
@@ -531,16 +488,14 @@ rules:
         label: Written mandate appointing an authorised representative (mandataire) based in France for packaging duties
         kind: representative
         satisfiedWhen: { hasRepresentative: { obligation: packaging_epr } }
-        whoMayFile: [authorised_representative]
+        whoMayFile: [ authorised_representative ]
         filing:
           channel: scheme
           feeNote: >
-            The representative signs up with the packaging scheme for you and files your declarations.
-            Representatives charge their own fees.
+            The representative signs up with the packaging scheme for you and files your declarations. Representatives charge their own fees.
     marketplaceChecks:
       - channel: amazon
         blocksListing: false
         note: >
-          Amazon tells sellers not established in the country of sale that they may need to appoint an
-          authorised representative there under the PPWR.
-        citations: [amazon-fr-news-2026]
+          Amazon tells sellers not established in the country of sale that they may need to appoint an authorised representative there under the PPWR.
+        citations: [ amazon-fr-news-2026 ]

@@ -11,7 +11,7 @@
     }
   },
   "bin": {
-    "keeper-audit": "./dist/bin.js"
+    "oblige-audit": "./dist/bin.js"
   },
   "files": [
     "dist"
@@ -21,7 +21,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "audit": "tsx --conditions=@oneseat/source src/bin.ts",
+    "gap-audit": "tsx --conditions=@oneseat/source src/bin.ts",
     "clean": "rm -rf dist coverage"
   },
   "dependencies": {

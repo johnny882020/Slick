@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// keeper-audit --catalog catalog.csv --seller seller.json [--rules dir] [--today YYYY-MM-DD]
+// oblige-audit --catalog catalog.csv --seller seller.json [--rules dir] [--today YYYY-MM-DD]
 //              [--html out.html] [--md out.md] [--json out.json]
 import { readFile, writeFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
@@ -11,6 +11,8 @@ import { renderHtml, renderMarkdown } from "./render.js";
 
 async function main(): Promise<number> {
   const { values } = parseArgs({
+    // pnpm passes a literal "--" through to the script; drop it.
+    args: process.argv.slice(2).filter((a) => a !== "--"),
     options: {
       catalog: { type: "string" },
       seller: { type: "string" },
@@ -22,7 +24,7 @@ async function main(): Promise<number> {
     },
   });
   if (!values.catalog || !values.seller) {
-    console.error("usage: keeper-audit --catalog catalog.csv --seller seller.json [--rules dir] [--html out.html] [--md out.md] [--json out.json]");
+    console.error("usage: oblige-audit --catalog catalog.csv --seller seller.json [--rules dir] [--html out.html] [--md out.md] [--json out.json]");
     return 2;
   }
   const { packs, issues } = await loadRulebook(values.rules!);

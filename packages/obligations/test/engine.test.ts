@@ -195,3 +195,33 @@ describe("map and audit", () => {
     expect(channelName("my_shop")).toBe("my_shop");
   });
 });
+
+describe("fix groups", () => {
+  it("merges requirements in one fix group into one fix with combined effects", () => {
+    const ps = packs();
+    const eu = ps[1]!;
+    eu.fixGroups = { safety: "Add safety information in each country's language" };
+    eu.rules[0]!.requires[0]!.group = "safety";
+    eu.rules[1]!.requires[0]!.group = "safety";
+    eu.rules[1]!.requires[0]!.filing = { channel: "portal", leadTimeDays: [2, 5] };
+    eu.rules[1]!.requires[1]!.group = "safety";
+    eu.rules[1]!.requires[1]!.filing = { channel: "portal", leadTimeDays: [1, 9] };
+    const rows = assess({ seller: seller(), products: [product()], packs: ps, today });
+    const fixes = buildFixes(rows, ps);
+    const merged = fixes.filter((f) => f.title.startsWith("Add safety information"));
+    expect(merged).toHaveLength(1);
+    const f = merged[0]!;
+    expect(f.title).toBe("Add safety information in each country's language — Germany");
+    expect(f.requirementIds).toHaveLength(3);
+    expect(f.effects).toEqual(["pay", "submit", "publish"]);
+    expect(f.leadTimeDays).toEqual([1, 9]);
+    expect(f.steps.at(-1)).toBe("This one fix covers: EU responsible person; Safety warnings in the local language; Electrical safety note.");
+  });
+
+  it("ignores a group that the pack does not define", () => {
+    const ps = packs();
+    ps[1]!.rules[1]!.requires[0]!.group = "undefined_group";
+    const rows = assess({ seller: seller(), products: [product()], packs: ps, today });
+    expect(buildFixes(rows, ps).some((f) => f.title.startsWith("Safety warnings in the local language"))).toBe(true);
+  });
+});

@@ -1,0 +1,623 @@
+id: it.packaging_epr
+version: 2026.11.1
+jurisdiction: IT
+obligation: packaging_epr
+title: Packaging take-back and labelling in Italy
+effectiveFrom: "2006-04-29"
+effectiveTo: null
+confidence: medium
+review:
+  status: draft
+  notes: >
+    Researched 2026-11-28. Italy still runs packaging take-back through CONAI under D.Lgs.
+    152/2006 (Testo Unico Ambientale, Part IV, arts. 217-226 and 261). The EU Packaging
+    Regulation (EU) 2025/40 (PPWR) applies directly since 12 Aug 2026, but Italy has not yet
+    adopted its implementing decree (delegation in Law 36/2026 art. 14), the national producer
+    register RENAP has no packaging section, and there is no Italian procedure for authorised
+    representatives. Law texts were read on normattiva.it. PPWR quotes were read from the
+    Official Journal text served by publications.europa.eu because eur-lex.europa.eu answered
+    automated requests with a bot challenge. conai.org returned HTTP 403 to every request, so
+    the CONAI Guide 2026 was read from a copy hosted by certifico.com.
+openQuestions:
+  - "Italian PPWR implementing decree: no legislative decree adapting Italian law to Regulation (EU) 2025/40 was found as of 2026-11-28. Law 36/2026 art. 14 gives the Government eight months from its entry into force (in force 9 Apr 2026, so roughly 9 Dec 2026). A MASE consultation on a draft decree dated 2 Sep 2026 is reported only by secondary sources. Re-check the register, authorised-representative rules, sanctions and CONAI's role once the decree is published."
+  - "National register: RENAP (renap.gov.it) currently holds only the WEEE (AEE), batteries (pile e accumulatori) and tyres registers. When will a packaging register open, and will CONAI membership count as registration (PPWR art. 44(2) second sentence lets a producer responsibility organisation register for its members unless the Member State says otherwise)? The rule treats CONAI membership as satisfying the register step until then."
+  - "PPWR art. 44(1) gives Member States 18 months from the first implementing act under art. 44(14) (due by 12 Feb 2026) to set up the register. The adoption date of that implementing act was not confirmed, so the latest date Italy's register must exist is unknown."
+  - "Amazon study 'two-step' registration: the study says several countries need both a PRO and a national registry. For Italy it documents one 17-field registration naming CONAI. Today Italy appears to need only CONAI; the second step (RENAP packaging register) does not exist yet. Confirm."
+  - "Authorised representative: PPWR art. 45(3) applies directly from 12 Aug 2026, but Italy has no national procedure, register entry, form or sanction for it, and the Austrian chamber of commerce (WKO, 12 Aug 2026) says there is no Italian legal basis that makes a formal AR mandatory. Confirm the formal mandate requirements in Italy (written form, language, notarisation or apostille, whether the AR needs an Italian VAT number and PEC address, liability) and whether CONAI's 'domicilio speciale' appointment for foreign members satisfies art. 45(3)."
+  - "Authorised representative for sellers outside the EU: art. 45(3) first sentence names producers under art. 3(1)(15)(c), which covers sellers established 'in un paese terzo' selling directly to consumers, but the second sentence makes AR appointment for third-country producers a Member State option, and the Council's 21 Oct 2026 mandate (recital 6) reads the third-country rule as that option. Confirm whether non-EU distance sellers must appoint an Italian AR now or only if Italy chooses to require it."
+  - "EU suspension of the AR duty: the Commission proposed (COM(2025) 982) to suspend art. 45(3) for EU-established producers until 2035. Parliament adopted its position on 20 Oct 2026 (micro and small enterprises) and the Council its mandate on 21 Oct 2026 (EU producers placing less than 1 tonne per Member State per year, until 1 Jan 2032). The Council's four-column table of 4 Nov 2026 has no draft agreement yet. Update the AR rule when the regulation is adopted; neither position covers non-EU producers."
+  - "Foreign sellers and CONAI: the CONAI Guide 2026 says a foreign company has no obligation towards CONAI unless it sells packaged goods in Italy through an e-commerce platform; otherwise membership is voluntary. WKO reports that CONAI treats all direct B2C distance sales by foreign companies as requiring CONAI registration, and PPWR art. 3(1)(15)(c) makes such sellers producers in Italy. The rule applies to all channels, including own web shops. Confirm with CONAI (aziendaestera@conai.org)."
+  - "Marketplace simplified routes (D.Lgs. 152/2006 art. 178-quater): which marketplaces have signed agreements with CONAI, and does using them (for example eBay's or Amazon's 'Pay on Behalf') satisfy the membership and declaration rules? The engine has no predicate for 'covered by a marketplace service', so these rules flag such sellers as missing membership. eBay's Italy page asks for an EPR number before Pay on Behalf can be used."
+  - "Fiscal representative: no requirement for a VAT fiscal representative was found for CONAI membership. Foreign members must elect a 'domicilio speciale' in Italy, and members established outside the EU without an Italian branch must give a guarantee covering the CAC expected over the next 12 months. Confirm the accepted forms and amount of the guarantee."
+  - "Registration number format: no official CONAI document describing the member number (codice consorziato / numero di iscrizione) format was found, so numberFormat is omitted. Also confirm which number marketplaces accept as the Italian packaging 'EPR registration number'."
+  - "CAC declarations: the rule uses CONAI membership as a stand-in for 'declarations filed', so it overstates compliance once a seller is a member. Italian sellers who buy goods or packaging from other EU countries are 'importers' for CONAI (UE e extra UE), but the seller role 'importer' only means non-EU imports; add a supplier-country field. Italian manufacturers who import empty packaging also declare and are not captured."
+  - "CAC thresholds and deadlines come from the CONAI Guide 2026 (exempt up to EUR 200 per material, annual up to EUR 3,000, quarterly up to EUR 31,000, monthly above; deadline the 20th of the following month). They were read from a copy hosted by certifico.com because conai.org returned HTTP 403. Verify against conai.org."
+  - "Labelling after the PPWR: art. 219(5) Italian labelling stays relevant in the transition (MASE page of 15 Oct 2026). PPWR art. 12 harmonised labelling applies from 12 Aug 2028 or 24 months after its implementing acts. Confirm whether and when the Italian labelling duty is replaced, and whether the Italian decree changes it."
+  - "Labelling guidelines: the MASE PDF read is the 'Linee Guida sull’etichettatura degli imballaggi' (file dated 27-09-2022, cover dated 27/7/2022), understood to be the version adopted by DM 360 of 28 Sep 2022. Confirm it is the current version."
+  - "B2B sales: per WKO, CONAI places the obligation on the Italian recipient when a foreign company supplies a professional end user that does not resell. The rules use product.consumerProduct as a stand-in for direct consumer sales, so they may over- or under-apply to B2B sellers."
+  - "Fulfilment providers that unpack packaged goods (PPWR art. 3(1)(15)(e)) and Italian 'utilizzatori' who only buy from Italian suppliers (they pay the CAC on supplier invoices but must still join CONAI) are modelled only roughly."
+  - "Marketplaces: Etsy has no public policy page on Italian packaging EPR that could be found, so there is no Etsy check. Amazon.it's public compliance page describes 'EPR Pagamento a Tuo Nome' only generally ('ove disponibili'); the Seller Central help pages need a login and were not read. Zalando's zDirect list of countries collecting packaging EPR details (page updated 15 Jun 2026) does not include Italy; its 1 Jan 2027 block applies once collection is live."
+  - "Lead time for CONAI membership is not documented officially, so leadTimeDays is omitted. The Amazon study gives 2-6 weeks per country in general."
+  - "Pack effectiveFrom is taken as the entry into force of D.Lgs. 152/2006 (29 Apr 2006) and was not re-checked; the CONAI membership duty itself dates from 1999 and the labelling duty from 1 Jan 2023."
+citations:
+  - id: tua-218
+    title: D.Lgs. 152/2006, art. 218, comma 1, lett. s) utilizzatori
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art218"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "s) utilizzatori: i commercianti, i distributori, gli addetti al riempimento, gli utenti di imballaggi e gli importatori di imballaggi pieni"
+  - id: tua-221
+    title: D.Lgs. 152/2006, art. 221, comma 2 (partecipazione al Consorzio nazionale imballaggi)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art221"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "i produttori e gli utilizzatori partecipano al Consorzio nazionale imballaggi, salvo il caso in cui venga adottato uno dei sistemi di cui al comma 3, lettere a) e c) del presente articolo"
+  - id: tua-261
+    title: D.Lgs. 152/2006, art. 261, comma 1 (sanzioni per mancata adesione)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art261"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "I produttori e gli utilizzatori che non adempiono all'obbligo di raccolta di cui all'articolo 221, comma 2, o non adottano, in alternativa, sistemi gestionali ai sensi del medesimo articolo 221, comma 3, lettere a) e c), sono puniti con la sanzione amministrativa pecuniaria di euro 5.000."
+  - id: tua-261-3
+    title: D.Lgs. 152/2006, art. 261, comma 3 (sanzione per imballaggi senza etichettatura)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art261"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "A chiunque immette sul mercato interno imballaggi privi dei requisiti di cui all'articolo 219, comma 5, si applica la sanzione amministrativa pecuniaria da 5.000 euro a 25.000 euro."
+  - id: tua-219-5
+    title: D.Lgs. 152/2006, art. 219, comma 5 (etichettatura ambientale degli imballaggi)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art219"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Tutti gli imballaggi devono essere opportunamente etichettati secondo le modalità stabilite dalle norme tecniche UNI applicabili e in conformità alle determinazioni adottate dalla Commissione dell'Unione europea"
+  - id: tua-178ter-registro
+    title: D.Lgs. 152/2006, art. 178-ter, comma 8 (Registro nazionale dei produttori)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art178ter"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "è istituito il Registro nazionale dei produttori al quale i soggetti sottoposti ad un regime di responsabilità estesa del produttore sono tenuti ad iscriversi secondo le modalità definite con il decreto di cui al comma 7"
+  - id: tua-178ter-ar
+    title: D.Lgs. 152/2006, art. 178-ter, comma 8 (rappresentante autorizzato per produttori di altri Stati membri)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art178ter"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "questi designano una persona giuridica o fisica stabilita sul territorio nazionale quale rappresentante autorizzato per l'adempimento degli obblighi e l'iscrizione al Registro"
+  - id: tua-178quater-3
+    title: D.Lgs. 152/2006, art. 178-quater, comma 3 (EPR nel commercio elettronico)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art178quater"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "I produttori del prodotto che immettono prodotti sul mercato nazionale mediante piattaforma di commercio elettronico adempiono agli obblighi di responsabilità estesa del produttore anche avvalendosi dei servizi che i soggetti gestori della piattaforma medesima sono tenuti a offrire"
+  - id: tua-178quater-10
+    title: D.Lgs. 152/2006, art. 178-quater, comma 10 (accordi per gli imballaggi solo con mandato scritto)
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2006-04-03;152~art178quater"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "gli accordi di cui al comma 3 riguardano esclusivamente l'immissione sul mercato effettuata dai produttori aventi sede legale fuori del territorio nazionale che abbiano conferito mandato scritto al gestore della piattaforma di commercio elettronico"
+  - id: l36-2026-art14
+    title: Legge 17 marzo 2026, n. 36 (Legge di delegazione europea 2025), art. 14 - delega per l'adeguamento al regolamento (UE) 2025/40
+    url: "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2026-03-17;36~art14"
+    publisher: Istituto Poligrafico e Zecca dello Stato (Normattiva)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Il Governo è delegato ad adottare, entro otto mesi dalla data di entrata in vigore della presente legge, uno o più decreti legislativi per l'adeguamento della normativa nazionale alle disposizioni del regolamento (UE) 2025/40"
+  - id: ppwr-3-15c
+    title: Regolamento (UE) 2025/40 (PPWR), art. 3, paragrafo 1, punto 15), lettera c) - produttore che vende a distanza
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "il fabbricante, l’importatore o il distributore è stabilito in uno Stato membro o in un paese terzo e mette a disposizione per la prima volta all’interno del territorio di un altro Stato membro, direttamente ai consumatori"
+  - id: ppwr-44-1
+    title: Regolamento (UE) 2025/40 (PPWR), art. 44, paragrafo 1 - termine per il registro nazionale
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Entro 18 mesi dalla data di entrata in vigore del primo atto di esecuzione adottato ai sensi dell’articolo 44, paragrafo 14, ciascuno Stato membro istituisce un registro nazionale"
+  - id: ppwr-44-2
+    title: Regolamento (UE) 2025/40 (PPWR), art. 44, paragrafo 2 - obbligo di registrazione
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "I produttori sono tenuti a iscriversi nel registro di cui al paragrafo 1 del presente articolo in ciascuno Stato membro nel cui territorio mettono a disposizione per la prima volta un imballaggio o prodotti imballati"
+  - id: ppwr-44-2-pro
+    title: Regolamento (UE) 2025/40 (PPWR), art. 44, paragrafo 2, secondo comma - registrazione tramite organizzazione per la responsabilità del produttore
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "gli obblighi di cui al presente articolo sono assolti da tale organizzazione, salvo se diversamente specificato dallo Stato membro in cui è istituito il registro"
+  - id: ppwr-44-4
+    title: Regolamento (UE) 2025/40 (PPWR), art. 44, paragrafo 4 - divieto di vendita senza registrazione
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Se i produttori o, se del caso, conformemente all’articolo 45, i loro rappresentanti autorizzati per la responsabilità estesa del produttore non sono registrati in uno Stato membro, essi non mettono a disposizione nel territorio di uno Stato membro per la prima volta imballaggi o prodotti imballati"
+  - id: ppwr-45-1
+    title: Regolamento (UE) 2025/40 (PPWR), art. 45, paragrafo 1 - responsabilità estesa del produttore
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "I produttori sono soggetti alla responsabilità estesa del produttore nell’ambito dei regimi istituiti a norma degli articoli 8 e 8 bis della direttiva 2008/98/CE e della presente sezione per gli imballaggi"
+  - id: ppwr-45-3
+    title: Regolamento (UE) 2025/40 (PPWR), art. 45, paragrafo 3 - rappresentante autorizzato
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Un produttore di cui all’articolo 3, paragrafo1, punto 15), lettere c) e d), nomina, mediante mandato scritto, un rappresentante autorizzato per la responsabilità estesa del produttore in ciascuno Stato membro dove il produttore mette a disposizione per la prima volta gli imballaggi"
+  - id: ppwr-45-4
+    title: Regolamento (UE) 2025/40 (PPWR), art. 45, paragrafo 4 - controlli delle piattaforme online
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "ottengono dai produttori che offrono imballaggi o prodotti imballati ai consumatori situati nell’Unione le seguenti informazioni, prima di autorizzare tali produttori a utilizzare i loro servizi"
+  - id: ppwr-12
+    title: Regolamento (UE) 2025/40 (PPWR), art. 12, paragrafo 1 - etichetta armonizzata
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "A decorrere dal 12 agosto 2028 o 24 mesi dopo la data di entrata in vigore degli atti di esecuzione adottati a norma del paragrafo 6 o 7 del presente articolo, se posteriore, l’imballaggio immesso sul mercato è contrassegnato da un’etichetta armonizzata"
+  - id: ppwr-71
+    title: Regolamento (UE) 2025/40 (PPWR), art. 71 - data di applicazione
+    url: "https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32025R0040"
+    publisher: Ufficio delle pubblicazioni dell'Unione europea (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Esso si applica a decorrere dal 12 agosto 2026."
+  - id: council-ar-mandate
+    title: Council of the EU, ST 14765/26 - negotiating mandate on suspending PPWR art. 45(3) (not adopted law)
+    url: https://data.consilium.europa.eu/doc/document/ST-14765-2026-INIT/en/pdf
+    publisher: Council of the European Union
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "The application of Article 45(3) of Regulation (EU) 2025/40 shall be suspended for a producer established in a Member State in respect of each other Member State where that producer makes less than 1 tonne of packaging"
+  - id: mase-ppwr
+    title: MASE - Imballaggi e rifiuti di imballaggio (Regolamento (UE) 2025/40), aggiornato 15.10.2026
+    url: "https://www.mase.gov.it/portale/imballaggi-e-rifiuti-di-imballaggio-regolamento-ue-2025/40-"
+    publisher: Ministero dell'Ambiente e della Sicurezza Energetica
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "applicabile dal 12 agosto 2026, sostituisce la direttiva 94/62/CE, le cui disposizioni, insieme alla disciplina nazionale del decreto legislativo 3 aprile 2006, n. 152, e del decreto legislativo 3 settembre 2020, n. 116, restano rilevanti nel periodo transitorio."
+  - id: mase-lg-b2c
+    title: MASE - Linee Guida sull’etichettatura degli imballaggi ai sensi dell’art. 219 comma 5 del D.Lgs. 152/2006 (imballaggi B2C)
+    url: https://www.mase.gov.it/portale/documents/d/guest/linee_guida_etichettatura_ambientale_27-09-2022-pdf
+    publisher: Ministero dell'Ambiente e della Sicurezza Energetica
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Per gli imballaggi monocomponente destinati al consumatore finale, devono essere riportate le seguenti informazioni: a) La codifica identificativa del materiale di imballaggio secondo la Decisione 129/97/CE b) Le indicazioni sulla raccolta."
+  - id: mase-lg-digitale
+    title: MASE - Linee Guida sull’etichettatura degli imballaggi (ricorso al digitale)
+    url: https://www.mase.gov.it/portale/documents/d/guest/linee_guida_etichettatura_ambientale_27-09-2022-pdf
+    publisher: Ministero dell'Ambiente e della Sicurezza Energetica
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "il soggetto obbligato è tenuto a riportare sull’imballaggio o sul punto di vendita, sia esso fisico o virtuale a cui il consumatore abbia accesso, le istruzioni per consentirgli di intercettare le informazioni ambientali obbligatorie tramite i canali digitali previsti"
+  - id: renap-home
+    title: RENAP - Registro Nazionale dei Produttori (home page)
+    url: https://www.renap.gov.it/
+    publisher: Ministero dell'Ambiente e della Sicurezza Energetica (RENAP)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Tutti i produttori di prodotti soggetti ad un regime di responsabilità estesa sono tenuti ad iscriversi al RENAP attraverso iscrizione allo specifico registro di filiera"
+  - id: renap-registri
+    title: RENAP - Registro nazionale dei produttori (registri di filiera esistenti - AEE, pile e accumulatori, pneumatici)
+    url: https://www.renap.gov.it/it/scopri-di-piu-su-renap
+    publisher: Ministero dell'Ambiente e della Sicurezza Energetica (RENAP)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Il RENAP comprende i seguenti registri di filiera esistenti."
+  - id: conai-guida-adesione
+    title: CONAI - Guida all'adesione e all'applicazione del Contributo Ambientale 2026, cap. 3 Adesione a CONAI (copy hosted by certifico.com; conai.org returned 403)
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Per iscriversi a CONAI ed effettuare il pagamento della quota di partecipazione occorre utilizzare il servizio Adesione online."
+  - id: conai-guida-termine
+    title: CONAI - Guida 2026, par. 3.1.1 Aziende di nuova costituzione (termine di adesione)
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "aderiscono a CONAI entro un mese dalla data di inizio dell’attività prendendo come riferimento la prima fattura ricevuta o emessa."
+  - id: conai-guida-estera
+    title: CONAI - Guida 2026, par. 2.4 Impresa estera
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "L’impresa estera, salvo che immetta prodotti imballati sul mercato nazionale mediante piattaforma di commercio elettronico, a oggi, non ha obblighi nei confronti del CONAI ma ha la facoltà di aderire allo stesso Consorzio"
+  - id: conai-guida-piattaforma
+    title: CONAI - Guida 2026, par. 2.4 Impresa estera (piattaforme di commercio elettronico)
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Nel caso in cui l’impresa estera decida di non avvalersi dei servizi offerti dalla piattaforma è tenuta comunque all’adesione al CONAI e a tutti gli adempimenti necessari."
+  - id: conai-guida-garanzie
+    title: CONAI - Guida 2026, par. 2.4 Impresa estera (imprese extra UE)
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "devono prestare idonee garanzie a copertura del Contributo Ambientale presumibilmente dovuto nei successivi dodici mesi"
+  - id: conai-guida-renap
+    title: CONAI - Guida 2026, par. 2.4 Impresa estera (fino all'operatività del RENAP)
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "tali disposizioni restano valide sino all’effettiva operatività del Registro Nazionale dei Produttori (RENAP)"
+  - id: conai-guida-consumatori
+    title: CONAI - Guida 2026, par. 2.4 Impresa estera (dichiarazioni per vendite ai consumatori)
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "le loro dichiarazioni del Contributo ambientale devono ricomprendere anche gli imballaggi (vuoti o pieni) trasferiti ai privati consumatori sul territorio nazionale."
+  - id: conai-guida-soggetti
+    title: CONAI - Guida 2026, par. 4.3 Dichiarazione periodica del Contributo Ambientale
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Tutti i produttori/importatori/commercianti che effettuano la prima cessione sono tenuti a dichiarare a CONAI gli imballaggi trattati, i quantitativi assoggettati al Contributo Ambientale e l’entità del Contributo che andrà versato."
+  - id: conai-guida-periodicita
+    title: CONAI - Guida 2026, Schema C Classi di dichiarazione - periodicità
+    url: https://www.certifico.com/component/attachments/download/47177
+    publisher: CONAI - Consorzio Nazionale Imballaggi
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Tutte le dichiarazioni periodiche devono essere presentate entro il 20 del mese successivo al periodo di riferimento."
+  - id: wko-ppwr-it
+    title: WKO - PPWR in Italien (Stand 12.08.2026)
+    url: https://www.wko.at/oe/abfall/ppwr-italien
+    publisher: Wirtschaftskammer Österreich
+    kind: secondary
+    retrieved: "2026-11-28"
+    quote: "In Italien existiert derzeit noch keine nationale Rechtsgrundlage, die die Zuweisung eines formellen Authorised Representative (Bevollmächtigten) gemäß Art. 45 PPWR zwingend vorschreibt."
+  - id: amazon-study-2026
+    title: Fragmentation in EPR packaging registration and opportunities to harmonize (Amazon-commissioned study, March 2026)
+    url: https://assets.aboutamazon.com/4a/4f/533903e94ec3befeb991ab514a03/fragmentation-in-epr-packaging-registration-and-opportunities-to-harmonize-march-2026.pdf
+    publisher: Amazon
+    kind: secondary
+    retrieved: "2026-11-28"
+    quote: "In several countries, producers must register with both a Producer Responsibility Organization (PRO) and a national registry, thereby duplicating effort and increasing time."
+  - id: ebay-it-epr
+    title: eBay - Extended Producer Responsibility selling in Italy
+    url: "https://www.ebay.co.uk/help/account/regulatory/extended-producer-responsibility/extended-producer-responsibility-selling-italy?id=5840"
+    publisher: eBay
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "If you’re a business seller who is offering to sell to buyers in Italy, you need to make sure you’re compliant with the Consolidated Environmental Act. This includes registering for an EPR number."
+  - id: amazon-it-env
+    title: Amazon.it - Guida alla conformità ambientale per venditori (EPR Pagamento a Tuo Nome)
+    url: https://sell.amazon.it/soluzioni-conformita/ambientale
+    publisher: Amazon
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Amazon ti iscrive automaticamente a EPR Pagamento a Tuo Nome se vendi prodotti soggetti a obblighi EPR e non hai inviato un numero di registrazione EPR (ERN) valido."
+  - id: zalando-ppwr
+    title: Zalando Partner University - What are the EPR requirements for packaging and what do I need to do? (updated 15 Jun 2026)
+    url: https://partner.zalando.com/university/article/what-is-ppwr-and-what-to-do
+    publisher: Zalando
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "From 1 January 2027, if you do not provide EPR details your assortment will be blocked."
+  - id: zalando-it-label
+    title: Zalando Partner University - What are the labelling requirements in Italy and what do I need to do? (updated 27 Jun 2024)
+    url: https://partner.zalando.com/university/article/labelling-requirements-in-italy
+    publisher: Zalando
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Environmental labelling is now mandatory on all packaging in Italy covering all primary, secondary and tertiary packaging."
+  - id: kaufland-it-epr
+    title: Kaufland Global Marketplace - Kaufland.it EPR guidelines for Italy
+    url: https://www.kauflandglobalmarketplace.com/en/seller-university/formal-framework/epr-guidelines/epr-kaufland-it/
+    publisher: Kaufland
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "If you place packaging on the Italian market, you must register with the Consorzio Nazionale Imballaggi (CONAI)."
+rules:
+  - id: it.packaging_epr.conai_membership
+    title: Join CONAI if your business is based in Italy and sells packaged goods
+    summary: >
+      Italian law makes every business that makes, imports, fills, sells or uses packaging
+      join CONAI, the national packaging consortium. That includes shops and online sellers
+      based in Italy, not only manufacturers. New businesses must join within one month of
+      their first invoice involving packaging.
+    severity: high
+    consequence: >
+      A fine of 5,000 euro for not joining, and 15,500 to 46,500 euro for packaging producers
+      that run no take-back system. CONAI also collects the membership fee and any back
+      contributions.
+    citations: [tua-218, tua-221, tua-261, conai-guida-adesione, conai-guida-termine, mase-ppwr]
+    appliesWhen:
+      all:
+        - { eq: [ market, IT ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - { eq: [ seller.establishedIn, IT ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, distributor ] }
+            - { contains: [ seller.roles, brand_owner ] }
+    requires:
+      - key: conai_membership
+        label: CONAI membership (Italian packaging consortium)
+        kind: scheme_contract
+        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer]
+        filing:
+          channel: portal_eid
+          url: https://www.conai.org/
+          feeNote: >
+            Join online through the 'Adesione online' service (via impresainungiorno.gov.it),
+            which needs an Italian digital identity (SPID or CNS) and an entry in the Registro
+            Imprese. One-off fee of 5.16 euro, plus a variable part for businesses with more than
+            500,000 euro revenue. The environmental contribution (CAC) is paid separately.
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: false
+        note: >
+          Amazon.it's public page says sellers without a valid EPR registration number are
+          enrolled automatically in 'EPR Pagamento a Tuo Nome' (pay on behalf). It does not say
+          listings are blocked in Italy.
+        citations: [amazon-it-env]
+      - channel: ebay
+        blocksListing: false
+        note: >
+          eBay asks business sellers to Italy to register for an EPR number per category,
+          including packaging, and add it in Account Settings. It does not say listings are
+          blocked.
+        citations: [ebay-it-epr]
+      - channel: kaufland
+        blocksListing: false
+        note: >
+          Kaufland.it tells sellers placing packaging on the Italian market to register with
+          CONAI. Its page does not say offers are hidden without it.
+        citations: [kaufland-it-epr]
+      - channel: zalando
+        blocksListing: false
+        note: >
+          Zalando blocks assortments without EPR details from 1 Jan 2027, but its list of
+          countries where packaging EPR details are collected does not include Italy yet.
+        citations: [zalando-ppwr]
+
+  - id: it.packaging_epr.conai_membership_non_established
+    title: Join CONAI if you ship packaged goods to Italian customers from abroad
+    summary: >
+      If your business is based outside Italy and you sell packaged goods directly to
+      consumers in Italy, you count as the packaging producer for Italy and must join CONAI
+      through its procedure for foreign companies. You must name a service address in Italy,
+      and businesses outside the EU must also give a guarantee covering a year of
+      contributions. A marketplace's own EPR service may cover your sales on that
+      marketplace only.
+    severity: high
+    consequence: >
+      Italian fines for not joining start at 5,000 euro, and marketplaces must check that
+      sellers are registered. Zalando will block assortments without EPR details once it
+      collects them for Italy.
+    citations: [ppwr-3-15c, ppwr-45-1, ppwr-71, conai-guida-estera, conai-guida-piattaforma, conai-guida-garanzie, tua-178quater-3, tua-178quater-10, tua-261, wko-ppwr-it, kaufland-it-epr]
+    appliesWhen:
+      all:
+        - { eq: [ market, IT ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - { eq: [ product.consumerProduct, true ] }
+        - { not: { eq: [ seller.establishedIn, IT ] } }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, distributor ] }
+            - { contains: [ seller.roles, brand_owner ] }
+    requires:
+      - key: conai_membership
+        label: CONAI membership as a foreign company (with a service address in Italy)
+        kind: scheme_contract
+        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer, authorised_representative, marketplace]
+        filing:
+          channel: email
+          feeNote: >
+            Ask CONAI for the foreign-company forms at aziendaestera@conai.org (toll-free
+            800.337799). Foreign members pay only the fixed fee of 5.16 euro. Businesses outside
+            the EU without an Italian branch must give a guarantee covering the contribution
+            expected over the next 12 months.
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: false
+        note: >
+          Amazon.it enrols sellers without a valid EPR number in its pay-on-behalf service; its
+          public page does not say listings are blocked in Italy.
+        citations: [amazon-it-env]
+      - channel: ebay
+        blocksListing: false
+        note: >
+          eBay offers an Italian Pay on Behalf service for categories where you have added an
+          EPR number; free during the launch period.
+        citations: [ebay-it-epr]
+      - channel: kaufland
+        blocksListing: false
+        note: >
+          Kaufland.it says CONAI registration applies to domestic and foreign sellers. Its page
+          does not say offers are hidden without it.
+        citations: [kaufland-it-epr]
+      - channel: zalando
+        blocksListing: false
+        note: >
+          Zalando blocks assortments without EPR details from 1 Jan 2027 once it collects them
+          for a country; Italy is not on its packaging collection list yet.
+        citations: [zalando-ppwr]
+
+  - id: it.packaging_epr.cac_declarations
+    title: Declare and pay the CONAI packaging contribution on time
+    summary: >
+      CONAI members who are the first to put packaging on the Italian market, such as
+      importers of packaged goods and foreign sellers shipping to Italian consumers, must
+      declare the packaging weight per material and pay the environmental contribution (CAC).
+      How often depends on last year's contribution per material. Italian sellers who buy
+      everything from Italian suppliers usually pay the CAC on their suppliers' invoices
+      instead.
+    severity: high
+    consequence: >
+      Late, missing or wrong declarations are serious breaches under CONAI's rules and lead
+      to back payments and penalties.
+    citations: [conai-guida-soggetti, conai-guida-periodicita, conai-guida-consumatori, tua-221]
+    appliesWhen:
+      all:
+        - { eq: [ market, IT ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, importer ] }
+            - all:
+                - { not: { eq: [ seller.establishedIn, IT ] } }
+                - { eq: [ product.consumerProduct, true ] }
+    requires:
+      - key: cac_declaration
+        label: CONAI contribution (CAC) declarations filed and paid (we check CONAI membership; keep your filing receipts)
+        kind: declaration
+        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer, authorised_representative, marketplace]
+        filing:
+          channel: portal
+          url: https://www.conai.org/
+          feeNote: >
+            Filed through CONAI's 'Dichiarazioni online'. Rates are per tonne and material, for
+            example 45 euro per tonne for plain paper and cardboard in 2026.
+        recurring:
+          every: quarter
+          note: >
+            New members file quarterly (by 20 April, 20 July, 20 October and 20 January). After
+            the first year, the class follows last year's contribution per material: exempt up
+            to 200 euro, one annual declaration by 20 January up to 3,000 euro, quarterly up to
+            31,000 euro, and monthly (by the 20th) above that.
+
+  - id: it.packaging_epr.environmental_label
+    title: Put the Italian environmental label on your packaging
+    summary: >
+      All packaging sold in Italy must show what material it is made of, using the EU
+      material codes (for example PAP 20 or PET 1). Packaging that reaches consumers must also
+      tell them how to sort it for disposal. You can give this information on the pack
+      or online, for example by QR code or on the product page, as long as the pack or the
+      listing tells the buyer where to find it.
+    severity: high
+    consequence: >
+      A fine of 5,000 to 25,000 euro for anyone who puts unlabelled packaging on the Italian
+      market. Zalando requires its suppliers to label packaging for Italy.
+    citations: [tua-219-5, tua-261-3, mase-lg-b2c, mase-lg-digitale, mase-ppwr, ppwr-12, zalando-it-label]
+    appliesWhen:
+      all:
+        - { eq: [ market, IT ] }
+        - { eq: [ product.shipsPackaged, true ] }
+    requires:
+      - key: it_environmental_label
+        label: >
+          Italian environmental label: material code for each packaging part and, for
+          consumer packaging, disposal instructions, on the pack or online (record it as
+          product attribute it_environmental_label)
+        kind: label
+        satisfiedWhen: { exists: product.attributes.it_environmental_label }
+        whoMayFile: [producer]
+    marketplaceChecks:
+      - channel: zalando
+        blocksListing: false
+        note: >
+          Zalando's Italy page tells suppliers to add the material code and disposal
+          instructions (in Italian) to their packaging. It does not say listings are blocked.
+        citations: [zalando-it-label]
+
+  - id: it.packaging_epr.authorised_representative
+    title: Appoint an authorised representative for Italy if you are not based there
+    summary: >
+      Since 12 August 2026 the EU packaging rules say a seller based in another country who
+      sells packaged goods directly to customers in Italy must appoint an authorised
+      representative in Italy by written mandate. Italy has not yet set up its own procedure
+      for this, and an EU change that would exempt small EU sellers is still being negotiated.
+      Until then, CONAI asks foreign members to name a service address in Italy.
+    severity: high
+    consequence: >
+      Once Italy's packaging register is open, producers that are not registered, directly or
+      through their representative, may not sell packaged goods in Italy. Italy has not yet
+      set fines for a missing representative.
+    citations: [ppwr-45-3, ppwr-3-15c, ppwr-71, ppwr-44-4, tua-178ter-ar, l36-2026-art14, council-ar-mandate, conai-guida-estera, wko-ppwr-it, kaufland-it-epr]
+    appliesWhen:
+      all:
+        - { eq: [ market, IT ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - { eq: [ product.consumerProduct, true ] }
+        - { not: { eq: [ seller.establishedIn, IT ] } }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, distributor ] }
+            - { contains: [ seller.roles, brand_owner ] }
+    requires:
+      - key: authorised_representative
+        label: Authorised representative for packaging in Italy (written mandate)
+        kind: representative
+        satisfiedWhen: { hasRepresentative: { obligation: packaging_epr } }
+        whoMayFile: [producer]
+    marketplaceChecks:
+      - channel: kaufland
+        blocksListing: false
+        note: >
+          Kaufland.it says sellers without an office in Italy must have their EPR registrations
+          done by an authorised representative. It does not say offers are hidden without one.
+        citations: [kaufland-it-epr]
+
+  - id: it.packaging_epr.national_register
+    title: Register in Italy's national producer register when packaging is added
+    summary: >
+      The EU packaging rules require every packaging producer to register in a national
+      register in each country it sells into. Italy's register (RENAP) does not have a
+      packaging section yet, and CONAI's current rules stay in place until it does. For now,
+      CONAI membership is the working route; you will need to act when the packaging
+      section opens.
+    severity: medium
+    consequence: >
+      Once the packaging register exists, producers (or their representatives) that are not
+      registered may not sell packaged goods in Italy.
+    citations: [ppwr-44-1, ppwr-44-2, ppwr-44-2-pro, ppwr-44-4, tua-178ter-registro, renap-home, renap-registri, conai-guida-renap, amazon-study-2026]
+    appliesWhen:
+      all:
+        - { eq: [ market, IT ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, distributor ] }
+            - { contains: [ seller.roles, brand_owner ] }
+        - any:
+            - { eq: [ seller.establishedIn, IT ] }
+            - { eq: [ product.consumerProduct, true ] }
+    requires:
+      - key: national_register
+        label: Entry in RENAP, Italy's national producer register (packaging section not open yet; CONAI membership counts for now)
+        kind: registration
+        satisfiedWhen:
+          any:
+            - { registered: { obligation: packaging_epr, register: RENAP } }
+            - { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer, authorised_representative, compliance_scheme]
+        filing:
+          channel: portal_eid
+          url: https://www.renap.gov.it/
+          feeNote: >
+            No packaging section yet. The RENAP portal is provided through the Chambers of
+            Commerce; check access requirements when the packaging section opens.

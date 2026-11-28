@@ -1,13 +1,15 @@
-# Compliance Keeper
+# Oblige
+
+*Compliance by design.*
 
 **Can I keep selling this product, in this country, on this marketplace? And if not, what do I fix?**
 
-Compliance Keeper checks every product a small seller lists across EU countries and marketplaces.
+Oblige checks every product a small seller lists across EU countries and marketplaces.
 It covers packaging take-back, product safety (GPSR), and later electronics, batteries and textiles
 take-back. It shows what's missing, ranks the fixes by how many listings each one protects, and
 keeps the evidence. The rules are versioned, cited packs evaluated by a deterministic engine.
 
-- Plan: [`docs/plan/compliance-keeper-development-plan.md`](docs/plan/compliance-keeper-development-plan.md)
+- Plan: [`docs/plan/oblige-development-plan.md`](docs/plan/oblige-development-plan.md)
 - Phase 0 playbook (outreach, interviews, concierge audits): [`docs/gtm/phase-0-playbook.md`](docs/gtm/phase-0-playbook.md)
 - Rule format: [`docs/rulebook-format.md`](docs/rulebook-format.md) · packs in [`rules/`](rules/)
 - Research behind the decision: [`reports/`](reports/)

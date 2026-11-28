@@ -54,43 +54,79 @@ function steps(spec: RequirementSpec, where: string, skus: number): string[] {
   }
 }
 
+function specFor(packById: Map<string, RulePack>, r: Requirement): { pack?: RulePack; spec?: RequirementSpec } {
+  const pack = packById.get(r.rulePack.id);
+  const spec = pack?.rules.find((x) => x.id === r.ruleId)?.requires.find((q) => q.key === r.requirementKey);
+  return { ...(pack ? { pack } : {}), ...(spec ? { spec } : {}) };
+}
+
+const capitalize = (s: string) => (s ? s[0]!.toUpperCase() + s.slice(1) : s);
+
 /** Build fixes from the open (missing or expiring) requirements, most urgent first. */
 export function buildFixes(requirements: Requirement[], packs: RulePack[]): Fix[] {
   const packById = new Map(packs.map((p) => [p.id, p]));
   const groups = new Map<string, Requirement[]>();
   for (const r of requirements) {
     if (r.status !== "missing" && r.status !== "expiring") continue;
-    const pack = packById.get(r.rulePack.id);
+    const { pack, spec } = specFor(packById, r);
     // National duties are fixed once per country; EU-wide product data once across markets.
     const scope = pack?.jurisdiction === "EU" ? "EU" : r.market;
-    const key = `${r.ruleId}|${r.requirementKey}|${scope}|${r.status}`;
+    // Requirements in the same fix group are one action for the seller.
+    const what = spec?.group && pack?.fixGroups?.[spec.group] ? `${r.rulePack.id}|group:${spec.group}` : `${r.ruleId}|${r.requirementKey}`;
+    const key = `${what}|${scope}|${r.status}`;
     groups.set(key, [...(groups.get(key) ?? []), r]);
   }
 
   const fixes: Fix[] = [];
   for (const [key, rows] of groups) {
     const first = rows[0]!;
-    const pack = packById.get(first.rulePack.id);
-    const spec = pack?.rules.find((x) => x.id === first.ruleId)?.requires.find((q) => q.key === first.requirementKey);
-    const scope = key.split("|")[2] as Jurisdiction;
+    const { pack, spec } = specFor(packById, first);
+    const parts = key.split("|");
+    const scope = parts[parts.length - 2] as Jurisdiction;
     const markets = [...new Set(rows.map((r) => r.market))].sort();
     const where = scope === "EU" ? markets.map(countryName).join(", ") : countryName(scope);
     const skus = new Set(rows.map((r) => r.sku)).size;
     const listings = new Set(rows.map((r) => `${r.sku}|${r.market}|${r.channel}`));
     const blocking = new Set(rows.filter((r) => r.blocksListingOn.includes(r.channel)).map((r) => `${r.sku}|${r.market}|${r.channel}`));
+
+    // Every distinct requirement in this fix, in first-seen order.
+    const specs: RequirementSpec[] = [];
+    const seen = new Set<string>();
+    for (const r of rows) {
+      const k = `${r.ruleId}|${r.requirementKey}`;
+      if (seen.has(k)) continue;
+      seen.add(k);
+      const s = specFor(packById, r).spec;
+      if (s) specs.push(s);
+    }
+    const groupTitle = spec?.group ? pack?.fixGroups?.[spec.group] : undefined;
     const kind = spec?.kind ?? "data_field";
-    const verb = first.status === "expiring" ? "Renew" : kind === "registration" ? "Get" : "Add";
+    const title = groupTitle
+      ? `${groupTitle} — ${where}`
+      : first.status === "expiring"
+        ? `Renew ${first.label} — ${where}`
+        : kind === "registration"
+          ? `Get ${first.label} — ${where}`
+          : `${capitalize(first.label)} — ${where}`;
+
+    let fixSteps = spec ? steps(spec, where, skus) : [`Resolve: ${first.label}.`];
+    if (specs.length > 1) fixSteps = [...fixSteps, `This one fix covers: ${specs.map((s) => s.label).join("; ")}.`];
+    const effects = [...new Set(specs.flatMap((s) => EFFECTS[s.kind]))];
+    const who = [...new Set(specs.flatMap((s) => s.whoMayFile ?? []))];
+    const leads = specs.map((s) => s.filing?.leadTimeDays).filter((x): x is [number, number] => x !== undefined);
+    const leadTimeDays: [number, number] | undefined = leads.length > 0 ? [Math.min(...leads.map((l) => l[0])), Math.max(...leads.map((l) => l[1]))] : undefined;
+
     fixes.push({
       id: key,
-      title: `${verb} ${first.label} — ${where}`,
+      title,
       requirementIds: rows.map((r) => r.id),
       obligation: first.obligation,
       jurisdiction: scope,
-      steps: spec ? steps(spec, where, skus) : [`Resolve: ${first.label}.`],
-      effects: EFFECTS[kind],
-      ...(spec?.whoMayFile ? { whoMayFile: spec.whoMayFile } : {}),
+      steps: fixSteps,
+      effects: effects.length > 0 ? effects : EFFECTS[kind],
+      ...(who.length > 0 ? { whoMayFile: who } : {}),
       ...(spec?.filing?.channel ? { filingChannel: spec.filing.channel } : {}),
-      ...(spec?.filing?.leadTimeDays ? { leadTimeDays: spec.filing.leadTimeDays } : {}),
+      ...(leadTimeDays ? { leadTimeDays } : {}),
       impact: { skus, listings: listings.size, blockingListings: blocking.size },
       status: "proposed",
     });

@@ -2,7 +2,7 @@
 
 **Goal of Phase 0 (30 Nov – 11 Dec 2026):** at least 10 paid gap audits at €149, 15 seller
 interviews, and 2 signed letters of intent from authorised-representative (AR) or take-back-scheme
-partners. If we miss these, the lead re-plans (`docs/plan/compliance-keeper-development-plan.md`,
+partners. If we miss these, the lead re-plans (`docs/plan/oblige-development-plan.md`,
 gate 0 → 1).
 
 Items marked **[human]** need the founder. The rest is prepared by agents.
@@ -164,7 +164,7 @@ pnpm --filter @oneseat/rulebook lint:rules
 ```
 
 ```bash
-pnpm --filter @oneseat/obligations audit -- --catalog <catalog.csv> --seller <seller.json> --rules ../../rules --html <out>.html --md <out>.md --json <out>.json
+pnpm --filter @oneseat/obligations gap-audit -- --catalog <catalog.csv> --seller <seller.json> --rules ../../rules --html <out>.html --md <out>.md --json <out>.json
 ```
 
 The agent then checks the output:
@@ -205,7 +205,7 @@ Record these for each audit; they feed the Phase 1 build and the rulebook:
 ## 5. Partner letters of intent (**[human]**, target 2)
 
 Non-binding, one page. The partner agrees to:
-- run a pilot with Compliance Keeper for 3 months;
+- run a pilot with Oblige for 3 months;
 - receive prepared filings for their clients;
 - give feedback on the format;
 - discuss a revenue share or referral fee.
