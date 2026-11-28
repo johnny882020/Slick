@@ -1,0 +1,606 @@
+id: eu.gpsr
+version: 2026.11.1
+jurisdiction: EU
+obligation: gpsr
+title: Product safety information for consumer products sold online in the EU
+effectiveFrom: "2024-12-13"
+effectiveTo: null
+confidence: medium
+review:
+  status: draft
+  notes: >
+    Written from the Official Journal text of Regulation (EU) 2023/988 (GPSR) and Regulation (EU)
+    2019/1020, the Commission Notice C/2025/6233 (GPSR guidelines for businesses) and the
+    marketplaces' own GPSR pages. EUR-Lex answered automated requests with a bot challenge, so the
+    legal text was read from the Publications Office (Cellar) copy of the same OJ act; citations
+    point to the EUR-Lex ELI links. The consolidated GPSR text of 29.05.2026 (amended by
+    Regulation (EU) 2024/2748, the emergency/IMERA package) was compared: it adds Chapter IIa
+    (emergency procedures) and a definition, and the quoted wording of Articles 9, 16, 19 and 22
+    is unchanged.
+openQuestions:
+  - >
+    Sector law: for products covered by EU harmonisation legislation (for example toys, electrical
+    equipment, cosmetics, CE-marked goods), GPSR Chapter III Section 1 (Articles 9 to 18, including
+    the manufacturer, importer, distributor and Article 16 responsible-person duties) does not
+    apply; sector law and Article 4 of Regulation (EU) 2019/1020 impose similar duties instead.
+    Articles 19 (online listing) and 22 (marketplaces) apply to those products too. The engine has
+    no "harmonised product" flag, so rules 1 to 4 are evaluated for all consumer products. Confirm
+    this is acceptable as a simplification, or add a flag and split the citations.
+  - >
+    Products excluded from the GPSR (Article 2(2): medicines, food, feed, living plants and animals,
+    plant protection products, antiques, etc.) are expected to be marked consumerProduct false or
+    handled by other packs. Confirm the product classifier treats these as out of scope.
+  - >
+    Transitional rule (Article 51): units placed on the EU market before 13 December 2024 that met
+    the old General Product Safety Directive may still be sold, and the new on-product labelling
+    duties do not apply to them (Commission guidelines). The listing duties apply to any offer made
+    from 13 December 2024. There is no "first placed on the market" date in the product data, so
+    the engine cannot exempt old stock. Should a field be added?
+  - >
+    "Electronic address": the rules accept either an email address or a website URL (bol and
+    Kaufland accept a contact page link; Kaufland's mandatory field is "e-mail address or website
+    URL"). Confirm with the Commission guidance or a legal reviewer that a URL alone satisfies
+    Articles 9(6), 16(3) and 19.
+  - >
+    Language: the `localized` check accepts any one official language of the market (see
+    MARKET_LANGUAGES). Article 9(7) says the language is "determined by the Member State". Some
+    member states may require several languages (for example Belgium, Luxembourg, Finland) or
+    accept others. National language rules were not researched for each member state.
+  - >
+    Products that can be used safely without instructions or warnings are exempt from Article 9(7)
+    and 11(4). There is no product field for "no safety information needed" (Amazon asks for an
+    acknowledgement that it isn't required), so such products will show the warnings requirement as
+    missing. Consider adding a field.
+  - >
+    Brand owners: under the GPSR a business that has a product made and sells it under its own name
+    or brand is the manufacturer. If a seller enters its contract factory (for example in China) as
+    product.safety.manufacturer instead of its own business, rule 1 will trigger even for an
+    EU-based brand owner. The onboarding flow should explain which manufacturer to enter.
+  - >
+    Importers must also put their own name and address on the product (Article 11(3)). The product
+    data has no importer-label field, so this is not checked separately; it is mentioned in rule
+    2's summary only.
+  - >
+    Rule 1 checks that the responsible person's country is an EU member state. EEA countries
+    (Norway, Iceland, Liechtenstein) and Northern Ireland also apply the GPSR, but the engine only
+    evaluates EU markets. Confirm whether a responsible person established in an EEA state should
+    be accepted for EU markets.
+  - >
+    Marketplace evidence: Amazon (SP-API changelog), eBay, bol and Kaufland state publicly that
+    listings without GPSR data are deactivated, hidden, kept offline or excluded. Etsy's help page
+    and Zalando's Partner University page say the fields are required but no public statement on
+    deactivation was found, so blocksListing is false for them. Etsy's Seller Handbook GPSR article
+    returned HTTP 403 and could not be read. Amazon's Seller Central help hub needs a login; the
+    public SP-API changelog was used instead.
+  - >
+    bol: new listings without manufacturer details have not gone online since 5 March 2026, and
+    without responsible-person details since 1 April 2026; existing listings are taken offline in
+    phases when manufacturer details are missing. bol does not say whether existing listings
+    without a responsible person are also taken offline.
+  - >
+    Penalties are set by each member state (Article 44) and were not researched country by country.
+    The consequence texts describe them only in general terms.
+  - >
+    Pending simplification proposals (for example Omnibus IV on digital instructions and safety
+    information) may change how safety information may be provided. It was not confirmed whether
+    any adopted or pending act amends GPSR Articles 9, 19 or 22 beyond Regulation (EU) 2024/2748.
+  - >
+    The Commission's GPSR Q&A and guidance pages on the Safety Gate site (webgate.ec.europa.eu)
+    redirected to an access-denied page and could not be read; the Commission Notice C/2025/6233
+    on EUR-Lex was used instead.
+citations:
+  - id: gpsr-2
+    title: Regulation (EU) 2023/988 (GPSR), Article 2(1) Scope
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "This Regulation applies to products that are placed or made available on the market insofar as there are no specific provisions with the same objective under Union law which regulate the safety of the products concerned."
+  - id: gpsr-9-5
+    title: Regulation (EU) 2023/988 (GPSR), Article 9(5) Product identifier
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Manufacturers shall ensure that their products bear a type, batch or serial number or other element enabling the identification of the product and which is easily visible and legible for consumers"
+  - id: gpsr-9-6
+    title: Regulation (EU) 2023/988 (GPSR), Article 9(6) Manufacturer name and address
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Manufacturers shall indicate their name, their registered trade name or registered trade mark, their postal and electronic address and, where different, the postal or electronic address of the single contact point at which they can be contacted."
+  - id: gpsr-9-7
+    title: Regulation (EU) 2023/988 (GPSR), Article 9(7) Instructions and safety information
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Manufacturers shall ensure that their product is accompanied by clear instructions and safety information in a language which can be easily understood by consumers, as determined by the Member State in which the product is made available on the market."
+  - id: gpsr-11
+    title: Regulation (EU) 2023/988 (GPSR), Article 11(3) Importer name and address
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Importers shall indicate their name, their registered trade name or registered trade mark, their postal and electronic address and, where different, the postal or electronic address of the single contact point at which they can be contacted."
+  - id: gpsr-12
+    title: Regulation (EU) 2023/988 (GPSR), Article 12(1) Distributor checks
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Before making a product available on the market, distributors shall verify that the manufacturer and, where applicable, the importer have complied with the requirements set out in Article 9(5), (6) and (7) and Article 11(3) and (4), as applicable."
+  - id: gpsr-16-1
+    title: Regulation (EU) 2023/988 (GPSR), Article 16(1) Responsible person in the EU
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "A product covered by this Regulation shall not be placed on the market unless there is an economic operator established in the Union who is responsible for the tasks set out in Article 4(3) of Regulation (EU) 2019/1020 in respect to that product."
+  - id: gpsr-16-3
+    title: Regulation (EU) 2023/988 (GPSR), Article 16(3) Responsible person details on the product
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "The name, registered trade name or registered trade mark, and contact details, including the postal and electronic address, of the economic operator referred to in paragraph 1 shall be indicated on the product or on its packaging, the parcel or an accompanying document."
+  - id: msr-4-2
+    title: Regulation (EU) 2019/1020 (Market Surveillance Regulation), Article 4(2) Who can be the responsible economic operator
+    url: https://eur-lex.europa.eu/eli/reg/2019/1020/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "a fulfilment service provider established in the Union with respect to the products it handles, where no other economic operator as mentioned in points (a), (b) and (c) is established in the Union."
+  - id: gpsr-19
+    title: Regulation (EU) 2023/988 (GPSR), Article 19 Distance sales
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Where economic operators make products available on the market online or through other means of distance sales, the offer of those products shall clearly and visibly indicate at least the following information:"
+  - id: gpsr-19-b
+    title: Regulation (EU) 2023/988 (GPSR), Article 19(b) Responsible person on the listing
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "where the manufacturer is not established in the Union, the name, postal and electronic address of the responsible person within the meaning of Article 16(1) of this Regulation or Article 4(1) of Regulation (EU) 2019/1020;"
+  - id: gpsr-19-c
+    title: Regulation (EU) 2023/988 (GPSR), Article 19(c) Product identification on the listing
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "information allowing the identification of the product, including a picture of it, its type and any other product identifier; and"
+  - id: gpsr-22-9
+    title: Regulation (EU) 2023/988 (GPSR), Article 22(9) Online marketplaces must collect and show safety information
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "providers of online marketplaces shall design and organise their online interface in a way that enables traders offering the product to provide at least the following information for each product offered"
+  - id: gpsr-44
+    title: Regulation (EU) 2023/988 (GPSR), Article 44(1) Penalties
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Member States shall lay down the rules on penalties applicable to infringements of this Regulation that impose obligations on economic operators and providers of online marketplaces"
+  - id: gpsr-52
+    title: Regulation (EU) 2023/988 (GPSR), Article 52 Date of application
+    url: https://eur-lex.europa.eu/eli/reg/2023/988/oj
+    publisher: EUR-Lex, Publications Office of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "It shall apply from 13 December 2024."
+  - id: com-guidelines-rp
+    title: Commission Notice C/2025/6233, Guidelines on the application of the EU general product safety legislative framework by businesses (responsible person)
+    url: https://eur-lex.europa.eu/eli/C/2025/6233/oj
+    publisher: European Commission
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "This can be done directly by you or another operator, but you must ensure that your product is not placed on the EU market unless the contact details of the responsible person in the EU are provided."
+  - id: com-guidelines-scope
+    title: Commission Notice C/2025/6233, Guidelines (link to EU harmonisation legislation)
+    url: https://eur-lex.europa.eu/eli/C/2025/6233/oj
+    publisher: European Commission
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "In addition, the GPSR obligations for the providers of online marketplaces also apply to products subject to specific safety requirements under other EU legislation."
+  - id: com-guidelines-timing
+    title: Commission Notice C/2025/6233, Guidelines (products placed on the market before 13 December 2024)
+    url: https://eur-lex.europa.eu/eli/C/2025/6233/oj
+    publisher: European Commission
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "This means that, for example, the new requirements to affix certain traceability and product safety information to the product, or its packaging, under the GPSR do not apply to products that were placed on the market before 13 December 2024."
+  - id: amazon-gpsr
+    title: Amazon SP-API changelog, Sellers can prove their GPSR compliance on their Account Health page
+    url: https://developer-docs.amazon.com/sp-api/changelog/sellers-can-prove-their-gpsr-compliance-on-their-account-health-page
+    publisher: Amazon
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "After December 13, if we become aware of non-compliant offers, such as those with invalid information or expired contracts, we will deactivate them."
+  - id: ebay-gpsr
+    title: eBay Seller Center, General Product Safety Regulation
+    url: https://www.ebay.com/sellercenter/resources/general-product-safety-regulation
+    publisher: eBay
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "In the case of missing GPSR information for specific listings, your listings may not be visible or purchasable to buyers in the EU and Northern Ireland."
+  - id: ebay-gpsr-language
+    title: eBay Seller Center, General Product Safety Regulation (safety information FAQ)
+    url: https://www.ebay.com/sellercenter/resources/general-product-safety-regulation
+    publisher: eBay
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "This information must be presented in the local language of the country where your item is being sold."
+  - id: etsy-gpsr
+    title: Etsy Help, What is the General Product Safety Regulation (GPSR)?
+    url: https://help.etsy.com/hc/en-us/articles/28211364687383-What-is-the-General-Product-Safety-Regulation-GPSR
+    publisher: Etsy
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Add applicable information to the Product safety info field in your listing forms."
+  - id: bol-gpsr
+    title: bol Partner Platform, General Product Safety Regulation
+    url: https://partnerplatform.bol.com/en/idp/gpsr
+    publisher: bol
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "New product range lacking mandatory manufacturer details will no longer go online starting 5 March 2026. For details of the responsible market operator, this applies as of 1 April 2026."
+  - id: bol-gpsr-offline
+    title: bol Partner Platform, General Product Safety Regulation (existing items)
+    url: https://partnerplatform.bol.com/en/idp/gpsr
+    publisher: bol
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Since 1 April 2026, bol has also been taking existing items offline in phases if manufacturer details are missing."
+  - id: bol-gpsr-content
+    title: bol Partner Platform, General Product Safety Regulation (mandatory content)
+    url: https://partnerplatform.bol.com/en/idp/gpsr
+    publisher: bol
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Therefore, complete this mandatory content carefully and fully. This prevents items from your product range from having to be taken offline."
+  - id: kaufland-gpsr
+    title: Kaufland Global Marketplace Seller University, General Product Safety Regulation (GPSR)
+    url: https://www.kauflandglobalmarketplace.com/en/seller-university/formal-framework/gpsr/
+    publisher: Kaufland Global Marketplace
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Offers that do not contain this information shall be systematically excluded from selling."
+  - id: kaufland-gpsr-language
+    title: Kaufland Global Marketplace Seller University, GPSR (safety information language)
+    url: https://www.kauflandglobalmarketplace.com/en/seller-university/formal-framework/gpsr/
+    publisher: Kaufland Global Marketplace
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Please note that the safety information must be provided in the national language of the respective marketplace."
+  - id: zalando-gpsr
+    title: Zalando Partner University, EU General Product Safety Regulation (GPSR)-related data requirements
+    url: https://partner.zalando.com/university/article/eu-general-product-safety-regulation-gpsr-related-data-requirements
+    publisher: Zalando
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "To be compliant with EU General Product Safety Regulation 2023/988 and to ensure product due diligence on Zalando, you are obliged to meet the GPSR requirements for attributes on both brand and article level."
+rules:
+  # (1) EU responsible person
+  - id: eu.gpsr.responsible_person
+    title: Have a responsible person in the EU when the manufacturer is outside the EU
+    summary: >
+      A consumer product may only be sold in the EU if a business established in the EU is
+      responsible for it: the EU manufacturer, the importer, an authorised representative with a
+      written mandate, or, if there is none of these, an EU fulfilment provider. If you make or
+      brand products outside the EU, or you sell products whose manufacturer is outside the EU, you
+      need such a responsible person, and their name, postal address and email must be on the
+      product, its packaging, the parcel or an accompanying document.
+    severity: blocking
+    consequence: >
+      The product may not be sold in the EU without one (sales ban). Amazon, eBay, Kaufland and bol
+      deactivate, hide or keep listings offline without the responsible person's details.
+      Member states set the fines.
+    citations: [gpsr-16-1, gpsr-16-3, msr-4-2, com-guidelines-rp, gpsr-44]
+    appliesWhen:
+      all:
+        - { eq: [ product.consumerProduct, true ] }
+        - any:
+            - { not: { inEU: product.safety.manufacturer.country } }
+            - all:
+                - { not: { inEU: seller.establishedIn } }
+                - any:
+                    - { contains: [ seller.roles, manufacturer ] }
+                    - { contains: [ seller.roles, brand_owner ] }
+                    - { contains: [ seller.roles, importer ] }
+    requires:
+      - key: eu_responsible_person
+        label: A responsible person established in the EU (importer, authorised representative or fulfilment provider) for this product
+        kind: representative
+        satisfiedWhen:
+          any:
+            - all:
+                - { exists: seller.euResponsiblePerson }
+                - { inEU: seller.euResponsiblePerson.country }
+            - all:
+                - { exists: product.safety.responsiblePerson }
+                - { inEU: product.safety.responsiblePerson.country }
+      - key: responsible_person_on_product
+        label: The responsible person's name, postal address and email on the product, its packaging, the parcel or an accompanying document
+        kind: label
+        satisfiedWhen:
+          all:
+            - { exists: product.safety.responsiblePerson.name }
+            - { exists: product.safety.responsiblePerson.street }
+            - { exists: product.safety.responsiblePerson.city }
+            - { inEU: product.safety.responsiblePerson.country }
+            - any:
+                - { exists: product.safety.responsiblePerson.email }
+                - { exists: product.safety.responsiblePerson.url }
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: true
+        note: Amazon asks for the EU Responsible Person in Account Health and deactivates non-compliant offers in its EU stores.
+        citations: [amazon-gpsr]
+      - channel: ebay
+        blocksListing: true
+        note: eBay may hide listings from EU buyers or make them unpurchasable when GPSR information is missing.
+        citations: [ebay-gpsr]
+      - channel: kaufland
+        blocksListing: true
+        note: Kaufland excludes offers from selling when the manufacturer or EU responsible person contact is missing.
+        citations: [kaufland-gpsr]
+      - channel: bol
+        blocksListing: true
+        note: Since 1 April 2026, new bol listings without the responsible economic operator do not go online.
+        citations: [bol-gpsr]
+
+  # (2) Manufacturer identification and contact
+  - id: eu.gpsr.manufacturer_contact
+    title: Put the manufacturer's name, postal address and email on the product
+    summary: >
+      Every consumer product must show who made it: the manufacturer's name or registered brand,
+      a postal address and an electronic address (email or contact page). It goes on the product,
+      or if that is impossible on the packaging or in an accompanying document. Importers add their
+      own name and address as well. If you only resell, you must check that this information is
+      there before you sell.
+    severity: blocking
+    consequence: >
+      Importers and distributors must not sell a product they know lacks this information.
+      Amazon, eBay, Kaufland and bol deactivate, hide or take listings offline without manufacturer
+      details. Member states set the fines.
+    citations: [gpsr-9-6, gpsr-11, gpsr-12, gpsr-2, gpsr-52, com-guidelines-timing, gpsr-44]
+    appliesWhen:
+      all:
+        - { eq: [ product.consumerProduct, true ] }
+    requires:
+      - key: manufacturer_contact_on_product
+        label: Manufacturer's name, postal address and email (or contact web page) on the product, packaging or accompanying document
+        kind: label
+        satisfiedWhen:
+          all:
+            - { exists: product.safety.manufacturer.name }
+            - { exists: product.safety.manufacturer.street }
+            - { exists: product.safety.manufacturer.city }
+            - { exists: product.safety.manufacturer.country }
+            - any:
+                - { exists: product.safety.manufacturer.email }
+                - { exists: product.safety.manufacturer.url }
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: true
+        note: Amazon asks for the manufacturer contact and deactivates non-compliant offers in its EU stores.
+        citations: [amazon-gpsr]
+      - channel: ebay
+        blocksListing: true
+        note: eBay may hide listings from EU buyers when the manufacturer's name and contact are missing.
+        citations: [ebay-gpsr]
+      - channel: kaufland
+        blocksListing: true
+        note: Kaufland excludes offers from selling when the manufacturer contact is missing.
+        citations: [kaufland-gpsr]
+      - channel: bol
+        blocksListing: true
+        note: New bol listings without manufacturer details do not go online (since 5 March 2026), and existing ones are taken offline in phases (since 1 April 2026).
+        citations: [bol-gpsr, bol-gpsr-offline]
+
+  # (3) Product identifier
+  - id: eu.gpsr.product_identifier
+    title: Mark the product with a type, batch or serial number
+    summary: >
+      Each consumer product must carry a type, batch or serial number, or another element that
+      identifies it, that buyers can easily see and read. If the product is too small, put it on
+      the packaging or an accompanying document. This lets buyers and authorities find the product
+      in a recall.
+    severity: high
+    consequence: >
+      Importers and distributors must not sell a product they know lacks an identifier; authorities
+      can order corrections or withdrawal. Member states set the fines.
+    citations: [gpsr-9-5, gpsr-12, gpsr-44]
+    appliesWhen:
+      all:
+        - { eq: [ product.consumerProduct, true ] }
+    requires:
+      - key: product_identifier
+        label: Type, batch or serial number (or other identifier) visible on the product, or on the packaging if the product is too small
+        kind: label
+        satisfiedWhen: { exists: product.safety.identifier }
+
+  # (4) Safety information and warnings in the market's language
+  - id: eu.gpsr.safety_information_language
+    title: Include instructions and safety warnings in the language of the country you sell to
+    summary: >
+      Consumer products must come with clear instructions and safety information in a language
+      buyers in the destination country easily understand, as set by that country. This is not
+      needed only if the product can be used safely without them. Importers must make sure this is
+      done for products they bring in, and resellers must check it.
+    severity: blocking
+    consequence: >
+      Importers and distributors must not sell a product they know lacks this information. Amazon
+      deactivates offers without warning and safety documents (or an acknowledgement that none are
+      needed); eBay and bol hide or take listings offline without mandatory safety content.
+      Member states set the fines.
+    citations: [gpsr-9-7, gpsr-11, gpsr-12, gpsr-44]
+    appliesWhen:
+      all:
+        - { eq: [ product.consumerProduct, true ] }
+    requires:
+      - key: safety_information_localized
+        label: Instructions and safety warnings in an official language of the country you sell to (unless the product is safe to use without them)
+        kind: label
+        satisfiedWhen: { localized: product.safety.warnings }
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: true
+        note: Amazon asks for warning and safety PDFs or images, or an acknowledgement that they are not required.
+        citations: [amazon-gpsr]
+      - channel: ebay
+        blocksListing: true
+        note: eBay requires safety information in the local language and may hide listings without GPSR information.
+        citations: [ebay-gpsr-language, ebay-gpsr]
+      - channel: bol
+        blocksListing: true
+        note: bol says complete mandatory content such as safety warnings to prevent items being taken offline.
+        citations: [bol-gpsr-content]
+      - channel: kaufland
+        blocksListing: false
+        note: Kaufland requires safety information in the marketplace's national language; its page states exclusion only for missing contacts.
+        citations: [kaufland-gpsr-language]
+
+  # (5) Online listing information (Article 19)
+  - id: eu.gpsr.online_listing
+    title: Show the product safety details on your online listing
+    summary: >
+      When you sell online to EU buyers, your listing itself must clearly show the manufacturer's
+      name, postal and electronic address; the EU responsible person's details if the manufacturer
+      is outside the EU; a picture, the type and any other identifier of the product; and the
+      warnings and safety information in the buyer's language. This applies to your own shop as
+      well as marketplaces.
+    severity: blocking
+    consequence: >
+      Authorities can order offers removed; marketplaces deactivate or hide listings missing this
+      information. Member states set the fines.
+    citations: [gpsr-19, gpsr-19-b, gpsr-19-c, gpsr-9-7, gpsr-52, gpsr-44]
+    appliesWhen:
+      all:
+        - { eq: [ product.consumerProduct, true ] }
+    requires:
+      - key: listing_manufacturer
+        label: Manufacturer's name, postal address and email shown on the listing
+        kind: data_field
+        satisfiedWhen:
+          all:
+            - { eq: [ product.safety.shownOnListing, true ] }
+            - { exists: product.safety.manufacturer.name }
+            - { exists: product.safety.manufacturer.country }
+            - any:
+                - { exists: product.safety.manufacturer.email }
+                - { exists: product.safety.manufacturer.url }
+      - key: listing_responsible_person
+        label: EU responsible person's name, postal address and email shown on the listing (needed when the manufacturer is outside the EU)
+        kind: data_field
+        satisfiedWhen:
+          any:
+            - { inEU: product.safety.manufacturer.country }
+            - all:
+                - { eq: [ product.safety.shownOnListing, true ] }
+                - any:
+                    - all:
+                        - { exists: product.safety.responsiblePerson }
+                        - { inEU: product.safety.responsiblePerson.country }
+                    - all:
+                        - { exists: seller.euResponsiblePerson }
+                        - { inEU: seller.euResponsiblePerson.country }
+      - key: listing_identification
+        label: Product picture, type and other identifier shown on the listing
+        kind: data_field
+        satisfiedWhen:
+          all:
+            - { eq: [ product.safety.hasImages, true ] }
+            - { exists: product.safety.identifier }
+      - key: listing_warnings
+        label: Warnings and safety information shown on the listing in the buyer's language
+        kind: data_field
+        satisfiedWhen:
+          all:
+            - { eq: [ product.safety.shownOnListing, true ] }
+            - { localized: product.safety.warnings }
+
+  # (6) Marketplace GPSR fields (Article 22 and marketplace policies)
+  - id: eu.gpsr.marketplace_fields
+    title: Fill in the marketplace's product safety fields
+    summary: >
+      EU law makes online marketplaces collect product safety details from sellers and show them on
+      each listing. Amazon, eBay, Etsy, bol, Kaufland and Zalando each have GPSR fields for the
+      manufacturer, the EU responsible person, product identification and safety documents. Fill
+      them in for every product you list on these marketplaces.
+    severity: blocking
+    consequence: >
+      Amazon deactivates non-compliant offers, eBay may hide them from EU buyers, Kaufland excludes
+      them from selling and bol keeps them offline. Etsy and Zalando require the fields; their
+      enforcement steps are not stated publicly.
+    citations: [gpsr-22-9, com-guidelines-scope, amazon-gpsr, ebay-gpsr, etsy-gpsr, bol-gpsr, kaufland-gpsr, zalando-gpsr]
+    appliesWhen:
+      all:
+        - { eq: [ product.consumerProduct, true ] }
+        - { in: [ channel, [ amazon, ebay, etsy, bol, kaufland, zalando ] ] }
+    requires:
+      - key: marketplace_manufacturer
+        label: Manufacturer name, postal address and email entered in the marketplace's GPSR fields
+        kind: data_field
+        satisfiedWhen:
+          all:
+            - { exists: product.safety.manufacturer.name }
+            - { exists: product.safety.manufacturer.street }
+            - { exists: product.safety.manufacturer.country }
+            - any:
+                - { exists: product.safety.manufacturer.email }
+                - { exists: product.safety.manufacturer.url }
+      - key: marketplace_responsible_person
+        label: EU responsible person entered in the marketplace's GPSR fields (needed when the manufacturer is outside the EU)
+        kind: data_field
+        satisfiedWhen:
+          any:
+            - { inEU: product.safety.manufacturer.country }
+            - all:
+                - { exists: product.safety.responsiblePerson }
+                - { inEU: product.safety.responsiblePerson.country }
+            - all:
+                - { exists: seller.euResponsiblePerson }
+                - { inEU: seller.euResponsiblePerson.country }
+      - key: marketplace_identification
+        label: Product images and type or model number entered on the marketplace listing
+        kind: data_field
+        satisfiedWhen:
+          all:
+            - { eq: [ product.safety.hasImages, true ] }
+            - { exists: product.safety.identifier }
+      - key: marketplace_safety_documents
+        label: Warnings and safety documents uploaded in the language of the marketplace country
+        kind: data_field
+        satisfiedWhen: { localized: product.safety.warnings }
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: true
+        note: Amazon EU stores require EU Responsible Person, manufacturer contact and warning/safety documents; non-compliant offers are deactivated.
+        citations: [amazon-gpsr]
+      - channel: ebay
+        blocksListing: true
+        note: eBay requires manufacturer, EU Responsible Person, product identifiers and local-language safety information; listings may be hidden from EU buyers.
+        citations: [ebay-gpsr, ebay-gpsr-language]
+      - channel: kaufland
+        blocksListing: true
+        note: Kaufland requires manufacturer and EU responsible person contacts, identifiers and national-language safety information; offers without contacts are excluded.
+        citations: [kaufland-gpsr, kaufland-gpsr-language]
+      - channel: bol
+        blocksListing: true
+        note: bol requires manufacturer details, the responsible economic operator and mandatory safety content per item; missing data keeps items offline.
+        citations: [bol-gpsr, bol-gpsr-offline, bol-gpsr-content]
+      - channel: etsy
+        blocksListing: false
+        note: Etsy asks for an Economic Operator or Manufacturers field and Product safety info; no public statement on deactivation was found.
+        citations: [etsy-gpsr]
+      - channel: zalando
+        blocksListing: false
+        note: Zalando requires GPSR attributes on brand and article level (safety PDFs first in English, then market languages); no public statement on deactivation was found.
+        citations: [zalando-gpsr]
