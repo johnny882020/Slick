@@ -11,6 +11,7 @@ import {
   freeEntitlement,
   isLicenseKey,
   LICENSE_REFRESH_DAYS,
+  PLANS,
   type Entitlement,
   type Feature,
   type FeedbackInput,
@@ -141,6 +142,37 @@ export class LicenseManager {
     this.save({ licenseKey: key, token });
     this.log(`license activated: ${ent.tier}`);
     return ent;
+  }
+
+  /**
+   * Start the free Team trial (TRIAL_DAYS) for this email. OneSeat Cloud issues a Team key and
+   * activates this computer with it; the key is saved like an activated one, so refresh works,
+   * and returned so the person can use it on the team's other computers.
+   */
+  async startTrial(email: string): Promise<Entitlement & { licenseKey: string }> {
+    const address = String(email ?? "").trim();
+    if (address.length > 254 || !/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(address))
+      throw new LicenseError("enter a valid email address to start the trial", "bad_email");
+    const current = this.status();
+    if (current.tier !== "free") throw new LicenseError(`this computer already has OneSeat ${PLANS[current.tier].name}; a trial is only for computers on Free`, "has_license");
+    let r: Record<string, unknown>;
+    try {
+      r = await this.post("/api/v1/trials", { email: address, deviceId: this.deviceId(), deviceName: hostname().slice(0, 80) });
+    } catch (e) {
+      const err = e as LicenseError;
+      if (err.code === "trial_used")
+        throw new LicenseError("this email or this computer has already had its free Team trial. Choose a plan on the OneSeat website, or paste a license key from your team", "trial_used");
+      if (err.code === "rate_limited") throw new LicenseError("too many trial requests from this network; wait a minute and try again", "rate_limited");
+      throw err;
+    }
+    const key = String(r["licenseKey"] ?? "").trim().toUpperCase();
+    const token = String(r["token"] ?? "");
+    if (!isLicenseKey(key)) throw new LicenseError("OneSeat Cloud did not send a license key for the trial", "bad_token");
+    const ent = this.verifyToken(token);
+    if (ent.tier === "free") throw new LicenseError(`OneSeat Cloud sent a license this computer cannot use: ${ent.reason ?? "unknown reason"}`, "bad_token");
+    this.save({ licenseKey: key, token });
+    this.log(`trial started: ${ent.tier} until ${ent.expiresAt ?? "unknown"}`);
+    return { ...ent, licenseKey: key };
   }
 
   async deactivate(): Promise<Entitlement> {

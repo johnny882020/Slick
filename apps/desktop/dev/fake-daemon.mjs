@@ -251,6 +251,7 @@ function validateCron(cron) {
 
 const FREE = { tier: "free", status: "none", features: [], computers: 1 };
 let license = FREE;
+let trialUsed = false;
 const feedback = [];
 /** FAKE_DAEMON_GATES=1: paid features need a license, like the real daemon. */
 const GATES = process.env.FAKE_DAEMON_GATES === "1";
@@ -585,6 +586,27 @@ const methods = {
       expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString(),
     };
     return license;
+  },
+  // Free Team trial. An email containing "used" (or a second trial on this computer) gets
+  // trial_used; one containing "offline" gets a network error.
+  "license.trial": (p) => {
+    const email = requireString(requireObject(p), "email").trim();
+    const blocked = ERR.blocked ?? -32002;
+    if (email.length > 254 || !/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(email)) throw new RpcError(blocked, "enter a valid email address to start the trial", { code: "bad_email" });
+    if (license.tier !== "free") throw new RpcError(blocked, `this computer already has OneSeat ${license.tier === "team" ? "Team" : "Pro"}; a trial is only for computers on Free`, { code: "has_license" });
+    if (/offline/i.test(email)) throw new RpcError(blocked, "could not reach OneSeat Cloud (fetch failed); check the internet connection", { code: "network" });
+    if (/used/i.test(email) || trialUsed)
+      throw new RpcError(blocked, "this email or this computer has already had its free Team trial. Choose a plan on the OneSeat website, or paste a license key from your team", { code: "trial_used" });
+    trialUsed = true;
+    license = {
+      tier: "team",
+      status: "trialing",
+      features: ["import_skills", "pinned_apps", "schedules", "mcp_connectors", "priority_support"],
+      computers: 15,
+      email,
+      expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString(),
+    };
+    return { ...license, licenseKey: "OS-TR1A-K9PX-4HTR-WB3D" };
   },
   "license.deactivate": () => (license = FREE),
   "feedback.send": (p) => {

@@ -1,6 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { featureRows, planSummary } from "../src/views/plan";
+import { featureRows, planSummary, trialActiveTitle, trialErrorText } from "../src/views/plan";
+import { ShellError } from "../src/transport";
 describe("plan view helpers", () => {
+  it("explains why a trial could not start, in plain words", () => {
+    const err = (code: string, message = "x") => new ShellError(message, -32002, { code });
+    expect(trialErrorText(err("trial_used"))).toMatch(/already had its free Team trial.*choose a plan at oneseat-cloud\.onrender\.com.*license key from someone on your team/);
+    expect(trialErrorText(err("bad_email"))).toBe("Enter your email address, like name@company.com.");
+    expect(trialErrorText(err("rate_limited"))).toMatch(/Wait a minute/);
+    expect(trialErrorText(err("network"))).toMatch(/Check the internet connection/);
+    expect(trialErrorText(err("has_license", "this computer already has OneSeat Pro"))).toBe("Could not start the trial: this computer already has OneSeat Pro");
+    expect(trialErrorText(new Error("boom"))).toBe("Could not start the trial: boom");
+  });
+  it("titles an active trial with its end date", () => {
+    expect(trialActiveTitle("2026-12-12T10:00:00.000Z")).toMatch(/^Team trial active until .*2026/);
+    expect(trialActiveTitle(undefined)).toBe("Team trial active");
+    expect(trialActiveTitle("nope")).toBe("Team trial active");
+  });
   it("summarises each plan in plain words", () => {
     expect(planSummary({ tier: "free", status: "none", features: [], computers: 1 })).toBe("Free: one computer and the seven starter skills.");
     expect(planSummary({ tier: "free", status: "none", features: [], computers: 1, reason: "the subscription was canceled" })).toBe("Free. The subscription was canceled.");

@@ -34,6 +34,17 @@ export interface NewLicense {
   endsAt: string;
 }
 
+/** The `team` of a trial license, shown in the admin list. */
+export const TRIAL_TEAM = "Trial";
+
+/** A free Team trial started from the app: one per email (lowercased) and one per computer, ever. */
+export interface NewTrial {
+  license: NewLicense;
+  emailLc: string;
+  deviceId: string;
+  deviceName: string;
+}
+
 export interface DeviceRow {
   licenseId: string;
   deviceId: string;
@@ -67,6 +78,11 @@ export interface Store {
   /** Create the license for a subscription if it is new (with this key), else merge the fields. */
   upsertLicense(fields: LicenseUpsert, newKey: { id: string; keyHash: string; key: string }): Promise<{ license: LicenseRow; created: boolean }>;
   createLicense(l: NewLicense): Promise<LicenseRow>;
+  /**
+   * Create the trial's license, record the trial and activate its computer, all or nothing.
+   * Undefined when this email or this computer already had a trial.
+   */
+  createTrial(t: NewTrial): Promise<LicenseRow | undefined>;
   /** The plain key, kept for 24 hours so the welcome page can show it. */
   revealKey(licenseId: string): Promise<string | undefined>;
   purgeReveals(olderThanHours: number): Promise<number>;
@@ -75,7 +91,8 @@ export interface Store {
   removeDevice(licenseId: string, deviceId: string): Promise<boolean>;
   addFeedback(f: Omit<FeedbackRow, "id" | "createdAt">): Promise<FeedbackRow>;
   listFeedback(limit: number): Promise<FeedbackRow[]>;
-  listLicenses(limit: number): Promise<(LicenseRow & { deviceCount: number })[]>;
+  /** Newest first; `trial` marks licenses that came from a self-serve trial. */
+  listLicenses(limit: number): Promise<(LicenseRow & { deviceCount: number; trial: boolean })[]>;
 }
 
 const nowIso = () => new Date().toISOString();
@@ -91,6 +108,7 @@ export class MemoryStore implements Store {
   deviceRows = new Map<string, DeviceRow>();
   feedback: FeedbackRow[] = [];
   events = new Set<string>();
+  trials: { emailLc: string; deviceId: string; licenseId: string; createdAt: string }[] = [];
 
   async migrate() {}
   async ping() {
@@ -142,6 +160,13 @@ export class MemoryStore implements Store {
     this.licenses.set(row.id, row);
     return row;
   }
+  async createTrial(t: NewTrial) {
+    if (this.trials.some((x) => x.emailLc === t.emailLc || x.deviceId === t.deviceId)) return undefined;
+    const row = await this.createLicense(t.license);
+    this.trials.push({ emailLc: t.emailLc, deviceId: t.deviceId, licenseId: row.id, createdAt: nowIso() });
+    await this.upsertDevice({ licenseId: row.id, deviceId: t.deviceId, deviceName: t.deviceName });
+    return row;
+  }
   async revealKey(id: string) {
     return this.reveals.get(id)?.key;
   }
@@ -175,7 +200,11 @@ export class MemoryStore implements Store {
     return [...this.licenses.values()]
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .slice(0, limit)
-      .map((l) => ({ ...l, deviceCount: [...this.deviceRows.values()].filter((d) => d.licenseId === l.id).length }));
+      .map((l) => ({
+        ...l,
+        deviceCount: [...this.deviceRows.values()].filter((d) => d.licenseId === l.id).length,
+        trial: this.trials.some((t) => t.licenseId === l.id),
+      }));
   }
 }
 

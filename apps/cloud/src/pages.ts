@@ -1,7 +1,7 @@
 // Server-rendered pages. No JavaScript: every page works with the strict content policy.
 // Visual design: docs/style-guide.md (Archival Editorial). Logical CSS properties throughout,
 // so a right-to-left page only needs dir="rtl".
-import { FEATURE_LABELS, PLANS, type Feature, type Tier } from "@oneseat/contracts";
+import { FEATURE_LABELS, PLANS, TRIAL_DAYS, type Feature, type Tier } from "@oneseat/contracts";
 import type { CloudConfig } from "./config.js";
 import { loadFonts } from "./fonts.js";
 import type { FeedbackRow, LicenseRow } from "./store.js";
@@ -200,6 +200,10 @@ function platformCards(cfg: CloudConfig): string {
 </div>${checksums ? `<p class="note" style="margin-block-start:1rem">Release notes and SHA-256 checksums: <a href="${esc(checksums)}">${esc(checksums.replace(/^https:\/\//, ""))}</a></p>` : ""}`;
 }
 
+/** The self-serve trial lives in the app, so it is tied to a computer: the site only points there. */
+const trialNote = () =>
+  `<div class="callout"><p><b>Try Team free for ${TRIAL_DAYS} days.</b> Start it from <b>OneSeat → Plan</b>: enter your email and choose <b>Start free trial</b>. You get a Team license key for up to ${PLANS.team.computers} computers, with no payment details.</p></div>`;
+
 const MODEL_KEYS = `<ul class="checks">
 <li><b>Claude (recommended):</b> create a key at <a href="https://console.anthropic.com/settings/keys">console.anthropic.com</a> and add prepaid credit under Billing. A Claude Pro or Max subscription doesn't include API use. OneSeat uses Claude Sonnet 5.5 by default.</li>
 <li><b>OpenAI:</b> a key from <a href="https://platform.openai.com/api-keys">platform.openai.com</a> with prepaid credit. A ChatGPT subscription doesn't include API use.</li>
@@ -211,6 +215,7 @@ export function downloadPage(cfg: CloudConfig): string {
     "Download OneSeat",
     section(`${eyebrow("Download")}<h1>Download OneSeat</h1><p class="lead">Install it, paste a model key, and run your first task in under five minutes.</p>`) +
       section(platformCards(cfg)) +
+      section(trialNote()) +
       section(`<div class="split"><div>${eyebrow("Model keys")}<h2>Connect one model key</h2><p>The key stays in your computer's keychain. OneSeat never sends it to us.</p></div>${MODEL_KEYS}</div>`, { band: true }),
     { active: "download" },
   );
@@ -225,11 +230,12 @@ export function pilotPage(cfg: CloudConfig): string {
       `${eyebrow("Pilot")}<h1>Welcome to the OneSeat pilot</h1>
 <p class="lead">For two weeks, your team uses OneSeat for real work, and tells us what helped and what got in the way. During the pilot your team has the full Team plan, for up to ${PLANS.team.computers} computers, at no cost.</p>`,
     ) +
+      section(trialNote()) +
       section(
         `<ol class="steps">
 <li><h3>Install OneSeat</h3><p>On each computer that will use it: Windows 10 or 11, or a Mac with Apple silicon.</p><div class="actions">${buttons || `<a class="btn secondary" href="/download">Download page</a>`}</div></li>
 <li><h3>Connect a model key</h3><p>Open OneSeat and paste a key when it asks. We recommend Claude: create a key at <a href="https://console.anthropic.com/settings/keys">console.anthropic.com</a> and add some prepaid credit. You pay the model provider for what you use. The pilot itself is free.</p></li>
-<li><h3>Activate your pilot license</h3><p>Go to <b>Plan</b>, paste the license key from your invitation email (it looks like <code>OS-XXXX-XXXX-XXXX-XXXX</code>), and choose <b>Activate</b>. Use the same key on every computer in your team. If you have no key, ask the person who invited you.</p></li>
+<li><h3>Activate your pilot license</h3><p>Go to <b>Plan</b>, paste the license key from your invitation email (it looks like <code>OS-XXXX-XXXX-XXXX-XXXX</code>), and choose <b>Activate</b>. Use the same key on every computer in your team. No invitation? Start a free ${TRIAL_DAYS}-day Team trial in <b>Plan</b> instead, then use its key on your team's other computers.</p></li>
 <li><h3>Use it for real work</h3><p>Look up customers, draft invoices and outreach emails, answer support messages, write the weekly report. OneSeat always asks before it sends, pays or deletes anything.</p></li>
 <li><h3>Tell us how it went</h3><p>In OneSeat, go to <b>Plan</b>, then <b>Send feedback</b>, whenever something works well or gets in your way. Don't include API keys or customer data.</p></li>
 </ol>`,
@@ -321,13 +327,14 @@ export function pilotCreatedPage(cfg: CloudConfig, license: LicenseRow, key: str
   );
 }
 
-export function adminPage(licenses: (LicenseRow & { deviceCount: number })[], feedback: FeedbackRow[]): string {
+export function adminPage(licenses: (LicenseRow & { deviceCount: number; trial?: boolean })[], feedback: FeedbackRow[]): string {
+  const trials = licenses.filter((l) => l.trial).length;
   const statusCls = (s: string) => (s === "active" || s === "trialing" ? "ok" : "warn");
   const ended = (l: LicenseRow) => !!l.endsAt && Date.parse(l.endsAt) <= Date.now();
   const teamOf = new Map(licenses.map((l) => [l.id, l.team ?? l.email]));
   return layout(
     "OneSeat admin",
-    section(`${eyebrow("Admin")}<h1>Admin</h1><p class="lead">${licenses.length} recent licenses · ${feedback.length} recent feedback</p>`) +
+    section(`${eyebrow("Admin")}<h1>Admin</h1><p class="lead">${licenses.length} recent licenses · ${trials} free trial${trials === 1 ? "" : "s"} · ${feedback.length} recent feedback</p>`) +
       section(
         `<div class="split"><div>${eyebrow("Pilot")}<h2>Invite a pilot team</h2><p>Creates a Team license for up to ${PLANS.team.computers} computers that switches to Free on its end date. You see the key once, with an invitation to send.</p></div>
 <form class="stack card" method="post" action="/admin/pilot"><label>Team name<input name="team" required maxlength="80" autocomplete="organization" placeholder="Acme Bakery"></label>
@@ -343,7 +350,7 @@ ${feedback.map((f) => `<tr><td class="num">${esc(f.createdAt.slice(0, 16).replac
       ) +
       section(
         `<div class="head">${eyebrow("Licenses")}<h2>Licenses</h2></div><div class="table"><table><thead><tr><th>Created</th><th>Team or email</th><th>Plan</th><th>Status</th><th>Ends</th><th>Computers</th><th>Stripe</th></tr></thead><tbody>
-${licenses.map((l) => `<tr><td class="num">${esc(l.createdAt.slice(0, 10))}</td><td>${l.team ? `<b>${esc(l.team)}</b><br>` : ""}${esc(l.email)}</td><td>${esc(PLANS[l.tier].name)}${l.team ? ` <span class="tag">pilot</span>` : ""}</td><td class="${ended(l) ? "warn" : statusCls(l.status)}">${ended(l) ? "ended" : esc(l.status)}</td><td class="num">${esc((l.endsAt ?? "").slice(0, 10))}</td><td class="num">${l.deviceCount} / ${l.computers}</td><td><code>${esc(l.stripeSubscription ?? "")}</code></td></tr>`).join("") || `<tr><td colspan="7">No licenses yet.</td></tr>`}
+${licenses.map((l) => `<tr><td class="num">${esc(l.createdAt.slice(0, 10))}</td><td>${l.team ? `<b>${esc(l.team)}</b><br>` : ""}${esc(l.email)}</td><td>${esc(PLANS[l.tier].name)}${l.trial ? ` <span class="tag cobalt">trial</span>` : l.team ? ` <span class="tag">pilot</span>` : ""}</td><td class="${ended(l) ? "warn" : statusCls(l.status)}">${ended(l) ? "ended" : esc(l.status)}</td><td class="num">${esc((l.endsAt ?? "").slice(0, 10))}</td><td class="num">${l.deviceCount} / ${l.computers}</td><td><code>${esc(l.stripeSubscription ?? "")}</code></td></tr>`).join("") || `<tr><td colspan="7">No licenses yet.</td></tr>`}
 </tbody></table></div>`,
       ),
     { active: "admin" },

@@ -1,13 +1,13 @@
 // OneSeat Cloud HTTP server: pages, Stripe webhook, license API, feedback, admin.
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { timingSafeEqual } from "node:crypto";
-import { isLicenseKey, PLANS, type LicenseStatus } from "@oneseat/contracts";
+import { isLicenseKey, PLANS, TRIAL_DAYS, type LicenseStatus } from "@oneseat/contracts";
 import type { CloudConfig } from "./config.js";
 import { loadFonts } from "./fonts.js";
 import { generateLicenseKey, hashKey, LicenseSigner } from "./licenses.js";
 import { adminPage, downloadPage, homePage, layout, pilotCreatedPage, pilotPage, privacyPage, welcomePage } from "./pages.js";
 import { handleStripeEvent, StripeSignatureError, verifyStripeSignature } from "./stripe.js";
-import { newId, type LicenseRow, type Store } from "./store.js";
+import { newId, TRIAL_TEAM, type LicenseRow, type Store } from "./store.js";
 
 const PAGE_CSP = "default-src 'none'; style-src 'unsafe-inline'; font-src 'self'; img-src 'self' data:; form-action 'self' https://checkout.stripe.com https://buy.stripe.com; frame-ancestors 'none'; base-uri 'none'";
 const MAX_BODY = 1024 * 1024;
@@ -73,6 +73,11 @@ function str(o: Record<string, unknown>, k: string, max = 200, required = true):
   return v.trim();
 }
 
+/** A simple shape check: something@domain.tld, no spaces, at most 254 characters. */
+function isEmail(s: string): boolean {
+  return s.length <= 254 && /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(s);
+}
+
 /** Fixed-window rate limit per client and route group. */
 class RateLimiter {
   private hits = new Map<string, { n: number; reset: number }>();
@@ -119,10 +124,11 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
   const signer = cfg.licensePrivateKey ? new LicenseSigner(cfg.licensePrivateKey) : undefined;
   const apiLimit = new RateLimiter(30, 60_000);
   const feedbackLimit = new RateLimiter(10, 60_000);
+  const trialLimit = new RateLimiter(5, 60_000);
 
   const tokenFor = (l: LicenseRow, deviceId: string) => {
     if (!signer) throw new HttpError(503, "licensing is not configured");
-    return signer.token({ lic: l.id, tier: l.tier, status: l.status, email: l.email, computers: l.computers, deviceId });
+    return signer.token({ lic: l.id, tier: l.tier, status: l.status, email: l.email, computers: l.computers, deviceId, endsAt: l.endsAt });
   };
 
   const findLicense = async (body: Record<string, unknown>) => {
@@ -137,7 +143,7 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
   const usable = (l: LicenseRow, now = Date.now()): LicenseStatus => (l.endsAt && Date.parse(l.endsAt) <= now ? "canceled" : l.status);
   const canceledMessage = (l: LicenseRow) =>
     l.endsAt && Date.parse(l.endsAt) <= Date.now()
-      ? `this pilot license ended on ${l.endsAt.slice(0, 10)}; your data is still on your computer, and you can choose a plan at ${cfg.publicUrl}/#plans`
+      ? `this ${l.team === TRIAL_TEAM ? "free Team trial" : "pilot license"} ended on ${l.endsAt.slice(0, 10)}; your data is still on your computer, and you can choose a plan at ${cfg.publicUrl}/#plans`
       : "this subscription was canceled; renew it to use this key";
 
   /** Browsers send basic-auth credentials on cross-site form posts too: only accept our own pages. */
@@ -231,7 +237,7 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
       const email = (form.get("email") ?? "").trim();
       const weeks = Number(form.get("weeks") ?? "4");
       if (!team || team.length > 80) throw new HttpError(400, "give the team a name of at most 80 characters");
-      if (!/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(email)) throw new HttpError(400, "give a contact email for the team");
+      if (!isEmail(email)) throw new HttpError(400, "give a contact email for the team");
       if (!Number.isInteger(weeks) || weeks < 1 || weeks > 12) throw new HttpError(400, "the pilot lasts 1 to 12 weeks");
       const key = generateLicenseKey();
       const endsAt = new Date(Date.now() + weeks * 7 * 86_400_000).toISOString();
@@ -241,7 +247,7 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
     }
 
     if (path.startsWith("/api/v1/")) {
-      const limiter = path === "/api/v1/feedback" ? feedbackLimit : apiLimit;
+      const limiter = path === "/api/v1/feedback" ? feedbackLimit : path === "/api/v1/trials" ? trialLimit : apiLimit;
       if (!limiter.allow(`${clientIp(req)} ${path}`)) throw new HttpError(429, "too many requests; try again in a minute", "rate_limited");
     }
     const body = parseJson(await readBody(req));
@@ -262,6 +268,33 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
         await store.upsertDevice({ licenseId: l.id, deviceId, deviceName });
         const { token, payload } = tokenFor({ ...l, status: usable(l) }, deviceId);
         return json(res, 200, { token, tier: payload.tier, status: payload.status, computers: payload.computers, used: known ? devices.length : devices.length + 1, expiresAt: new Date(payload.exp * 1000).toISOString() });
+      }
+      case "/api/v1/trials": {
+        // A free Team trial, started from OneSeat → Plan: one per email and one per computer, ever.
+        if (!signer) throw new HttpError(503, "licensing is not configured");
+        const email = str(body, "email", 254)!;
+        if (!isEmail(email)) throw new HttpError(400, "enter a valid email address to start the trial", "bad_email");
+        const deviceId = str(body, "deviceId", 80)!;
+        if (!/^[A-Za-z0-9_.-]{8,80}$/.test(deviceId)) throw new HttpError(400, "deviceId is not valid", "bad_device");
+        const deviceName = str(body, "deviceName", 80, false) ?? "";
+        const key = generateLicenseKey();
+        const endsAt = new Date(Date.now() + TRIAL_DAYS * 86_400_000).toISOString();
+        const l = await store.createTrial({
+          license: { id: newId("lic"), keyHash: hashKey(key), email, tier: "team", status: "trialing", computers: PLANS.team.computers, team: TRIAL_TEAM, endsAt },
+          emailLc: email.toLowerCase(),
+          deviceId,
+          deviceName,
+        });
+        if (!l)
+          throw new HttpError(
+            409,
+            `this email or this computer has already used its free Team trial. Choose a plan at ${cfg.publicUrl}/#plans, or paste a license key from your team in OneSeat → Plan`,
+            "trial_used",
+          );
+        log(`trial license ${l.id} until ${endsAt.slice(0, 10)}`);
+        const { token, payload } = tokenFor(l, deviceId);
+        // The key is returned this once: the app saves it, and the person keeps it for the team.
+        return json(res, 200, { licenseKey: key, token, tier: payload.tier, status: payload.status, computers: payload.computers, used: 1, expiresAt: new Date(payload.exp * 1000).toISOString() });
       }
       case "/api/v1/licenses/deactivate": {
         const l = await findLicense(body);

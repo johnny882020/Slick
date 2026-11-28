@@ -318,7 +318,6 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     "skills.search": async () => notYet("skills.search"),
     "skills.restorable": async () => notYet("skills.restorable"),
     "skills.restore": async () => notYet("skills.restore"),
-    "license.trial": async () => notYet("license.trial"),
     "auth.set": async (p) => {
       const provider = providerId(p["provider"]);
       const apiKey = p["apiKey"];
@@ -427,6 +426,14 @@ export function createDaemon(opts: DaemonOptions): Daemon {
         await startMcp();
         return ent;
       }),
+    "license.trial": async (p) => {
+      const email = str(p, "email")!;
+      return licenseCall(async () => {
+        const ent = await opts.license!.startTrial(email);
+        await startMcp();
+        return ent;
+      });
+    },
     "license.deactivate": async () => licenseCall(() => opts.license!.deactivate()),
     "feedback.send": async (p) => {
       const message = str(p, "message")!;

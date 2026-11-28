@@ -1,6 +1,6 @@
 // Postgres (Neon) implementation of the Store.
 import pg from "pg";
-import type { DeviceRow, FeedbackRow, LicenseRow, LicenseUpsert, NewLicense, Store } from "./store.js";
+import type { DeviceRow, FeedbackRow, LicenseRow, LicenseUpsert, NewLicense, NewTrial, Store } from "./store.js";
 import { newId } from "./store.js";
 
 export const SCHEMA_SQL = `
@@ -44,6 +44,12 @@ CREATE TABLE IF NOT EXISTS feedback (
   os text
 );
 CREATE INDEX IF NOT EXISTS feedback_created ON feedback(created_at DESC);
+CREATE TABLE IF NOT EXISTS trials (
+  email_lc text PRIMARY KEY,
+  device_id text NOT NULL UNIQUE,
+  license_id text REFERENCES licenses(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS stripe_events (
   id text PRIMARY KEY,
   type text NOT NULL,
@@ -147,6 +153,33 @@ export class PgStore implements Store {
     return licenseFrom(r[0]!);
   }
 
+  async createTrial(t: NewTrial) {
+    const l = t.license;
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      const lic = await client.query(
+        `INSERT INTO licenses (id, key_hash, email, tier, status, computers, team, ends_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        [l.id, l.keyHash, l.email, l.tier, l.status, l.computers, l.team, l.endsAt],
+      );
+      // Either unique column (the email or the computer) already taken means the trial was used.
+      const trial = await client.query("INSERT INTO trials (email_lc, device_id, license_id) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING email_lc", [t.emailLc, t.deviceId, l.id]);
+      if (trial.rowCount !== 1) {
+        await client.query("ROLLBACK");
+        return undefined;
+      }
+      await client.query("INSERT INTO devices (license_id, device_id, device_name) VALUES ($1, $2, $3)", [l.id, t.deviceId, t.deviceName]);
+      await client.query("COMMIT");
+      return licenseFrom(lic.rows[0] as Row);
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
   async upsertLicense(fields: LicenseUpsert, k: { id: string; keyHash: string; key: string }) {
     const client = await this.pool.connect();
     try {
@@ -216,10 +249,11 @@ export class PgStore implements Store {
   }
   async listLicenses(limit: number) {
     const r = await this.q(
-      `SELECT l.*, (SELECT count(*) FROM devices d WHERE d.license_id = l.id)::int AS device_count
+      `SELECT l.*, (SELECT count(*) FROM devices d WHERE d.license_id = l.id)::int AS device_count,
+              EXISTS (SELECT 1 FROM trials t WHERE t.license_id = l.id) AS trial
        FROM licenses l ORDER BY l.created_at DESC LIMIT $1`,
       [limit],
     );
-    return r.map((x) => ({ ...licenseFrom(x), deviceCount: Number(x["device_count"]) }));
+    return r.map((x) => ({ ...licenseFrom(x), deviceCount: Number(x["device_count"]), trial: x["trial"] === true }));
   }
 }

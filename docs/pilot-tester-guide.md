@@ -6,8 +6,9 @@ the AI model you choose. This is an early test build.
 
 **Time needed:** 10 minutes to set up, then use it for real work for two weeks.
 
-**You need:** your invitation email (it has your team's license key), a Windows 10/11 PC or a
-Mac with Apple silicon, and a model key (step 2).
+**You need:** a Windows 10/11 PC or a Mac with Apple silicon, a model key (step 2), and either
+your invitation email (it has your team's license key) or an email address for the free trial
+(step 3).
 
 The pilot is free. You don't buy anything and you don't need a card. You only pay your model
 provider for what you use.
@@ -62,8 +63,14 @@ Keychain). It is never written to a file or sent anywhere except to that provide
 2. Paste the license key from your invitation email (it looks like `OS-XXXX-XXXX-XXXX-XXXX`).
 3. Choose **Activate**.
 
-Use the same key on every computer in your team (up to 15). If you have no key, ask the
-person who invited you. Please keep the key within your team.
+Use the same key on every computer in your team (up to 15). Please keep the key within your team.
+
+**No invitation? Start the free trial instead.** On Free, **Plan** shows **Try Team free for
+14 days**: enter your email and choose **Start free trial**. OneSeat turns on the Team plan on
+this computer and shows your team's license key. Copy it and paste it under **License key** on
+your team's other computers (up to 15). There is one trial per email and per computer, and no
+card is needed. When the 14 days end, OneSeat goes back to Free; your data stays on your
+computer.
 
 The license gives you the full Team plan: pinned apps, schedules, skill imports and tool
 connectors.
