@@ -135,7 +135,7 @@ describe("nightly-live.yml", () => {
 describe("nightly-live.yml live QA", () => {
   const qa = load("nightly-live.yml").jobs["qa"]!;
   it("runs the shipped daemon on Windows, macOS and Linux, finding each OS's sidecars", () => {
-    expect(qa.strategy?.matrix?.["os"]).toEqual(["ubuntu-latest", "windows-latest", "macos-latest"]);
+    expect(qa.strategy?.matrix?.["os"]).toBe(`\${{ fromJSON(inputs.os == 'linux' && '["ubuntu-latest"]' || '["ubuntu-latest","windows-latest","macos-latest"]') }}`);
     expect(qa["runs-on"]).toBe("${{ matrix.os }}");
     const r = runs(qa);
     expect(r).toContain('ls "$bin"/oneseat-daemon-*');
@@ -148,6 +148,10 @@ describe("nightly-live.yml live QA", () => {
     // Run on demand: one of the two jobs alone (inputs.jobs), or both.
     expect(qa.if).toContain("inputs.jobs != 'evals'");
     expect(load("nightly-live.yml").jobs["live"]!.if).toContain("inputs.jobs != 'qa'");
+    // A manual run can name scenarios; the input reaches the script only through QA_ONLY.
+    expect(qaStep.env?.["QA_ONLY"]).toBe("${{ inputs.scenarios }}");
+    expect(r).toContain('only=(--only "$QA_ONLY")');
+    expect(r).not.toContain("inputs.scenarios");
   });
 });
 
