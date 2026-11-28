@@ -30,6 +30,9 @@ take-back in Germany. Packs live in `rules/<jurisdiction>/<obligation>.yaml`, fo
 | `seller.establishedIn` | Country the seller's business is established in (any ISO alpha-2) |
 | `seller.roles` | List: `manufacturer`, `importer`, `distributor`, `brand_owner`, `fulfilment_provider` |
 | `seller.euResponsiblePerson` | Address of the seller's EU responsible person, if any |
+| `seller.establishments` | Countries where the seller has a branch, besides `establishedIn` (v1.2) |
+| `seller.annualPackagingKg.$market` | Packaging placed on this market last year, in kg (v1.2) |
+| `seller.attributes.<name>` | Seller-level facts a rule needs, e.g. `de_ve_filed_for_last_year` (v1.2) |
 | `product.consumerProduct` | Consumer product (true/false) |
 | `product.shipsPackaged` | Sold with packaging, including shipping packaging (true/false) |
 | `product.packaging` | List of `{material, weightGrams, role}` |
@@ -40,6 +43,11 @@ take-back in Germany. Packs live in `rules/<jurisdiction>/<obligation>.yaml`, fo
 | `product.safety.manufacturer`, `.responsiblePerson`, `.identifier`, `.warnings`, `.shownOnListing` | Product safety data |
 
 ## Predicate operators
+
+`$market` stands for the country being evaluated, both as a path segment
+(`seller.annualPackagingKg.$market`) and as a value (`{ contains: [seller.establishments, $market] }`).
+Use a fix `group` on requirements that the seller satisfies with one action, and give each group a
+title in the pack's `fixGroups` map.
 
 ```yaml
 { always: true }
@@ -57,6 +65,8 @@ take-back in Germany. Packs live in `rules/<jurisdiction>/<obligation>.yaml`, fo
 { registered: { obligation: packaging_epr, jurisdiction: DE, register: LUCID } }
 { inScheme: { obligation: packaging_epr } }
 { hasRepresentative: { obligation: packaging_epr } }
+{ declared: { obligation: packaging_epr, kind: annual_declaration } }      # filed for last year (v1.2)
+{ declared: { obligation: packaging_epr, kind: annual_declaration, period: this_year } }
 ```
 
 ## Example

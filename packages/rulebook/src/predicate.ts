@@ -37,14 +37,14 @@ const EU = new Set<string>(EU_COUNTRIES);
 /** Every operator name the language accepts, for the linter. */
 export const PREDICATE_OPERATORS = [
   "always", "all", "any", "not", "eq", "in", "contains", "exists",
-  "gt", "gte", "lt", "lte", "inEU", "localized", "registered", "inScheme", "hasRepresentative",
+  "gt", "gte", "lt", "lte", "inEU", "localized", "registered", "inScheme", "hasRepresentative", "declared",
 ] as const;
 
 const MISSING = Symbol("missing");
 
 /** Read a dotted path from the context. Returns MISSING when any segment is absent. */
 export function readPath(ctx: EvalContext, path: string): unknown {
-  const [head, ...rest] = path.split(".");
+  const [head, ...rest] = path.split(".").map((seg) => (seg === "$market" ? ctx.market : seg));
   let cur: unknown;
   switch (head) {
     case "market": cur = ctx.market; break;
@@ -80,8 +80,9 @@ function compare(ctx: EvalContext, path: string, n: number, op: (a: number, b: n
   return of(typeof v === "number" && op(v, n));
 }
 
-function scalarEquals(a: unknown, b: Scalar): boolean {
-  return a === b;
+/** "$market" as a value means the market being evaluated. */
+function resolveValue(v: Scalar, ctx: EvalContext): Scalar {
+  return v === "$market" ? ctx.market : v;
 }
 
 /** Evaluate a predicate. Unknown operators throw: the linter should have caught them. */
@@ -116,19 +117,20 @@ export function evaluate(p: Predicate, ctx: EvalContext): EvalResult {
     const [path, value] = p.eq;
     const v = readPath(ctx, path);
     if (v === MISSING) return unknown(path);
-    return of(scalarEquals(v, value));
+    return of(v === resolveValue(value, ctx));
   }
   if ("in" in p) {
     const [path, values] = p.in;
     const v = readPath(ctx, path);
     if (v === MISSING) return unknown(path);
-    return of(values.some((x) => scalarEquals(v, x)));
+    return of(values.some((x) => v === resolveValue(x, ctx)));
   }
   if ("contains" in p) {
     const [path, value] = p.contains;
     const v = readPath(ctx, path);
     if (v === MISSING) return unknown(path);
-    return of(Array.isArray(v) && v.some((x) => scalarEquals(x, value)));
+    const want = resolveValue(value, ctx);
+    return of(Array.isArray(v) && v.some((x) => x === want));
   }
   if ("exists" in p) {
     const v = readPath(ctx, p.exists);
@@ -179,6 +181,18 @@ export function evaluate(p: Predicate, ctx: EvalContext): EvalResult {
     return of(
       (ctx.seller.representatives ?? []).some(
         (r) => r.obligation === p.hasRepresentative.obligation && r.jurisdiction === j && current(r.validTo, ctx.today),
+      ),
+    );
+  }
+  if ("declared" in p) {
+    const { obligation, kind } = p.declared;
+    const j = resolveJurisdiction(p.declared.jurisdiction, ctx);
+    const year = Number(ctx.today.slice(0, 4));
+    const period = p.declared.period ?? "last_year";
+    const prefix = period === "last_year" ? String(year - 1) : period === "this_year" ? String(year) : "";
+    return of(
+      (ctx.seller.declarations ?? []).some(
+        (d) => d.obligation === obligation && d.jurisdiction === j && d.kind === kind && d.period.startsWith(prefix),
       ),
     );
   }

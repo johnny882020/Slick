@@ -202,3 +202,16 @@ describe("labels", () => {
     expect(lintPack(p, "t").some((i) => i.level === "warning" && i.message.includes("keep it short"))).toBe(true);
   });
 });
+
+describe("v1.2 operators", () => {
+  it("validates declared and accepts the new seller fields", () => {
+    const p = base();
+    p.rules[0].appliesWhen = { all: [{ gt: ["seller.annualPackagingKg.$market", 1] }, { contains: ["seller.establishments", "$market"] }, { eq: ["seller.attributes.x", true] }] };
+    p.rules[0].requires[1].satisfiedWhen = { declared: { obligation: "packaging_epr", kind: "annual_declaration", period: "last_year" } };
+    expect(errors(p)).toEqual([]);
+    p.rules[0].requires[1].satisfiedWhen = { declared: { obligation: "packaging_epr", period: "someday" } };
+    const e = errors(p).join("\n");
+    expect(e).toContain("declared needs a kind");
+    expect(e).toContain("declared.period must be");
+  });
+});

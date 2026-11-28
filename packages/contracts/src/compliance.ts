@@ -104,6 +104,26 @@ export interface Seller {
   euResponsiblePerson?: Address;
   /** Authorised representatives appointed per jurisdiction and obligation. */
   representatives?: { jurisdiction: Jurisdiction; obligation: ObligationId; name: string; validTo?: string }[];
+  /** v1.2: countries (ISO alpha-2) where the seller has a branch or establishment, besides establishedIn. */
+  establishments?: string[];
+  /** v1.2: packaging placed on each market in the last calendar year, in kilograms. */
+  annualPackagingKg?: Partial<Record<CountryCode, number>>;
+  /** v1.2: declarations and reports already filed. */
+  declarations?: Declaration[];
+  /** v1.2: seller-level facts for rules that need them (e.g. "de_ve_filed_for_last_year"). */
+  attributes?: Record<string, string | number | boolean>;
+}
+
+/** v1.2: a declaration or report the seller has filed. */
+export interface Declaration {
+  obligation: ObligationId;
+  jurisdiction: Jurisdiction;
+  /** What was filed, matching the rule's `declared.kind`, e.g. "annual_declaration", "completeness_declaration". */
+  kind: string;
+  /** Period covered: "2025", "2025-Q4" or "2025-12". */
+  period: string;
+  filedOn?: string;
+  evidenceIds?: string[];
 }
 
 export type PackagingMaterial =
@@ -166,7 +186,9 @@ export interface Product {
 
 /**
  * A path into the evaluation context, e.g. "product.electrical", "seller.roles",
- * "market", "channel", "product.safety.responsiblePerson.country".
+ * "market", "channel", "product.safety.responsiblePerson.country". v1.2: a "$market" segment is
+ * replaced by the market being evaluated, e.g. "seller.annualPackagingKg.$market". A value of
+ * "$market" in eq, in or contains also means the market being evaluated.
  */
 export type Path = string;
 export type Scalar = string | number | boolean;
@@ -202,7 +224,13 @@ export type Predicate =
   /** Seller has a current take-back scheme contract (jurisdiction defaults to $market). */
   | { inScheme: { obligation: ObligationId; jurisdiction?: Jurisdiction | "$market" } }
   /** Seller has a current authorised representative (jurisdiction defaults to $market). */
-  | { hasRepresentative: { obligation: ObligationId; jurisdiction?: Jurisdiction | "$market" } };
+  | { hasRepresentative: { obligation: ObligationId; jurisdiction?: Jurisdiction | "$market" } }
+  /**
+   * v1.2: Seller has filed a declaration of this kind (jurisdiction defaults to $market). `period`
+   * last_year (default) needs a filing whose period starts with the previous calendar year;
+   * this_year the current one; any accepts every period.
+   */
+  | { declared: { obligation: ObligationId; kind: string; jurisdiction?: Jurisdiction | "$market"; period?: "last_year" | "this_year" | "any" } };
 
 export type FilingChannel = "api" | "portal" | "portal_eid" | "email" | "post" | "scheme" | "marketplace";
 export type WhoMayFile = "producer" | "authorised_representative" | "marketplace" | "compliance_scheme";
@@ -409,4 +437,4 @@ export interface AuditReport {
   disclaimers: string[];
 }
 
-export const COMPLIANCE_CONTRACTS_VERSION = "1.1.0";
+export const COMPLIANCE_CONTRACTS_VERSION = "1.2.0";

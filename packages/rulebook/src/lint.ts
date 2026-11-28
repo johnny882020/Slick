@@ -26,7 +26,7 @@ const OPS = new Set<string>(PREDICATE_OPERATORS);
 
 const SELLER_KEYS = new Set([
   "id", "legalName", "establishedIn", "roles", "vatIds", "registrations", "schemes",
-  "euResponsiblePerson", "representatives",
+  "euResponsiblePerson", "representatives", "establishments", "annualPackagingKg", "declarations", "attributes",
 ]);
 const PRODUCT_KEYS = new Set([
   "sku", "title", "gtin", "brand", "category", "consumerProduct", "listings", "shipsPackaged",
@@ -244,7 +244,12 @@ function lintPredicate(raw: unknown, at: string, err: (at: string, m: string) =>
     case "localized":
       return lintPath(v, at, err);
     default: {
-      // registered, inScheme, hasRepresentative
+      // registered, inScheme, hasRepresentative, declared
+      if (op === "declared" && isObj(v)) {
+        if (!isStr(v["kind"])) err(at, "declared needs a kind, e.g. annual_declaration");
+        const per = v["period"];
+        if (per !== undefined && !["last_year", "this_year", "any"].includes(String(per))) err(at, "declared.period must be last_year, this_year or any");
+      }
       if (!isObj(v) || !isStr(v["obligation"]) || !OBLIGATION_SET.has(v["obligation"])) return err(at, `${op} needs a valid obligation`);
       const j = v["jurisdiction"];
       if (j !== undefined && !(isStr(j) && (j === "$market" || JURISDICTIONS.has(j)))) err(at, `${op}.jurisdiction must be $market, EU or a country code`);

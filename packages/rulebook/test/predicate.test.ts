@@ -140,3 +140,40 @@ describe("predicatePaths", () => {
     ]);
   });
 });
+
+describe("v1.2: $market, declarations and seller facts", () => {
+  it("substitutes $market in paths and values", () => {
+    const s = seller({ annualPackagingKg: { DE: 120000, NL: 800 }, establishments: ["DE", "AT"] });
+    const de = ctx({ seller: s });
+    const nl = ctx({ seller: s, market: "NL" });
+    expect(evaluate({ gt: ["seller.annualPackagingKg.$market", 50000] }, de).value).toBe("true");
+    expect(evaluate({ gt: ["seller.annualPackagingKg.$market", 50000] }, nl).value).toBe("false");
+    expect(evaluate({ gt: ["seller.annualPackagingKg.$market", 50000] }, { ...nl, market: "FR" })).toEqual({ value: "unknown", missing: ["seller.annualPackagingKg.$market"] });
+    expect(evaluate({ contains: ["seller.establishments", "$market"] }, de).value).toBe("true");
+    expect(evaluate({ contains: ["seller.establishments", "$market"] }, nl).value).toBe("false");
+    expect(evaluate({ eq: ["seller.establishedIn", "$market"] }, ctx({ seller: seller({ establishedIn: "DE" }) })).value).toBe("true");
+    expect(evaluate({ in: ["market", ["$market"]] }, de).value).toBe("true");
+  });
+
+  it("checks declarations by kind, jurisdiction and period", () => {
+    const s = seller({
+      declarations: [
+        { obligation: "packaging_epr", jurisdiction: "DE", kind: "completeness_declaration", period: "2025" },
+        { obligation: "packaging_epr", jurisdiction: "NL", kind: "annual_declaration", period: "2026-Q3" },
+      ],
+    });
+    const de = ctx({ seller: s });
+    expect(evaluate({ declared: { obligation: "packaging_epr", kind: "completeness_declaration" } }, de).value).toBe("true");
+    expect(evaluate({ declared: { obligation: "packaging_epr", kind: "completeness_declaration", period: "this_year" } }, de).value).toBe("false");
+    expect(evaluate({ declared: { obligation: "packaging_epr", kind: "annual_declaration" } }, de).value).toBe("false");
+    const nl = ctx({ seller: s, market: "NL" });
+    expect(evaluate({ declared: { obligation: "packaging_epr", kind: "annual_declaration", period: "this_year" } }, nl).value).toBe("true");
+    expect(evaluate({ declared: { obligation: "packaging_epr", kind: "annual_declaration", period: "any", jurisdiction: "NL" } }, de).value).toBe("true");
+    expect(evaluate({ declared: { obligation: "weee", kind: "annual_declaration" } }, ctx()).value).toBe("false");
+  });
+
+  it("reads seller attributes", () => {
+    const de = ctx({ seller: seller({ attributes: { de_ve_filed_for_last_year: true } }) });
+    expect(evaluate({ eq: ["seller.attributes.de_ve_filed_for_last_year", true] }, de).value).toBe("true");
+  });
+});
