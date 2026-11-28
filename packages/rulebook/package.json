@@ -1,0 +1,39 @@
+{
+  "name": "@oneseat/rulebook",
+  "version": "0.1.0",
+  "description": "Compliance rulebook: load, lint, sign and evaluate versioned, cited rule packs.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@oneseat/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "keeper-rules": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint:rules": "tsx --conditions=@oneseat/source src/bin.ts lint ../../rules",
+    "cli": "tsx --conditions=@oneseat/source src/bin.ts",
+    "clean": "rm -rf dist coverage"
+  },
+  "dependencies": {
+    "@oneseat/contracts": "workspace:*",
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.12"
+  }
+}

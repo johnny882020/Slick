@@ -1,0 +1,38 @@
+{
+  "name": "@oneseat/obligations",
+  "version": "0.1.0",
+  "description": "Obligations engine: turns a seller's catalog and the rulebook into requirements, fixes, a 'Can I sell?' map and a gap-audit report.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@oneseat/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "keeper-audit": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "audit": "tsx --conditions=@oneseat/source src/bin.ts",
+    "clean": "rm -rf dist coverage"
+  },
+  "dependencies": {
+    "@oneseat/contracts": "workspace:*",
+    "@oneseat/rulebook": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.12"
+  }
+}

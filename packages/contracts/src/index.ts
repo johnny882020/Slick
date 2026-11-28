@@ -7,5 +7,6 @@ export * from "./evals.js";
 export * from "./data.js";
 export * from "./license.js";
 export * from "./testing.js";
+export * from "./compliance.js";
 
 export const CONTRACTS_VERSION = "1.0.0";

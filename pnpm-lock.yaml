@@ -210,6 +210,31 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12(@types/node@22.20.7)(@vitest/coverage-v8@4.1.12)(happy-dom@21.0.4)(vite@7.3.8(@types/node@22.20.7)(tsx@4.23.15)(yaml@2.9.1))
 
+  packages/obligations:
+    dependencies:
+      '@oneseat/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@oneseat/rulebook':
+        specifier: workspace:*
+        version: link:../rulebook
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.20.7
+      '@vitest/coverage-v8':
+        specifier: ^4.1.12
+        version: 4.1.12(vitest@4.1.12)
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.15
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@types/node@22.20.7)(@vitest/coverage-v8@4.1.12)(happy-dom@21.0.4)(vite@7.3.8(@types/node@22.20.7)(tsx@4.23.15)(yaml@2.9.1))
+
   packages/registry:
     dependencies:
       '@oneseat/contracts':
@@ -219,6 +244,31 @@ importers:
       '@oneseat/testkit':
         specifier: workspace:*
         version: link:../testkit
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.20.7
+      '@vitest/coverage-v8':
+        specifier: ^4.1.12
+        version: 4.1.12(vitest@4.1.12)
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.15
+      typescript:
+        specifier: ^5.8.0
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@types/node@22.20.7)(@vitest/coverage-v8@4.1.12)(happy-dom@21.0.4)(vite@7.3.8(@types/node@22.20.7)(tsx@4.23.15)(yaml@2.9.1))
+
+  packages/rulebook:
+    dependencies:
+      '@oneseat/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      yaml:
+        specifier: ^2.8.0
+        version: 2.9.1
+    devDependencies:
       '@types/node':
         specifier: ^22.10.0
         version: 22.20.7

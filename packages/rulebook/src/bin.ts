@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+// keeper-rules lint <dir> | citations <dir> | hash <dir>
+import { loadRulebook } from "./load.js";
+import { checkCitations } from "./citations.js";
+import { packHash } from "./sign.js";
+
+async function main(argv: string[]): Promise<number> {
+  const [cmd, dir = "rules"] = argv;
+  const { packs, issues } = await loadRulebook(dir);
+  if (cmd === "lint") {
+    for (const i of issues) console.log(`${i.level === "error" ? "ERROR" : "warn "} ${i.pack} ${i.at}: ${i.message}`);
+    const errors = issues.filter((i) => i.level === "error").length;
+    console.log(`${packs.length} pack(s) loaded, ${errors} error(s), ${issues.length - errors} warning(s)`);
+    return errors > 0 ? 1 : 0;
+  }
+  if (cmd === "citations") {
+    const results = await checkCitations(packs, (url) => fetch(url, { redirect: "follow", headers: { "user-agent": "keeper-rules citation check" } }));
+    for (const r of results) console.log(`${r.ok ? "ok  " : "FAIL"} ${r.pack} ${r.id} ${r.status ?? ""} ${r.error ?? ""} ${r.url}`);
+    return results.some((r) => !r.ok) ? 1 : 0;
+  }
+  if (cmd === "hash") {
+    for (const p of packs) console.log(`${packHash(p)}  ${p.id}@${p.version} (${p.review.status})`);
+    return 0;
+  }
+  console.error("usage: keeper-rules lint|citations|hash <rules dir>");
+  return 2;
+}
+
+main(process.argv.slice(2)).then((code) => process.exit(code), (e) => {
+  console.error(e);
+  process.exit(1);
+});
