@@ -1,0 +1,594 @@
+id: es.packaging_epr
+version: 2026.11.1
+jurisdiction: ES
+obligation: packaging_epr
+title: Packaging registration and take-back in Spain
+effectiveFrom: "2022-12-29"
+effectiveTo: null
+confidence: medium
+review:
+  status: draft
+  notes: >
+    Researched 2026-11-28. Since 12 Aug 2026 the EU Packaging Regulation (EU) 2025/40 (PPWR)
+    applies directly in Spain; Real Decreto 1055/2022 still applies where it is not
+    incompatible, and MITECO is drafting a new royal decree. The rules follow MITECO's own
+    reading (interpretive note of 13/08/2026 and the register page). PPWR quotes were read
+    from the Official Journal PDF hosted by BOE because EUR-Lex refused automated access.
+openQuestions:
+  - "Annual report deadline: Spain still uses 31 March (RD 1055/2022 art. 16.2; MITECO opened 2 Jan - 31 Mar 2027 for 2026 data), but PPWR art. 44.7 says 1 June. Confirm which date applies from the 2027 data year and whether the new Spanish royal decree changes it."
+  - "Authorised representative for producers outside the EU: RD 1055/2022 art. 17.2 and MITECO say 'deberán designar', Ley 7/2022 art. 40 says 'podrán designar', and PPWR art. 45.3 makes it mandatory only for EU-established producers (Member States may require it for third-country producers). Confirm Spain's legal basis for requiring it of non-EU sellers after 12 Aug 2026."
+  - "Registration number on invoices (RD 1055/2022 art. 15.3) runs 'hasta los puntos de venta' for household packaging. Confirm whether an online seller's invoice to the final consumer must show the number, and whether the duty survives the PPWR."
+  - "Shipping boxes: under PPWR art. 3(1)(15)(a) the producer of transport packaging is the maker or first supplier established in Spain, so a Spain-based shop that buys boxes from a Spanish supplier may not be the producer of those boxes. product.shipsPackaged does not separate sales and shipping packaging; the rules should read product.packaging[].role once the engine supports it."
+  - "Does RD 1055/2022 art. 17.5 (couriers and e-commerce platforms carry the duties for the shipping packaging they supply in distance sales) still apply after 12 Aug 2026, or does the PPWR producer definition replace it?"
+  - "Spain-established distributors that buy packaged goods in another EU country (adquisición intracomunitaria) are producers, but the evaluation context has no supplier-origin field, so appliesWhen currently treats a Spain-established distributor as not a producer. Add a seller or product field for supplier country."
+  - "Sellers outside Spain who sell only to Spanish businesses that resell (not to end users) are not producers under PPWR art. 3(1)(15)(c)-(d); the context has no B2C/B2B flag, so these rules may over-apply to them."
+  - "Fulfilment providers that unpack packaged goods (PPWR art. 3(1)(15)(e)) and the micro-enterprise brand-owner exception in the PPWR 'fabricante' definition are not modelled."
+  - "Registration lead time and fees: MITECO lists no registration fee and assigns the number when the application is signed; PPWR art. 44.11 allows up to 12 weeks and cost-based fees. Sellers outside Spain first need a Spanish NIF (starting with N) and a digital certificate, which can take weeks. Confirm typical lead times."
+  - "Register name used in seller data: the rules use register 'RPP' (Registro de Productores de Producto). Confirm this is the value stored in Seller.registrations."
+  - "The engine has no predicate for 'declaration filed' or 'number printed on invoices', so those requirements use registered / inScheme as a stand-in and rely on recurring deadlines. They will show as met once the seller is registered, which overstates compliance."
+  - "Individual systems (SIRAP) must be recognised by the seller's Comunidad Autónoma (Registro de Producción y Gestión de Residuos); lead time and practicality for small sellers not researched."
+  - "Simplified annual report: Spain keeps the 15-tonne threshold until the PPWR art. 44.14 implementing act is in place (PPWR uses 10 tonnes). Confirm status of that implementing act."
+  - "eBay: its help page (read on ebay.co.uk; ebay.es returned a bot check) still says eBay files under its own number ENV/2023/000034242 for international business sellers, which matches the pre-PPWR rule that platforms act as subsidiary producers. MITECO says platforms stop being subsidiary producers from 12 Aug 2026. Confirm eBay's current Spain policy."
+  - "Amazon.es: its own page says sellers without a valid number may be enrolled in 'Pago en tu Nombre' (pay on behalf), not blocked; a trade press report (Aug 2026) says Amazon Spain blocked listings and suspended accounts. Confirm whether Amazon.es now blocks listings."
+  - "Zalando: its Spain EPR page is dated 8 July 2024 (before the PPWR) and says missing numbers 'could potentially suspend you from selling in Spain'. Confirm current enforcement."
+  - "Ecoembes pages (SCRAP joining steps, fees, lead time) were behind a bot check and could not be read; scheme lead times and fees are therefore not stated."
+  - "Number format: MITECO documents ENV/<year>/<9 digits>. Confirm that numbers issued in 2023 follow the same pattern (eBay's ENV/2023/000034242 does)."
+citations:
+  - id: rd1055-art2t
+    title: Real Decreto 1055/2022, artículo 2 t) Productor de producto
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "t) Productor de producto: los envasadores o los agentes económicos dedicados a la importación o adquisición en otros Estados miembros de la Unión Europea de productos envasados para su puesta en el mercado."
+  - id: rd1055-art2e
+    title: Real Decreto 1055/2022, artículo 2 e) Envasadores (ventas a distancia)
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "En el caso de los envases empleados en las ventas a distancia, tendrá la consideración de envasador el titular del comercio responsable de la venta, respecto de esos envases."
+  - id: rd1055-art15-1
+    title: Real Decreto 1055/2022, artículo 15.1 Inscripción en el Registro de Productores de Productos
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Los productores de producto o los representantes autorizados en el supuesto regulado en el artículo 17.2 se inscribirán en la sección de envases del Registro de Productores de Productos"
+  - id: rd1055-art15-2
+    title: Real Decreto 1055/2022, artículo 15.2 Certificado de pertenencia a un sistema RAP
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Asimismo, se deberá aportar en el momento de la inscripción, un certificado de pertenencia a un sistema individual o colectivo de responsabilidad ampliada del productor."
+  - id: rd1055-art15-3
+    title: Real Decreto 1055/2022, artículo 15.3 Número de registro en facturas
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "En el momento de la inscripción, se asignará un número de registro que deberá figurar en las facturas y cualquier otra documentación que acompañe a las transacciones comerciales de productos envasados"
+  - id: rd1055-art16-2
+    title: Real Decreto 1055/2022, artículo 16.2 Información anual
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Dicha información se remitirá anualmente a la Dirección General de Calidad y Evaluación Ambiental del Ministerio para la Transición Ecológica y el Reto Demográfico antes del 31 de marzo del año siguiente al que se refiera"
+  - id: rd1055-art17-1j
+    title: Real Decreto 1055/2022, artículo 17.1 j) Información a los sistemas colectivos
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Proporcionar a los sistemas colectivos de responsabilidad ampliada del productor antes del día 28 de febrero del año siguiente, la información necesaria para que el sistema pueda dar cumplimiento a sus obligaciones de información"
+  - id: rd1055-art17-2
+    title: Real Decreto 1055/2022, artículo 17.2 Representante autorizado
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Los productores de productos que estén establecidos en otro Estado miembro o en terceros países y que comercialicen productos en España, deberán designar a una persona física o jurídica en territorio español como representante autorizado"
+  - id: rd1055-art17-3
+    title: Real Decreto 1055/2022, artículo 17.3 Sistemas individuales o colectivos
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-22690
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Los productores cumplirán con las obligaciones establecidas en las letras e), f), g) y h) del apartado 1 de este artículo a través de la constitución de los correspondientes sistemas individuales o colectivos de responsabilidad ampliada del productor."
+  - id: ley7-art40
+    title: Ley 7/2022, artículo 40 Representante autorizado del productor del producto
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-5809
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "A estos efectos, podrán designar a una persona física o jurídica en territorio español como representante autorizado."
+  - id: ley7-art108-3ac
+    title: Ley 7/2022, artículo 108.3 ac) Infracción grave (registro y número)
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-5809
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "ac) El incumplimiento de las obligaciones de inscripción en el Registro de Productores de productos, así como de las obligaciones de información sobre el número de identificación del productor registrado"
+  - id: ley7-art108-3p
+    title: Ley 7/2022, artículo 108.3 p) Infracción grave (obligaciones financieras RAP)
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-5809
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "p) La comercialización de productos incumpliendo las obligaciones financieras o financieras y organizativas establecidas en los regímenes de responsabilidad ampliada del productor"
+  - id: ley7-art109
+    title: Ley 7/2022, artículo 109.1 b) Sanciones por infracciones graves
+    url: https://www.boe.es/buscar/act.php?id=BOE-A-2022-5809
+    publisher: Agencia Estatal Boletín Oficial del Estado
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "1.º Multa desde 2.001 euros hasta 100.000 euros"
+  - id: ppwr-art3-15d
+    title: Reglamento (UE) 2025/40, artículo 3, apartado 1, punto 15, letra d) «productor»
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "que el fabricante, importador o distribuidor esté establecido en un Estado miembro o en un tercer país y comercialice, por primera vez y directamente a usuarios finales, en el territorio de otro Estado miembro productos envasados"
+  - id: ppwr-art44-2
+    title: Reglamento (UE) 2025/40, artículo 44.2 Registro de productores
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Los productores estarán obligados a inscribirse en el registro a que se refiere el apartado 1 del presente artículo en cada uno de los Estados miembros en cuyo territorio comercialicen envases o productos envasados por primera vez"
+  - id: ppwr-art44-4
+    title: Reglamento (UE) 2025/40, artículo 44.4 Prohibición de comercializar sin registro
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "en el territorio de un Estado miembro si ellos o, cuando proceda, de conformidad con el artículo 45, sus representantes autorizados a efectos de la responsabilidad ampliada del productor, no están registrados en ese Estado miembro."
+  - id: ppwr-art44-7
+    title: Reglamento (UE) 2025/40, artículo 44.7 Información anual al registro
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "presentará la información establecida en el anexo IX, parte B, punto 1, a la autoridad competente responsable del registro, a más tardar el 1 de junio, para cada año civil precedente completado."
+  - id: ppwr-art45-3
+    title: Reglamento (UE) 2025/40, artículo 45.3 Representante autorizado
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "El productor a que se refiere el artículo 3, apartado 1, punto 15, letras c) y d), designará, mediante mandato escrito, un representante autorizado a efectos de la responsabilidad ampliada del productor en cada Estado miembro distinto de su Estado miembro de establecimiento"
+  - id: ppwr-art45-3b
+    title: Reglamento (UE) 2025/40, artículo 45.3 párrafo segundo (productores de terceros países)
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Los Estados miembros podrán disponer que los productores establecidos en terceros países designen, mediante mandato escrito, un representante autorizado a efectos de la responsabilidad ampliada del productor"
+  - id: ppwr-art45-4
+    title: Reglamento (UE) 2025/40, artículo 45.4 Plataformas en línea
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "deberán obtener la información siguiente de los productores que ofrezcan envases o productos envasados a consumidores situados en la Unión antes de que se permita a dichos productores usar sus servicios"
+  - id: ppwr-art71
+    title: Reglamento (UE) 2025/40, artículo 71 Entrada en vigor y aplicación
+    url: https://www.boe.es/doue/2025/040/L00001-00124.pdf
+    publisher: Diario Oficial de la Unión Europea (copia publicada por BOE)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Será aplicable a partir del 12 de agosto de 2026."
+  - id: miteco-nota-aclaratoria
+    title: Nota aclaratoria SGR sobre la aplicación del Reglamento (UE) 2025/40 y sus efectos sobre el RD 1055/2022 (19/05/2026)
+    url: https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/sgecocir/envases/nota%20aclaratoria%20sobre%20la%20aplicaci%C3%B3n%20del%20Reglamento%202025-40%20y%20sus%20efectos%20sobre%20el%20RD%201055-2022.pdf
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "la aplicación del régimen jurídico de los envases y residuos de envases se regirá por lo establecido en el Reglamento (UE) 2025/40 y, en lo no previsto o no incompatible con éste, por el Real Decreto 1055/2022."
+  - id: miteco-rpp-number
+    title: Registro de Productores de Producto, sección envases - Número de Registro en el RPP
+    url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/registro-productores-producto/registro-productores-producto-seccion-envases.html
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Donde XXXXXXXXX es un contador de 9 dígitos y AÑO REGISTRO es el año en que se inscribe en el registro de productores de producto"
+  - id: miteco-rpp-scrap-cert
+    title: Registro de Productores de Producto, sección envases - Novedades a) Los SRAP
+    url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/registro-productores-producto/registro-productores-producto-seccion-envases.html
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Es obligatorio adjuntar los certificados de adhesión a los SCRAP contratados, en el plazo de un mes tras la contratación, y que dichos SRAPs estén autorizados para la categoría correspondiente de envase."
+  - id: miteco-rpp-report-2026
+    title: Registro de Productores de Producto, sección envases - Plazo de reporte datos 2026
+    url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/registro-productores-producto/registro-productores-producto-seccion-envases.html
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "PLAZO DE REPORTE para los datos de envases de 2026: estará abierto del 2 de enero de 2027 hasta el 31 de marzo de 2027, inclusive."
+  - id: miteco-rpp-representative
+    title: Registro de Productores de Producto, sección envases - Novedades e) Representantes autorizados
+    url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/registro-productores-producto/registro-productores-producto-seccion-envases.html
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "tendrán la consideración de “Productor” y deberán designar un representante autorizado a efectos de la responsabilidad ampliada del productor en España."
+  - id: miteco-rpp-platforms
+    title: Registro de Productores de Producto, sección envases - Novedades f) Nuevas obligaciones de las plataformas en línea
+    url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/registro-productores-producto/registro-productores-producto-seccion-envases.html
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Deberán obtener información sobre la inscripción del productor que utiliza su plataforma (o Marketplace) en el Registro de Productores de Producto de España."
+  - id: miteco-rpp-platform-not-producer
+    title: Registro de Productores de Producto, sección envases - Obligación anual (plataformas de comercio electrónico)
+    url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/registro-productores-producto/registro-productores-producto-seccion-envases.html
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "a partir del 12 de agosto de 2026, no tendrán la consideración de Productor con carácter subsidiario"
+  - id: miteco-sede-inscripcion
+    title: Sede electrónica MITECO - Inscripción en el registro de productores de producto (SIA 1523222)
+    url: https://sede.miteco.gob.es/portal/site/seMITECO/ficha-procedimiento?procedure_suborg_responsable=11&procedure_etiqueta_pdu=null&procedure_id=476
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Los productores de producto de envases deben aportar: Certificado de participación en el sistema o sistemas de Responsabilidad Ampliada del Productor que hayan indicado en la inscripción del registro."
+  - id: miteco-sede-acceso
+    title: Sede electrónica MITECO - Acceso a la Sede Electrónica (métodos de identificación)
+    url: https://sede.miteco.gob.es/portal/site/seMITECO/template.PAGE/faqs/?faqDocPath=/Acceso/Acceso.html&fromLastQueryString=&viewID=view_detail
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Los certificados admitidos deben estar asociados a un Número de Identificación Fiscal español (DNI, NIE o CIF)."
+  - id: miteco-nota-ppwr-representante
+    title: Nota interpretativa SGR definición de productor conforme al Reglamento (UE) 2025/40, v2 (13/08/2026) - 7. Inscripción productores establecidos fuera de España
+    url: https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/sgecocir/envases/260813_NOTA%20INSCRIPCION%20RPP_nuevo%20PPWR_.pdf
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "En ese certificado digital de representante se deberá indicar a un representante que deberá tener NIF o NIE español y que será el que actúe como representante autorizado"
+  - id: miteco-nota-ppwr-scrap
+    title: Nota interpretativa SGR definición de productor conforme al Reglamento (UE) 2025/40, v2 (13/08/2026) - 8. Sistemas de Responsabilidad Ampliada del Productor
+    url: https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/sgecocir/envases/260813_NOTA%20INSCRIPCION%20RPP_nuevo%20PPWR_.pdf
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "los productores podrán encomendar a los SCRAP las tareas de inscripción y reporte en el Registro de Productores de Producto, en su nombre."
+  - id: miteco-nota-ppwr-simplificada
+    title: Nota interpretativa SGR definición de productor conforme al Reglamento (UE) 2025/40, v2 (13/08/2026) - 9. Información anual
+    url: https://www.miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/sgecocir/envases/260813_NOTA%20INSCRIPCION%20RPP_nuevo%20PPWR_.pdf
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "seguirá optándose por la opción de declaración simplificada hasta la cantidad de 15 toneladas establecidas en el RD 1055/2022."
+  - id: miteco-scrap-list
+    title: Responsabilidad ampliada del productor - SCRAP de envases autorizados
+    url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/flujos/responsabilidad-ampliada.html
+    publisher: Ministerio para la Transición Ecológica y el Reto Demográfico
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Los SCRAP de envases con autorización definitiva"
+  - id: amazon-es-epr
+    title: Amazon ES - Cumplimiento de la responsabilidad ampliada del productor (Requisitos de RAP España)
+    url: https://sell.amazon.es/cumplimiento-responsabilidad-extendida-del-productor
+    publisher: Amazon EU S.à r.l.
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Si todavía no has proporcionado un número de registro RAP válido para Amazon ES, Amazon puede inscribirte automáticamente en el servicio de Pago en tu Nombre de la RAP."
+  - id: ebay-spain-epr
+    title: eBay Help - Extended Producer Responsibility selling in Spain
+    url: https://www.ebay.co.uk/help/account/regulatory/extended-producer-responsibility/extended-producer-responsibility-selling-spain?id=5460
+    publisher: eBay
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "International business sellers will need to add eBay's Producer of Products Registration Number to invoices for goods shipped to Spain"
+  - id: etsy-spain-number
+    title: Etsy Help - Extended Producer Responsibility (EPR) in Spain
+    url: https://help.etsy.com/hc/en-us/articles/42462390264087-Extended-Producer-Responsibility-EPR-in-Spain
+    publisher: Etsy, Inc.
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "These registration numbers must be provided to Etsy in your Shop Manager."
+  - id: etsy-spain-representative
+    title: Etsy Help - Extended Producer Responsibility (EPR) in Spain (producers outside Spain)
+    url: https://help.etsy.com/hc/en-us/articles/42462390264087-Extended-Producer-Responsibility-EPR-in-Spain
+    publisher: Etsy, Inc.
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Producers established outside Spain who offer products to Spanish buyers will need to appoint an Authorized Representative in Spain to comply with applicable EPR requirements."
+  - id: zalando-spain-suspend
+    title: Zalando Partner University - What are the EPR obligations in Spain (FAQ 15)
+    url: https://partner.zalando.com/university/article/what-are-the-epr-obligations-in-spain
+    publisher: Zalando SE
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Failure to do so could potentially suspend you from selling in Spain."
+  - id: zalando-spain-hq
+    title: Zalando Partner University - What are the EPR obligations in Spain (partners headquartered in Spain)
+    url: https://partner.zalando.com/university/article/what-are-the-epr-obligations-in-spain
+    publisher: Zalando SE
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "partners headquartered in Spain do not need to submit their EPR registration number to Zalando."
+  - id: press-amazon-es-blocks
+    title: NutraIngredients - Amazon Spain blocks listings and suspends accounts in compliance crackdown (05-Aug-2026)
+    url: https://www.nutraingredients.com/Article/2026/08/05/amazon-spain-blocks-listings-and-imposes-fines-over-rap-number-compliance/
+    publisher: NutraIngredients (William Reed)
+    kind: secondary
+    retrieved: "2026-11-28"
+    quote: "Amazon Spain has triggered immediate blocks on listings and suspended accounts as it cracks down on producer responsibility compliance."
+rules:
+  - id: es.packaging_epr.registration
+    title: Register in Spain's packaging producer register before selling packaged goods to Spain
+    summary: >
+      If you are the first to put packaged goods on the Spanish market (you make them, import
+      them, sell them under your own brand, or ship them from outside Spain straight to Spanish
+      customers), you must register in the packaging section of the Registro de Productores de
+      Producto run by the Ministry for Ecological Transition (MITECO). Since 12 August 2026 EU law
+      says you may not sell packaged goods in Spain until you, or your Spanish authorised
+      representative, are registered. Registration is online and must be signed with a Spanish
+      digital certificate.
+    severity: blocking
+    consequence: >
+      Selling while unregistered is banned under the EU Packaging Regulation. In Spain it is a
+      serious offence with fines from 2,001 to 100,000 euros, and marketplaces must check your
+      registration before letting you sell.
+    citations: [ppwr-art44-2, ppwr-art44-4, ppwr-art71, rd1055-art2t, rd1055-art2e, rd1055-art15-1, ppwr-art3-15d, miteco-nota-aclaratoria, miteco-sede-inscripcion, miteco-sede-acceso, miteco-rpp-number, ley7-art108-3ac, ley7-art109]
+    appliesWhen:
+      all:
+        - { eq: [ market, ES ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - all:
+                - { contains: [ seller.roles, distributor ] }
+                - { not: { eq: [ seller.establishedIn, ES ] } }
+    requires:
+      - key: registration_number
+        label: Spanish packaging register number (ENV/year/9 digits)
+        kind: registration
+        satisfiedWhen: { registered: { obligation: packaging_epr, register: RPP } }
+        whoMayFile: [producer, authorised_representative, compliance_scheme]
+        filing:
+          channel: portal_eid
+          url: https://sede.miteco.gob.es/portal/site/seMITECO/ficha-procedimiento?procedure_suborg_responsable=11&procedure_etiqueta_pdu=null&procedure_id=476
+          leadTimeDays: [1, 30]
+          feeNote: >
+            MITECO lists no registration fee; the number is issued when the signed application
+            is submitted. You need a digital certificate tied to a Spanish tax number (NIF/NIE/CIF);
+            Cl@ve only allows viewing, not signing. Sellers outside Spain first need a Spanish NIF,
+            which can take weeks. Take-back scheme fees are separate.
+        numberFormat: '^ENV/\d{4}/\d{9}$'
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: false
+        note: >
+          Amazon.es asks for the number in its EPR compliance portal in Seller Central. Its own
+          page says sellers without a valid number may be enrolled in "Pago en tu Nombre" (Amazon
+          pays the fees and charges them back plus a service fee) rather than blocked. A trade
+          press report from August 2026 says Amazon Spain has blocked listings; not confirmed on
+          an Amazon policy page.
+        citations: [amazon-es-epr, press-amazon-es-blocks]
+      - channel: etsy
+        blocksListing: false
+        note: Etsy asks producers to enter the Spanish number in Shop Manager > Finances > Legal and tax information; its page does not say listings are blocked.
+        citations: [etsy-spain-number]
+      - channel: zalando
+        blocksListing: false
+        note: >
+          Zalando asks partners not headquartered in Spain for the number in zDirect and says a
+          missing number "could potentially suspend you from selling in Spain" (page dated July
+          2024). Partners headquartered in Spain do not have to send it.
+        citations: [zalando-spain-suspend, zalando-spain-hq]
+      - channel: ebay
+        blocksListing: false
+        note: >
+          eBay's help page says eBay registered under its own number and covers international
+          business sellers shipping to Spain. This reflects the pre-August-2026 rule that
+          platforms act as fallback producers, which MITECO says no longer applies; check before
+          relying on it.
+        citations: [ebay-spain-epr, miteco-rpp-platform-not-producer]
+
+  - id: es.packaging_epr.scheme_membership
+    title: Join an authorised packaging take-back scheme in Spain
+    summary: >
+      Producers must pay for the collection and recycling of their packaging in Spain, either by
+      joining a collective take-back scheme (SCRAP, for example Ecoembes for household packaging)
+      or by running an individual system (SIRAP) approved by the regional government. You need the
+      scheme's membership certificate to register, and you must upload new certificates to the
+      register within one month of signing.
+    severity: high
+    consequence: >
+      Selling packaged goods without meeting the take-back financing duty is a serious offence
+      under Spanish waste law (fines from 2,001 to 100,000 euros). You also cannot complete your
+      registration without the membership certificate.
+    citations: [rd1055-art17-3, rd1055-art15-2, miteco-rpp-scrap-cert, miteco-sede-inscripcion, miteco-nota-ppwr-scrap, miteco-scrap-list, ley7-art108-3p, ley7-art109]
+    appliesWhen:
+      all:
+        - { eq: [ market, ES ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - all:
+                - { contains: [ seller.roles, distributor ] }
+                - { not: { eq: [ seller.establishedIn, ES ] } }
+    requires:
+      - key: scheme_contract
+        label: Contract with an authorised Spanish packaging take-back scheme (SCRAP) or an approved individual system (SIRAP)
+        kind: scheme_contract
+        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer, authorised_representative]
+        filing:
+          channel: scheme
+          url: https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/prevencion-y-gestion-residuos/flujos/responsabilidad-ampliada.html
+          feeNote: >
+            Schemes charge fees based on the weight and material of packaging you put on the
+            market. Pick a scheme authorised for your packaging category (household, commercial or
+            industrial); MITECO publishes the list.
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: false
+        note: Amazon.es says producers must also declare and pay eco-fees to an authorised scheme; without a valid number it may pay on your behalf.
+        citations: [amazon-es-epr]
+
+  - id: es.packaging_epr.annual_declaration
+    title: Report your packaging every year to the Spanish register and to your scheme
+    summary: >
+      Every year you must report the weight (by material) and number of packaging units you first
+      put on the Spanish market in the previous calendar year. The report goes to the MITECO
+      register between 2 January and 31 March, and your take-back scheme needs your data by
+      28 February. Producers with under 15 tonnes of packaging a year use a shorter form.
+    severity: high
+    consequence: >
+      Not filing on time is a serious offence under Spanish waste law (fines from 2,001 to
+      100,000 euros), and your scheme cannot settle your fees correctly.
+    citations: [rd1055-art16-2, rd1055-art17-1j, miteco-rpp-report-2026, miteco-nota-ppwr-simplificada, ppwr-art44-7, ley7-art108-3ac, ley7-art109]
+    appliesWhen:
+      all:
+        - { eq: [ market, ES ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - all:
+                - { contains: [ seller.roles, distributor ] }
+                - { not: { eq: [ seller.establishedIn, ES ] } }
+    requires:
+      - key: register_annual_report
+        label: Annual packaging report to the MITECO register (by 31 March)
+        kind: declaration
+        satisfiedWhen: { registered: { obligation: packaging_epr, register: RPP } }
+        whoMayFile: [producer, authorised_representative, compliance_scheme]
+        filing:
+          channel: portal_eid
+          url: https://sede.miteco.gob.es/portal/site/seMITECO/ficha-procedimiento?procedure_suborg_responsable=11&procedure_etiqueta_pdu=null&procedure_id=964&by=theme
+          feeNote: No fee is listed. Under 15 tonnes a year, use the simplified declaration procedure instead.
+        recurring:
+          every: year
+          note: >
+            Report the previous calendar year's packaging between 2 January and 31 March (2026
+            data: 2 January to 31 March 2027). Signing needs a Spanish digital certificate or a
+            representative registered in the REA. The EU Regulation sets 1 June; Spain still uses
+            31 March.
+      - key: scheme_annual_report
+        label: Packaging data sent to your take-back scheme (by 28 February)
+        kind: declaration
+        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer, authorised_representative]
+        filing:
+          channel: scheme
+        recurring:
+          every: year
+          note: Send the previous year's packaging data to your collective scheme before 28 February; your scheme may ask for more frequent reports.
+
+  - id: es.packaging_epr.authorised_representative
+    title: Appoint an authorised representative in Spain if your business is based elsewhere
+    summary: >
+      If your business is not established in Spain and you sell packaged goods directly to
+      customers in Spain, you must appoint an authorised representative in Spain by written
+      mandate. The representative must have a Spanish tax number (NIF or NIE) and is the one who
+      registers you and files your reports, using a representative digital certificate or a power
+      of attorney in Spain's electronic power-of-attorney register (REA).
+    severity: blocking
+    consequence: >
+      Without a representative you cannot register in Spain, and selling while unregistered is
+      banned. Etsy and Zalando also ask sellers based outside Spain to have one.
+    citations: [ppwr-art45-3, ppwr-art45-3b, rd1055-art17-2, ley7-art40, miteco-rpp-representative, miteco-nota-ppwr-representante, ppwr-art44-4]
+    appliesWhen:
+      all:
+        - { eq: [ market, ES ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - { not: { eq: [ seller.establishedIn, ES ] } }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - { contains: [ seller.roles, distributor ] }
+    requires:
+      - key: authorised_representative
+        label: Authorised representative in Spain with a written mandate
+        kind: representative
+        satisfiedWhen: { hasRepresentative: { obligation: packaging_epr } }
+        whoMayFile: [producer]
+        filing:
+          channel: portal_eid
+          url: https://sede.administracion.gob.es/PAG_Sede/ServiciosElectronicos/RegistroElectronicoDeApoderamientos.html
+          leadTimeDays: [14, 60]
+          feeNote: >
+            Representatives charge their own fees. A foreign company first needs a Spanish NIF
+            starting with N from the tax agency, then either a representative digital certificate
+            or a power of attorney (type C) in the REA for the register procedures.
+    marketplaceChecks:
+      - channel: etsy
+        blocksListing: false
+        note: Etsy says producers outside Spain selling to Spanish buyers must appoint an authorised representative in Spain; it does not say listings are blocked.
+        citations: [etsy-spain-representative]
+      - channel: zalando
+        blocksListing: false
+        note: Zalando says it must make sure partners not headquartered in Spain have a Spanish authorised representative and number; a missing number could lead to suspension from selling in Spain.
+        citations: [zalando-spain-suspend]
+
+  - id: es.packaging_epr.registration_number_shown
+    title: Show your Spanish packaging register number on invoices and give it to marketplaces
+    summary: >
+      Your register number (format ENV/year/9 digits) must appear on invoices and other documents
+      that go with sales of packaged goods along the supply chain. Since 12 August 2026,
+      marketplaces must also collect your Spanish number and a self-declaration that you meet the
+      take-back rules before they let you sell to Spanish customers.
+    severity: high
+    consequence: >
+      Leaving the number off is a serious offence under Spanish waste law (fines from 2,001 to
+      100,000 euros). Marketplaces that cannot verify your number may stop you selling in Spain.
+    citations: [rd1055-art15-3, ley7-art108-3ac, ley7-art109, ppwr-art45-4, miteco-rpp-platforms, miteco-rpp-number]
+    appliesWhen:
+      all:
+        - { eq: [ market, ES ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - all:
+                - { contains: [ seller.roles, distributor ] }
+                - { not: { eq: [ seller.establishedIn, ES ] } }
+    requires:
+      - key: number_on_invoices
+        label: Register number printed on invoices and delivery documents
+        kind: label
+        satisfiedWhen: { registered: { obligation: packaging_epr, register: RPP } }
+        whoMayFile: [producer, authorised_representative]
+        numberFormat: '^ENV/\d{4}/\d{9}$'
+      - key: number_given_to_marketplace
+        label: Register number and take-back self-declaration given to each marketplace you sell on in Spain
+        kind: data_field
+        satisfiedWhen: { registered: { obligation: packaging_epr, register: RPP } }
+        whoMayFile: [producer, authorised_representative]
+        filing:
+          channel: marketplace
+        numberFormat: '^ENV/\d{4}/\d{9}$'
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: false
+        note: Submit the number in the Amazon EPR compliance portal in Seller Central; otherwise Amazon.es may enrol you in pay-on-behalf.
+        citations: [amazon-es-epr]
+      - channel: etsy
+        blocksListing: false
+        note: Enter the number in Shop Manager > Finances > Legal and tax information > EPR Registrations > Spain.
+        citations: [etsy-spain-number]
+      - channel: zalando
+        blocksListing: false
+        note: Partners not headquartered in Spain submit the number in their zDirect Business Profile; Spain-based partners do not need to.
+        citations: [zalando-spain-suspend, zalando-spain-hq]
+      - channel: ebay
+        blocksListing: false
+        note: eBay's page tells international business sellers without their own number to print eBay's number ENV/2023/000034242 on invoices for goods shipped to Spain; sellers with their own number use it. May be outdated after August 2026.
+        citations: [ebay-spain-epr]
