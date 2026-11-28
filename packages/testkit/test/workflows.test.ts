@@ -9,7 +9,7 @@ import { findRepoRoot } from "../src/index.js";
 const root = findRepoRoot(import.meta.dirname);
 const dir = join(root, ".github", "workflows");
 
-type Step = { name?: string; uses?: string; run?: string; with?: Record<string, unknown>; env?: Record<string, string>; if?: string; shell?: string; "working-directory"?: string };
+type Step = { id?: string; name?: string; uses?: string; run?: string; with?: Record<string, unknown>; env?: Record<string, string>; if?: string; shell?: string; "working-directory"?: string };
 type Job = { name?: string; "runs-on"?: string; needs?: string | string[]; uses?: string; strategy?: { matrix?: Record<string, unknown> }; steps?: Step[]; permissions?: Record<string, string>; if?: string; env?: Record<string, string> };
 type Workflow = { name: string; on: Record<string, unknown>; permissions?: Record<string, string>; concurrency?: { group: string; "cancel-in-progress": boolean }; jobs: Record<string, Job> };
 
@@ -153,6 +153,11 @@ describe("nightly-live.yml live QA", () => {
     expect(qaStep.env?.["QA_ONLY"]).toBe("${{ inputs.scenarios }}");
     expect(r).toContain('only=(--only "$QA_ONLY")');
     expect(r).not.toContain("inputs.scenarios");
+    // Gate 5 can be narrowed to named skills the same way.
+    const evals = steps(load("nightly-live.yml").jobs["live"]!).find((s) => s.id === "evals")!;
+    expect(evals.env?.["EVAL_SKILLS"]).toBe("${{ inputs.skills }}");
+    expect(evals.run).toContain('only=(--skill "$EVAL_SKILLS")');
+    expect(evals.run).not.toContain("inputs.skills");
   });
 });
 

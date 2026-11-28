@@ -22,6 +22,10 @@ on:
         description: "Live QA scenario ids, comma-separated (empty runs all)"
         type: string
         default: ""
+      skills:
+        description: "Gate 5 skills, comma-separated (empty runs all)"
+        type: string
+        default: ""
   # Add the "live-qa" label to a PR to run live QA and gate 5 on it (uses the key secrets).
   pull_request:
     types: [labeled]
@@ -108,7 +112,13 @@ jobs:
       - name: "Gate 5: live evals (skill vs no-skill baseline)"
         id: evals
         if: ${{ !cancelled() && steps.providers.outputs.list != '' }}
-        run: node packages/testkit/bin/oneseat-evals.js --live --concurrency 2 --providers "${{ steps.providers.outputs.list }}" --out eval-report
+        env:
+          # Passed through the environment, never pasted into the script (no shell injection).
+          EVAL_SKILLS: ${{ inputs.skills }}
+        run: |
+          only=()
+          if [ -n "$EVAL_SKILLS" ]; then only=(--skill "$EVAL_SKILLS"); fi
+          node packages/testkit/bin/oneseat-evals.js --live --concurrency 2 --providers "${{ steps.providers.outputs.list }}" "${only[@]}" --out eval-report
 
       - name: "Gate 5: skipped"
         if: ${{ !cancelled() && steps.providers.outputs.list == '' }}
