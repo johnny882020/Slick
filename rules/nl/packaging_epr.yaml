@@ -1,0 +1,472 @@
+id: nl.packaging_epr
+version: 2026.11.1
+jurisdiction: NL
+obligation: packaging_epr
+title: Packaging registration and take-back in the Netherlands
+effectiveFrom: "2023-01-01"
+effectiveTo: null
+confidence: medium
+review:
+  status: draft
+  notes: >
+    Written from the Besluit beheer verpakkingen 2014 (consolidated text of 2024-01-01, read from the
+    official BWB repository because wetten.overheid.nl served a bot check), the Staatscourant
+    publication of the generally binding Verpact agreement for 2023-2027 (Stcrt. 2022, 35473),
+    Verpact's Beleid 2026 (concept version 3.3) and PPWR factsheet of September 2026, RVO pages,
+    Regulation (EU) 2025/40 (read from the Publications Office Cellar copy of the Official Journal
+    text), Council documents on procedure 2025/0395(COD), and bol's own Partnerplatform pages.
+    The 50,000 kg threshold cannot be evaluated with the current evaluation context, so the
+    registration and declaration rules will flag sellers who are in fact below it.
+openQuestions:
+  - >
+    The evaluation context has no field for a seller's total packaging weight placed on the Dutch
+    market per year. Rules 1 and 2 therefore apply to every producer and only explain the 50,000 kg
+    threshold in text, which over-reports small sellers. Should the contract add a per-market annual
+    packaging weight (for example seller.packagingKgPerYear.NL) and an SUP/deposit-packaging flag,
+    so the threshold and its exceptions can be evaluated deterministically?
+  - >
+    Below 50,000 kg the Verpact agreement exempts producers from both the contribution and the duty
+    to sign up with Verpact (Bijlage 2, art. 5.1 and 6.4), but they must still document how they
+    calculated that they stay below it. Confirm there is no separate registration duty below the
+    threshold before the PPWR producer register opens, and confirm whether the threshold applies to
+    the whole calendar year 2026 despite the change of producer definition on 12 August 2026.
+  - >
+    The threshold does not apply to single-use plastic (SUP) packaging or deposit (statiegeld)
+    packaging: these must be signed up and declared from the first item. The context cannot detect
+    SUP packaging (product.packaging has material and weight only). Needs a product flag or a
+    separate rule.
+  - >
+    The generally binding declaration (AVV) of the Verpact agreement runs from 1 January 2023 to
+    31 December 2027. Confirm whether a successor agreement or a PPWR-based national scheme is being
+    prepared for 2028 onwards, and re-check this pack before 2028.
+  - >
+    The Besluit beheer verpakkingen 2014 text used is the consolidated version of 2024-01-01 from the
+    BWB repository; wetten.overheid.nl could not be read (bot check). Confirm whether the Besluit was
+    amended or partly repealed when the PPWR started to apply on 12 August 2026, and how its producer
+    definition now relates to the PPWR definition that Verpact applies from that date.
+  - >
+    Verpact's Beleid 2026 file read was labelled "concept" (version 3.3). Confirm the final Beleid
+    2026 text, in particular the producer definition from 12 August 2026 (section 1), the levy on
+    foreign businesses (3.2.1), the fee-free 50,000 kg allowance (3.2.5) and the sign-up duty (5.2).
+  - >
+    Role mapping: the contract's "distributor" means a reseller of goods already on the EU market,
+    but under the PPWR a distributor established in the Netherlands is the Dutch producer when it is
+    the first to make packaged products available in the Netherlands (for example goods bought from
+    a German wholesaler). This pack only treats distributors established outside the Netherlands
+    as producers. Needs a seller field for "first to make available in NL" or a reviewer decision.
+  - >
+    Shipping packaging: from 12 August 2026 the PPWR names a different producer for transport,
+    service and primary production packaging (the party first making the packaging itself available)
+    than for other packaging (the party first making the packaged product available). Verpact says
+    the declaring party now differs per packaging type and has paused parts of this for transport,
+    service and primary production packaging. This pack does not split by packaging role.
+  - >
+    PPWR Article 45(3): producers established in another EU member state that sell directly to end
+    users in the Netherlands must appoint an authorised representative for EPR in the Netherlands.
+    The regulation has applied since 12 August 2026, but no Dutch guidance was found on how to
+    appoint one, whether Verpact can act as the representative, or whether Rijkswaterstaat or ILT
+    enforce it before the producer register exists.
+  - >
+    A proposal to suspend PPWR Article 45(3) (procedure 2025/0395(COD)) is in trilogue. The
+    Commission proposed suspension until 1 January 2035; the Council mandate of 21 October 2026
+    suspends it until 1 January 2032 only for EU-established producers that make less than 1 tonne
+    of packaging available per year in the other member state; the Parliament mandate differs. The
+    four-column table of 4 November 2026 showed no agreed text. Re-check before verifying, and
+    consider adding a per-market tonnage field so the 1 tonne exemption could be evaluated.
+  - >
+    PPWR Article 45(3) lets member states also require producers established outside the EU to
+    appoint an authorised representative. No Dutch measure doing so was found; the 2020 Besluit UPV
+    explanatory note says foreign online sellers are "free" to join a producer organisation. Confirm
+    the Netherlands has not used this option.
+  - >
+    PPWR producer register (Article 44): Verpact expects the Dutch register, run by Rijkswaterstaat,
+    to open before the second quarter of 2028, with first reporting for 2029, and says it will handle
+    registration for its members. Add a separate rule once the register, its number format and the
+    sales ban under Article 44(4) take effect.
+  - >
+    Registration number format: Verpact does not publish the format of its participant (relation)
+    number, and the PPWR register number format is not yet set. numberFormat is omitted.
+  - >
+    bol: no bol page was found saying bol takes offers offline for missing packaging or packaging EPR
+    data. bol's "legally required product information" enforcement (offline from 16 September 2026)
+    lists manufacturer details, energy labels and connected-device information; its PPWR page says
+    bol does not actively enforce PPWR obligations yet; its Dutch EPR enforcement covers batteries.
+    The reported "offline from September 2026 for missing packaging data" could not be confirmed, so
+    no bol listing-data rule was written. Re-check bol's Partnerplatform before verifying.
+  - >
+    Amazon.nl, Zalando, eBay and Etsy: no policy page or official statement on Dutch packaging EPR
+    was found (Amazon's Seller Central help pages need a login). No marketplace checks were added for
+    them. PPWR Article 45(4) will require online platforms to collect producers' register numbers,
+    which is not workable until the registers exist.
+citations:
+  - id: bbv-art1-producent
+    title: Besluit beheer verpakkingen 2014, artikel 1, onder g (producent of importeur)
+    url: https://wetten.overheid.nl/BWBR0035711/2024-01-01
+    publisher: Overheid.nl (Wettenbank), Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "alsmede elke in het buitenland gevestigde natuurlijke of rechtspersoon die rechtstreeks producten in een verpakking verkoopt aan consumenten in Nederland door overeenkomsten op afstand"
+  - id: avv-2023-2027
+    title: Kennisgeving algemeen verbindend verklaren Overeenkomst afvalbeheersbijdrage verpakkingen (Stcrt. 2022, 35473)
+    url: https://zoek.officielebekendmakingen.nl/stcrt-2022-35473.pdf
+    publisher: Staatscourant, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Overeenkomst inzake de afvalbeheersbijdrage verpakkingen algemeen verbindend te verklaren voor de periode van 1 januari 2023 tot en met 31 december 2027."
+  - id: avv-overeenkomst-2-5
+    title: Afvalbeheerbijdrageovereenkomst Verpakkingen, artikel 2.5 (aansluiting bij het Afvalfonds), in Stcrt. 2022, 35473
+    url: https://zoek.officielebekendmakingen.nl/stcrt-2022-35473.pdf
+    publisher: Staatscourant, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Producenten en Importeurs nemen deel aan de Afvalbeheerstructuur en sluiten zich daartoe aan bij het Afvalfonds Verpakkingen. Aansluiting bij het Afvalfonds Verpakkingen geschiedt via een schriftelijke melding aan het Afvalfonds Verpakkingen"
+  - id: avv-betalingsvoorwaarden-5-1
+    title: Afvalbeheerbijdrageovereenkomst Verpakkingen, Bijlage 2 Betalingsvoorwaarden, artikel 5.1 (ondergrens 50.000 kg)
+    url: https://zoek.officielebekendmakingen.nl/stcrt-2022-35473.pdf
+    publisher: Staatscourant, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Producenten en Importeurs die in een bepaald kalenderjaar onder de grens van 50.000 kilogram Verpakkingen blijven zijn over dat kalenderjaar geen Afvalbeheerbijdrage Verpakkingen verschuldigd"
+  - id: avv-betalingsvoorwaarden-5-1-sup
+    title: Afvalbeheerbijdrageovereenkomst Verpakkingen, Bijlage 2, artikel 5.1, tweede volzin (geen drempel voor statiegeld en SUP)
+    url: https://zoek.officielebekendmakingen.nl/stcrt-2022-35473.pdf
+    publisher: Staatscourant, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "De in de vorige volzin bedoelde grens is niet van toepassing op Verpakkingen welke aan een wettelijke statiegeldverplichting of een SUP-bijdrage zijn onderworpen."
+  - id: avv-betalingsvoorwaarden-6-1
+    title: Afvalbeheerbijdrageovereenkomst Verpakkingen, Bijlage 2, artikel 6.1 (jaarlijkse aangifte)
+    url: https://zoek.officielebekendmakingen.nl/stcrt-2022-35473.pdf
+    publisher: Staatscourant, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Producenten en Importeurs doen jaarlijks, uiterlijk voor 1 april, aangifte bij het Afvalfonds Verpakkingen van de gewichtshoeveelheid en aantallen Verpakkingen over het voorafgaande kalenderjaar."
+  - id: avv-betalingsvoorwaarden-7-1
+    title: Afvalbeheerbijdrageovereenkomst Verpakkingen, Bijlage 2, artikel 7.1 (voorlopige betalingen per kwartaal)
+    url: https://zoek.officielebekendmakingen.nl/stcrt-2022-35473.pdf
+    publisher: Staatscourant, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "doen uiterlijk op de laatste dag van het eerste, het tweede, het derde en het vierde kwartaal van dat kalenderjaar een voorlopige betaling."
+  - id: avv-overeenkomst-6-1
+    title: Afvalbeheerbijdrageovereenkomst Verpakkingen, artikel 6.1 (boeteregeling)
+    url: https://zoek.officielebekendmakingen.nl/stcrt-2022-35473.pdf
+    publisher: Staatscourant, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Ingeval de Producent of Importeur zijn verplichtingen binnen die gestelde termijn niet nakomt, kan het Afvalfonds Verpakkingen hem een boete opleggen volgens het Boetereglement."
+  - id: verpact-beleid-2026-producent
+    title: Verpact, Beleid 2026 (concept, versie 3.3), definitie Producent vanaf 12 augustus 2026
+    url: https://www.verpact.nl/sites/default/files/2026-01/Beleid%202026_concept.pdf
+    publisher: Verpact (Stichting Afvalfonds Verpakkingen)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Elke verwijzing in dit Beleid naar de Producent of Importeur welke betrekking heeft op de periode vanaf 12 augustus 2026 geldt als verwijzing naar de Producent zoals hierboven gedefinieerd."
+  - id: verpact-beleid-2026-buitenland
+    title: Verpact, Beleid 2026 (concept), 3.2.1 Heffing (buitenlandse ondernemers)
+    url: https://www.verpact.nl/sites/default/files/2026-01/Beleid%202026_concept.pdf
+    publisher: Verpact (Stichting Afvalfonds Verpakkingen)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Het tweede lid, onderdeel a en c zijn tot 12 augustus 2026 voor Buitenlandse ondernemers alleen van toepassing voor zover het Verpakkingen betreft (van producten) welke zij in Nederland ter beschikking stellen aan Consumenten."
+  - id: verpact-beleid-2026-drempel
+    title: Verpact, Beleid 2026 (concept), 3.2.5 Heffingsvrije drempel
+    url: https://www.verpact.nl/sites/default/files/2026-01/Beleid%202026_concept.pdf
+    publisher: Verpact (Stichting Afvalfonds Verpakkingen)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "Als de verschuldigde Afvalbeheerbijdrage Verpakkingen betrekking heeft op één verpakkingsmateriaal of -soort, is het bedrag van de vermindering: 50.000 kilogram vermenigvuldigd met het voor die verpakkingsmateriaal of -soort geldende tarief"
+  - id: verpact-beleid-2026-aanmelding
+    title: Verpact, Beleid 2026 (concept), 5.2 Aanmeldingsplicht
+    url: https://www.verpact.nl/sites/default/files/2026-01/Beleid%202026_concept.pdf
+    publisher: Verpact (Stichting Afvalfonds Verpakkingen)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "alsmede elke Producent of Importeur van (één of meer) Statiegeldverpakkingen en/of SUP-Verpakkingen, is in het kader van de ABBO verplicht zich aan te melden bij Verpact."
+  - id: verpact-beleid-2026-aangifte
+    title: Verpact, Beleid 2026 (concept), 5.3 Aangifte- en opgaveplicht
+    url: https://www.verpact.nl/sites/default/files/2026-01/Beleid%202026_concept.pdf
+    publisher: Verpact (Stichting Afvalfonds Verpakkingen)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "De Bijdrageplichtige is gehouden zijn Aangifte juist en volledig in te vullen, (digitaal) te ondertekenen en in te dienen voor 1 april van het daaropvolgende kalenderjaar."
+  - id: verpact-micro-drempel
+    title: Verpact, Factsheet PPWR en micro-ondernemingen (september 2026), aangiftedrempel
+    url: https://www.verpact.nl/sites/default/files/2026-09/vrp_ppwr_micro_ondernemingen_03.pdf
+    publisher: Verpact (Stichting Afvalfonds Verpakkingen)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "De aangiftedrempel van 50.000 kilo verpakkingen per jaar in Nederland blijft voorlopig gelden. Ze verdwijnt uiterlijk wanneer je voor het eerst aan het producentenregister rapporteert; naar verwachting vanaf 2029."
+  - id: verpact-micro-register
+    title: Verpact, Factsheet PPWR en micro-ondernemingen (september 2026), producentenregister
+    url: https://www.verpact.nl/sites/default/files/2026-09/vrp_ppwr_micro_ondernemingen_03.pdf
+    publisher: Verpact (Stichting Afvalfonds Verpakkingen)
+    kind: register
+    retrieved: "2026-11-28"
+    quote: "We verwachten dat het producentenregister er vóór het tweede kwartaal van 2028 staat. Het eerste jaar van aangifte is dan 2029. In Nederland gaat Rijkswaterstaat dit producentenregister beheren."
+  - id: rvo-afvalbeheerbijdrage
+    title: Afvalbeheerbijdrage verpakkingen betalen (Ondernemersplein)
+    url: https://ondernemersplein.overheid.nl/wetten-en-regels/afvalbeheersbijdrage-verpakkingen-betalen/
+    publisher: Rijksdienst voor Ondernemend Nederland (RVO)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Dan moet u een Afvalbeheerbijdrage Verpakkingen betalen aan Verpact (vroeger bekend als het Afvalfonds Verpakkingen). Dit geldt ook als u een bedrijf in het buitenland heeft en direct (online) verkoopt aan Nederlandse consumenten."
+  - id: rvo-administratie
+    title: Afvalbeheerbijdrage verpakkingen betalen, Verpakkingenadministratie bijhouden (Ondernemersplein)
+    url: https://ondernemersplein.overheid.nl/wetten-en-regels/afvalbeheersbijdrage-verpakkingen-betalen/
+    publisher: Rijksdienst voor Ondernemend Nederland (RVO)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Blijft u onder de 50.000 kilo? Dan moet u vastleggen hoe u heeft berekend dat u onder deze drempel blijft. Bij controle moet u toegang geven van uw administratie."
+  - id: business-gov-registration
+    title: Packaging waste management contribution (Business.gov.nl)
+    url: https://business.gov.nl/regulations/packaging-waste-management-contribution/
+    publisher: Netherlands Enterprise Agency (RVO), Business.gov.nl
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "If you have to pay the packaging waste management fee, you must report the weight and quantity of packaging annually. To do so, you must first register with Verpact."
+  - id: besluit-upv-toelichting
+    title: Besluit regeling voor uitgebreide producentenverantwoordelijkheid (Stb. 2020, 375), Nota van toelichting
+    url: https://zoek.officielebekendmakingen.nl/stb-2020-375.html
+    publisher: Staatsblad, Ministerie van Infrastructuur en Waterstaat
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Ook producenten uit het buitenland, die middels online-verkoop producten rechtstreeks op de Nederlandse markt aanbieden, zijn vrij om zich aan te sluiten bij een producentenorganisatie"
+  - id: ppwr-art3-15d
+    title: Regulation (EU) 2025/40 (PPWR), Article 3(1), point (15)(d), definition of producer
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj/eng
+    publisher: Publications Office of the European Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "the manufacturer, importer or distributor is established in a Member State or in a third country and makes available for the first time on the territory of another Member State, directly to end users, products packaged in packaging other than those referred to in point (c)"
+  - id: ppwr-art44-1
+    title: Regulation (EU) 2025/40 (PPWR), Article 44(1), national register of producers
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj/eng
+    publisher: Publications Office of the European Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Each Member State shall, within 18 months of the date of entry into force of first implementing act adopted pursuant to paragraph 14, establish a national register"
+  - id: ppwr-art44-2
+    title: Regulation (EU) 2025/40 (PPWR), Article 44(2), duty to register
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj/eng
+    publisher: Publications Office of the European Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Producers shall be obliged to register in the register referred to in paragraph 1 of this Article in each Member State where they make packaging or packaged products available on the territory of the Member State for the first time"
+  - id: ppwr-art45-3
+    title: Regulation (EU) 2025/40 (PPWR), Article 45(3), authorised representative for EPR
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj/eng
+    publisher: Publications Office of the European Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "shall appoint, by written mandate, an authorised representative for the extended producer responsibility in each Member State where the producer makes packaging or packaged products available for the first time, other than the Member State where the producer is established"
+  - id: ppwr-art45-3-third-country
+    title: Regulation (EU) 2025/40 (PPWR), Article 45(3), second sentence (producers outside the EU)
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj/eng
+    publisher: Publications Office of the European Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Member States may provide that producers established in third countries shall appoint, by written mandate, an authorised representative for the extended producer responsibility when making packaging or packaged products available on their territory for the first time."
+  - id: ppwr-art71
+    title: Regulation (EU) 2025/40 (PPWR), Article 71, date of application
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj/eng
+    publisher: Publications Office of the European Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "It shall apply from 12 August 2026."
+  - id: council-mandate-14765-26
+    title: Council of the EU, doc. 14765/26, mandate for negotiations on suspending PPWR Article 45(3) (proposal 2025/0395(COD), not adopted)
+    url: https://data.consilium.europa.eu/doc/document/ST-14765-2026-INIT/en/pdf
+    publisher: Council of the European Union
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "The application of Article 45(3) of Regulation (EU) 2025/40 shall be suspended for a producer established in a Member State in respect of each other Member State where that producer makes less than 1 tonne of packaging"
+  - id: bol-ppwr
+    title: bol Partnerplatform, European packaging legislation (PPWR)
+    url: https://partnerplatform.bol.com/en/idp/ppwr
+    publisher: bol.com b.v.
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Currently, bol does not actively enforce PPWR obligations. There is no system yet that allows us to check registrations on a large scale."
+  - id: bol-upv-nl
+    title: bol Partnerplatform, UPV - Uitgebreide Producentenverantwoordelijkheid
+    url: https://partnerplatform.bol.com/nl/idp/upv
+    publisher: bol.com b.v.
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "In Nederland geldt deze verplichting voor batterijen, en op termijn naar verwachting ook voor andere productcategorieën."
+  - id: bol-legally-required-info
+    title: bol Partnerplatform, Legally required product information
+    url: https://partnerplatform.bol.com/en/nadp/legally-required-product-information
+    publisher: bol.com b.v.
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "From 16 September we'll start taking these items offline if they don't meet the legally required product information."
+rules:
+  - id: nl.packaging_epr.registration
+    title: Sign up with Verpact if you put more than 50,000 kg of packaging on the Dutch market
+    summary: >
+      In the Netherlands, the business that first puts packaged goods on the Dutch market pays for
+      collecting and recycling the packaging through Verpact (formerly Afvalfonds Verpakkingen).
+      This includes sellers based outside the Netherlands who ship directly to Dutch customers.
+      You must sign up with Verpact once you put more than 50,000 kg of packaging on the Dutch
+      market in a year, or from the first item if you sell single-use plastic or deposit
+      (statiegeld) packaging. Below 50,000 kg you do not need to sign up, but you must keep a record
+      showing how you worked out that you stay below it. From about 2028 you will also have to be
+      listed in a new EU producer register run by Rijkswaterstaat; Verpact says it will arrange that
+      for the businesses that declare through it.
+    severity: medium
+    consequence: >
+      Verpact can estimate your packaging and charge you on that basis, and can fine you under its
+      penalty rules. Once the EU producer register opens (expected 2028), producers that are not
+      registered may not sell packaged goods in the Netherlands.
+    citations:
+      - bbv-art1-producent
+      - avv-2023-2027
+      - avv-overeenkomst-2-5
+      - avv-betalingsvoorwaarden-5-1
+      - avv-betalingsvoorwaarden-5-1-sup
+      - avv-overeenkomst-6-1
+      - verpact-beleid-2026-producent
+      - verpact-beleid-2026-buitenland
+      - verpact-beleid-2026-aanmelding
+      - verpact-micro-register
+      - rvo-afvalbeheerbijdrage
+      - rvo-administratie
+      - business-gov-registration
+      - ppwr-art3-15d
+      - ppwr-art44-1
+      - ppwr-art44-2
+    appliesWhen:
+      all:
+        - { eq: [ market, NL ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - all:
+                - { contains: [ seller.roles, distributor ] }
+                - { not: { eq: [ seller.establishedIn, NL ] } }
+    requires:
+      - key: verpact_signup
+        label: Verpact sign-up (needed above 50,000 kg of packaging a year, or for any single-use plastic or deposit packaging)
+        kind: registration
+        satisfiedWhen:
+          any:
+            - { registered: { obligation: packaging_epr, register: Verpact } }
+            - { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer]
+        filing:
+          channel: scheme
+          url: https://www.verpact.nl/nl/aanmeldformulier
+          feeNote: >
+            Verpact charges a contribution per kilogram, by material and packaging type. The first
+            50,000 kg each year is fee-free; this allowance does not apply to single-use plastic or
+            deposit packaging.
+    marketplaceChecks:
+      - channel: bol
+        blocksListing: false
+        note: >
+          bol says it does not yet actively check packaging (PPWR) registrations and will announce
+          when it starts. Its Dutch EPR checks currently cover batteries, and its "legally required
+          product information" take-downs from 16 September 2026 concern manufacturer details,
+          energy labels and connected-device information, not packaging data.
+        citations: [bol-ppwr, bol-upv-nl, bol-legally-required-info]
+
+  - id: nl.packaging_epr.annual_declaration
+    title: Declare your packaging to Verpact every year and pay the contribution
+    summary: >
+      Once you are signed up with Verpact, you declare the weight and number of packaging items you
+      put on the Dutch market in the previous calendar year, split by material and type, before
+      1 April. You also pay the contribution in advance in four quarterly instalments. The first
+      50,000 kg is fee-free, and if you stay below 50,000 kg in a year you need neither declare nor
+      pay (except for single-use plastic and deposit packaging), but you must keep records showing
+      how you calculated that you stayed below the threshold.
+    severity: medium
+    consequence: >
+      Verpact can fine late or missing declarations and payments, impose an estimated declaration,
+      and audit declarations for up to five years afterwards.
+    citations:
+      - avv-betalingsvoorwaarden-5-1
+      - avv-betalingsvoorwaarden-5-1-sup
+      - avv-betalingsvoorwaarden-6-1
+      - avv-betalingsvoorwaarden-7-1
+      - avv-overeenkomst-6-1
+      - verpact-beleid-2026-drempel
+      - verpact-beleid-2026-aangifte
+      - verpact-micro-drempel
+      - rvo-administratie
+      - business-gov-registration
+    appliesWhen:
+      all:
+        - { eq: [ market, NL ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - all:
+                - { contains: [ seller.roles, distributor ] }
+                - { not: { eq: [ seller.establishedIn, NL ] } }
+    requires:
+      - key: annual_declaration
+        label: Yearly packaging declaration to Verpact (needed above 50,000 kg a year, or for any single-use plastic or deposit packaging)
+        kind: declaration
+        satisfiedWhen: { inScheme: { obligation: packaging_epr } }
+        whoMayFile: [producer]
+        filing:
+          channel: portal
+          url: https://packtool.verpact.nl/index.php/login
+          feeNote: >
+            Contribution per kilogram (and for some types per item) by material; paid as quarterly
+            advance payments of 25% with a final settlement within 30 days of the declaration.
+        recurring:
+          every: year
+          note: >
+            Declare the previous calendar year's packaging weights and numbers before 1 April. Pay
+            advance instalments by the last day of each quarter. If your volume will change a lot,
+            send Verpact an updated estimate for the current year.
+      - key: packaging_weights
+        label: Packaging material and weight for each product (needed for the declaration, or to show you stay under 50,000 kg)
+        kind: data_field
+        satisfiedWhen: { exists: product.packaging }
+
+  - id: nl.packaging_epr.authorised_representative
+    title: Appoint an authorised representative in the Netherlands if your business is in another EU country
+    summary: >
+      Since 12 August 2026, an EU business based outside the Netherlands that sells packaged goods
+      directly to customers in the Netherlands must appoint, in writing, an authorised representative
+      for packaging take-back in the Netherlands. The representative handles your Dutch packaging
+      duties on your behalf. EU lawmakers are negotiating a pause of this duty for small sellers
+      (the Council's version would pause it for less than 1 tonne of packaging a year per country),
+      but nothing has been adopted yet. Businesses outside the EU are not covered by this rule.
+    severity: medium
+    consequence: >
+      No Dutch fine or sales ban specific to this duty was found yet. Once the EU producer register
+      opens (expected 2028), a producer whose representative is not registered may not sell packaged
+      goods in the Netherlands.
+    citations:
+      - ppwr-art3-15d
+      - ppwr-art45-3
+      - ppwr-art45-3-third-country
+      - ppwr-art71
+      - council-mandate-14765-26
+      - besluit-upv-toelichting
+    appliesWhen:
+      all:
+        - { eq: [ market, NL ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - { inEU: seller.establishedIn }
+        - { not: { eq: [ seller.establishedIn, NL ] } }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, distributor ] }
+            - { contains: [ seller.roles, brand_owner ] }
+    requires:
+      - key: authorised_representative
+        label: Authorised representative for packaging take-back in the Netherlands (written mandate)
+        kind: representative
+        satisfiedWhen: { hasRepresentative: { obligation: packaging_epr } }
+        whoMayFile: [producer]
