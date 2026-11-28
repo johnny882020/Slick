@@ -208,7 +208,21 @@ describe("SQL screening", () => {
 
   it("checkWriteSql and delete detection", () => {
     expect(checkWriteSql("INSERT INTO customers (id, name) VALUES ('1', 'DELETE FROM x')")).toEqual({ ok: true, kind: "INSERT", deletes: false });
-    expect(checkWriteSql("UPDATE customers SET name = 'x'")).toMatchObject({ ok: true, deletes: false });
+    expect(checkWriteSql("UPDATE customers SET name = 'x' WHERE id = 'c1'")).toMatchObject({ ok: true, deletes: false });
+    // Security scan F3: these destroy data too, so they ask the person first.
+    expect(checkWriteSql("UPDATE customers SET name = 'x'")).toMatchObject({ ok: true, deletes: true });
+    expect(checkWriteSql("ALTER TABLE customers DROP email")).toMatchObject({ ok: true, deletes: true });
+    expect(checkWriteSql("REPLACE INTO customers (id, name) VALUES ('c1', 'x')")).toMatchObject({ ok: true, deletes: true });
+    expect(checkWriteSql("INSERT OR REPLACE INTO customers (id, name) VALUES ('c1', 'x')")).toMatchObject({ ok: true, deletes: true });
+    expect(checkWriteSql("UPDATE OR REPLACE customers SET id = 'c2' WHERE id = 'c1'")).toMatchObject({ ok: true, deletes: true });
+    expect(checkWriteSql("WITH c AS (SELECT 1) REPLACE INTO notes (id) VALUES ('x')")).toMatchObject({ ok: true, deletes: true });
+    // Not destructive: the replace() function, an ordinary insert, a rename, words inside literals.
+    expect(checkWriteSql("UPDATE customers SET name = replace(name, 'Ltd', 'Limited') WHERE id = 'c1'")).toMatchObject({ ok: true, deletes: false });
+    expect(checkWriteSql("INSERT INTO notes (id, body) VALUES ('n1', 'please drop or replace into')")).toMatchObject({ ok: true, deletes: false });
+    expect(checkWriteSql("ALTER TABLE notes RENAME TO notes_old")).toMatchObject({ ok: true, deletes: false });
+    expect(checkWriteSql("INSERT INTO notes (id) VALUES ('n1') ON CONFLICT(id) DO NOTHING")).toMatchObject({ ok: true, deletes: false });
+    expect(checkWriteSql("INSERT INTO brand (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value")).toMatchObject({ ok: true, deletes: false });
+    expect(checkWriteSql("WITH x AS (SELECT 1) UPDATE customers SET name = 'x'")).toMatchObject({ ok: true, deletes: true });
     expect(checkWriteSql("DELETE FROM customers")).toMatchObject({ ok: true, deletes: true });
     expect(checkWriteSql("DROP TABLE posts")).toMatchObject({ ok: true, deletes: true });
     expect(checkWriteSql("ALTER TABLE posts DROP COLUMN campaign")).toMatchObject({ ok: true, deletes: true });

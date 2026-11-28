@@ -20,9 +20,11 @@ describe("createEvalHarness", () => {
       ]);
       h = createEvalHarness({ dataDir: dir, workspaceDir: join(dir, "ws"), provider }, store);
       const events: HarnessEvent[] = [];
-      for await (const e of h.run({ input: "every monday", provider: "local", model: "m", skill: "weekly-report", origin: { kind: "eval" } }, async () => ({ approved: false })))
+      for await (const e of h.run({ input: "every monday", provider: "local", model: "m", skill: "weekly-report", origin: { kind: "eval" } }, async () => ({ approved: true })))
         events.push(e);
       const end = events.at(-1)!;
+      // schedule_task always asks a person (security scan F2).
+      expect(events.filter((e) => e.type === "approval_request").map((e) => e.type === "approval_request" && e.call.name)).toEqual(["schedule_task"]);
       expect(end.type).toBe("done");
       expect(events.some((e) => e.type === "skill_loaded" && e.reason === "forced")).toBe(true);
       const toolEnd = events.find((e) => e.type === "tool_end");

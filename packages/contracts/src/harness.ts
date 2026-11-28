@@ -157,6 +157,8 @@ export interface Schedule {
   cron: string;
   task: Omit<TaskRequest, "origin">;
   enabled: boolean;
+  /** Skills each run may use, kept from the run that made the schedule (a pinned app's list). */
+  allowedSkills?: string[];
   lastRunAt?: string;
   nextRunAt?: string;
 }

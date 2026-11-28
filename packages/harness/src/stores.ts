@@ -244,7 +244,10 @@ export class ScheduleStore {
   constructor(private readonly d: OneSeatDb) {}
 
   private toSchedule(r: ScheduleRow): Schedule {
-    const s: Schedule = { id: r.id, cron: r.cron, task: JSON.parse(r.task) as Schedule["task"], enabled: r.enabled === 1 };
+    // The skill restriction is kept in the task JSON, so older rows need no migration.
+    const { allowedSkills, ...task } = JSON.parse(r.task) as Schedule["task"] & { allowedSkills?: string[] };
+    const s: Schedule = { id: r.id, cron: r.cron, task, enabled: r.enabled === 1 };
+    if (Array.isArray(allowedSkills)) s.allowedSkills = allowedSkills;
     if (r.last_run_at) s.lastRunAt = r.last_run_at;
     if (r.next_run_at) s.nextRunAt = r.next_run_at;
     return s;
@@ -270,7 +273,7 @@ export class ScheduleStore {
          ON CONFLICT(id) DO UPDATE SET cron = excluded.cron, task = excluded.task, enabled = excluded.enabled,
            last_run_at = excluded.last_run_at, next_run_at = excluded.next_run_at, updated_at = excluded.updated_at`,
       )
-      .run(s.id, s.cron, JSON.stringify(s.task), s.enabled ? 1 : 0, s.lastRunAt ?? null, s.nextRunAt ?? null, now, now);
+      .run(s.id, s.cron, JSON.stringify(s.allowedSkills ? { ...s.task, allowedSkills: s.allowedSkills } : s.task), s.enabled ? 1 : 0, s.lastRunAt ?? null, s.nextRunAt ?? null, now, now);
     return this.get(s.id)!;
   }
 

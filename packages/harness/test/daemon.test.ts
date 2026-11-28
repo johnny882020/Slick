@@ -266,6 +266,19 @@ describe("daemon JSON-RPC", () => {
     expect(provider.requests.at(-1)!.tools.map((t) => t.name)).not.toContain("ask_user");
   });
 
+  it("a restricted schedule fires with only its allowed skills (security scan F2)", async () => {
+    const clock = { t: new Date(2026, 2, 12, 9) };
+    const { rpc, daemon, provider } = make([{ steps: [{ text: "done" }] }], { now: () => clock.t });
+    await rpc.call("auth.set", { provider: "anthropic", apiKey: KEY });
+    daemon.scheduler.upsert({ id: "s2", cron: "30 8 * * *", task: run("weekly") as never, enabled: true, allowedSkills: ["weekly-report"] });
+    clock.t = new Date(2026, 2, 13, 8, 30);
+    const fired = await daemon.scheduler.tick();
+    await rpc.event(fired[0]!.runId, "done");
+    const system = provider.requests.at(-1)!.system ?? "";
+    expect(system).toContain("weekly-report");
+    expect(system).not.toContain("invoice-chase");
+  });
+
   it("cancelling a run releases its pending question", async () => {
     const { rpc } = make([{ steps: [{ tool: "ask_user", input: { question: "Which one?" } }] }]);
     await rpc.call("auth.set", { provider: "anthropic", apiKey: KEY });

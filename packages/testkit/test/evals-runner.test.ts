@@ -198,6 +198,8 @@ describe("runEvals", () => {
 
   it("denies every approval by default and sends the forced skill / disableSkills flags", async () => {
     expect(await DENY_ALL_APPROVALS({ approvalId: "a", call: { id: "c", name: "send_email", input: {} }, effects: ["send"], summary: "" })).toMatchObject({ approved: false });
+    // schedule_task always asks; evals record schedules without firing them, so it is allowed.
+    expect(await DENY_ALL_APPROVALS({ approvalId: "b", call: { id: "c", name: "schedule_task", input: {} }, effects: ["write"], summary: "" })).toMatchObject({ approved: true });
     const tasks: unknown[] = [];
     const spy: EvalHarnessFactory = () => ({
       async *run(task) {

@@ -27,6 +27,8 @@ export interface RegisteredTool {
   definition: ToolDefinition;
   /** Effects for this particular input (e.g. db_execute adds "delete" for DELETE). Defaults to definition.effects. */
   effectsFor?(input: Record<string, unknown>, ctx: ToolContext): ToolEffect[] | Promise<ToolEffect[]>;
+  /** Always ask the person first, whatever the effects (schedule_task: lasting, unattended work). */
+  alwaysAsk?: boolean;
   /** One-line, human-readable description of the action, shown in approvals and the action log. */
   summarize?(input: Record<string, unknown>, ctx: ToolContext): string | Promise<string>;
   run(input: Record<string, unknown>, ctx: ToolContext): Promise<ToolOutput>;

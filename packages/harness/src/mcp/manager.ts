@@ -76,15 +76,25 @@ export async function loadMcpConfig(path: string): Promise<{ config: McpConfig; 
   return parseMcpConfig(text);
 }
 
+/**
+ * A tool's effects from its MCP annotations, with the spec's defaults (MCP 2025-06-18): a missing
+ * readOnlyHint means the tool can change things, a missing destructiveHint means it can destroy,
+ * and a missing openWorldHint means it reaches outside the machine. MCP has no "send" hint, so a
+ * tool that changes things in the open world (send_email, post_message) counts as a send.
+ * So only a read-only tool, or one that states it is neither destructive nor open-world, runs
+ * without asking the person. Overrides in mcp.json only add effects.
+ */
 export function mcpToolEffects(tool: McpTool, overrides?: Record<string, ToolEffect[]>): ToolEffect[] {
   const a = tool.annotations ?? {};
   const out = new Set<ToolEffect>();
+  const openWorld = a.openWorldHint !== false;
   if (a.readOnlyHint === true) out.add("read");
   else {
     out.add("write");
-    if (a.destructiveHint === true) out.add("delete");
+    if (a.destructiveHint !== false) out.add("delete");
+    if (openWorld) out.add("send");
   }
-  if (a.openWorldHint === true) out.add("network");
+  if (openWorld) out.add("network");
   for (const e of overrides?.["*"] ?? []) out.add(e);
   for (const e of overrides?.[tool.name] ?? []) out.add(e);
   // An override that adds an outward effect makes the tool non-read-only.

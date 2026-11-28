@@ -88,8 +88,11 @@ describe("database tools", () => {
     const { tools, ctx } = services();
     const t = tools.get("db_execute")!;
     expect(await t.effectsFor!({ sql: "DELETE FROM posts" }, ctx())).toEqual(["write", "delete"]);
-    expect(await t.effectsFor!({ sql: "UPDATE posts SET body = ''" }, ctx())).toEqual(["write"]);
-    expect(await t.summarize!({ sql: "UPDATE posts\n SET body = ''" }, ctx())).toBe("Change database: UPDATE posts SET body = ''");
+    expect(await t.effectsFor!({ sql: "UPDATE posts SET body = '' WHERE id = 's1'" }, ctx())).toEqual(["write"]);
+    // No WHERE: every post's body is blanked, so it asks first (security scan F3).
+    expect(await t.effectsFor!({ sql: "UPDATE posts SET body = ''" }, ctx())).toEqual(["write", "delete"]);
+    expect(await t.summarize!({ sql: "UPDATE posts\n SET body = '' WHERE id = 's1'" }, ctx())).toBe("Change database: UPDATE posts SET body = '' WHERE id = 's1'");
+    expect(await t.summarize!({ sql: "UPDATE posts SET body = ''" }, ctx())).toBe("Overwrite data: UPDATE posts SET body = ''");
   });
 });
 
@@ -182,6 +185,30 @@ describe("schedule_task", () => {
     delete noSched.s.schedules;
     const t = createBuiltinTools(noSched.s).find((x) => x.definition.name === "schedule_task")!;
     expect((await t.run({ cron: "0 9 * * *", input: "x" }, noSched.ctx())).content).toContain("not available");
+  });
+});
+
+describe("schedule_task safety (security scan F2)", () => {
+  it("always asks, refuses unattended origins and keeps the run's skill restriction", async () => {
+    const { call, scheduler, ctx, store, tools, db } = services();
+    expect(tools.get("schedule_task")!.alwaysAsk).toBe(true);
+    const from = (origin: NonNullable<ToolContext["task"]["origin"]>) => ({ ...ctx(), task: { ...ctx().task, origin } });
+    for (const origin of [{ kind: "app", appId: "app_1" }, { kind: "schedule", scheduleId: "sch_1" }] as const) {
+      const r = await call("schedule_task", { cron: "*/5 * * * *", input: "x" }, from(origin));
+      expect(r.isError).toBe(true);
+      expect(r.content).toContain("only be made from the main window");
+    }
+    expect(scheduler.list()).toHaveLength(0);
+    // A restricted run's schedule carries the restriction, through the store and an edit.
+    const limited = new SkillSession({ store, allowedSkills: ["weekly-report"] });
+    const r = JSON.parse((await call("schedule_task", { cron: "0 9 * * 1", input: "Weekly brief", skill: "weekly-report" }, ctx(limited))).content);
+    expect(scheduler.get(r.scheduleId)!.allowedSkills).toEqual(["weekly-report"]);
+    expect(new ScheduleStore(db).get(r.scheduleId)!.task).not.toHaveProperty("allowedSkills");
+    const edited = scheduler.upsert({ id: r.scheduleId, cron: "0 10 * * 1", task: { input: "Weekly brief", provider: "anthropic", model: "m" }, enabled: true });
+    expect(edited.allowedSkills).toEqual(["weekly-report"]);
+    // An unrestricted run makes an unrestricted schedule.
+    const open = JSON.parse((await call("schedule_task", { cron: "0 9 * * 2", input: "Other" })).content);
+    expect(scheduler.get(open.scheduleId)!.allowedSkills).toBeUndefined();
   });
 });
 

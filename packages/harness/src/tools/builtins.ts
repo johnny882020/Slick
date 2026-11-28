@@ -14,7 +14,7 @@ import {
 import { isValidCron, nextRun } from "../cron.js";
 import type { OneSeatDb } from "../db.js";
 import type { ScheduleInput } from "../scheduler.js";
-import { checkReadSql, checkWriteSql } from "../sql.js";
+import { checkReadSql, checkWriteSql, stripSql } from "../sql.js";
 import type { ArtifactDrafts, MemoryStore } from "../stores.js";
 import { errorMessage, newId } from "../util.js";
 import { displayPath, resolveInside } from "../workspace.js";
@@ -124,7 +124,8 @@ export function dbExecuteTool(s: BuiltinServices): RegisteredTool {
     summarize(input) {
       const sql = String(input["sql"]).replace(/\s+/g, " ").trim();
       const check = checkWriteSql(sql);
-      return `${check.ok && check.deletes ? "Delete data" : "Change database"}: ${sql.slice(0, 140)}`;
+      const label = !check.ok || !check.deletes ? "Change database" : /\b(DELETE|DROP)\b/i.test(stripSql(sql)) ? "Delete data" : "Overwrite data";
+      return `${label}: ${sql.slice(0, 140)}`;
     },
     async run(input) {
       const sql = String(input["sql"]);
@@ -387,9 +388,15 @@ export function scheduleTaskTool(s: BuiltinServices): RegisteredTool {
       effects: ["write"],
       source: "builtin",
     },
+    // A schedule is lasting work that runs with nobody watching, so a person always approves it.
+    alwaysAsk: true,
     summarize: (input) => `Schedule "${String(input["input"]).slice(0, 100)}" at cron ${String(input["cron"])}`,
     async run(input, ctx) {
       if (!s.schedules) return fail("scheduling is not available in this session");
+      // Pinned apps and scheduled runs have nobody to approve, and must not create more work.
+      const origin = ctx.task.origin?.kind;
+      if (origin === "app" || origin === "schedule")
+        return fail("schedules can only be made from the main window, where a person approves them");
       const cron = String(input["cron"]).trim();
       if (!isValidCron(cron)) return fail(`invalid cron "${cron}": use 5 fields: minute hour day-of-month month day-of-week`);
       if (!nextRun(cron, (s.now ?? (() => new Date()))())) return fail(`cron "${cron}" never runs`);
@@ -398,7 +405,9 @@ export function scheduleTaskTool(s: BuiltinServices): RegisteredTool {
       const task: Schedule["task"] = { input: String(input["input"]), provider: ctx.task.provider, model: ctx.task.model };
       if (skill) task.skill = skill;
       if (ctx.task.effort) task.effort = ctx.task.effort;
-      const sch = s.schedules.upsert({ cron, task, enabled: true });
+      // Keep this run's skill restriction, so the schedule can never reach more than its maker.
+      const allowed = ctx.skills.allowedSkills;
+      const sch = s.schedules.upsert({ cron, task, enabled: true, ...(allowed ? { allowedSkills: [...allowed] } : {}) });
       return ok({ scheduleId: sch.id, cron: sch.cron, nextRunAt: sch.nextRunAt });
     },
   };

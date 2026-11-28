@@ -239,7 +239,8 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     logger,
     ...(opts.now ? { now: opts.now } : {}),
     ...(opts.schedulerIntervalMs ? { intervalMs: opts.schedulerIntervalMs } : {}),
-    fire: async (s: Schedule) => startRun({ ...s.task, origin: { kind: "schedule", scheduleId: s.id } }),
+    // A schedule made by a restricted run (a pinned app) keeps that run's skills when it fires.
+    fire: async (s: Schedule) => startRun({ ...s.task, origin: { kind: "schedule", scheduleId: s.id } }, undefined, s.allowedSkills),
     onFired: (scheduleId, runId) => notify({ method: "schedule.fired", params: { scheduleId, runId } }),
   });
 

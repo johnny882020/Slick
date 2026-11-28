@@ -99,6 +99,23 @@ export function checkWriteSql(sql: string): SqlCheck {
     return { ok: false, reason: "only ALTER TABLE is allowed" };
   if (head === "WITH" && !/\b(INSERT|UPDATE|DELETE|REPLACE)\b/i.test(stmt))
     return { ok: false, reason: "a WITH statement in db_execute must write; use db_query to read" };
-  const deletes = head === "DROP" || /\bDELETE\s+FROM\b/i.test(stmt) || (head === "ALTER" && /\bDROP\s+COLUMN\b/i.test(stmt));
-  return { ok: true, kind: head, deletes };
+  return { ok: true, kind: head, deletes: destroysData(head, stmt) };
+}
+
+/**
+ * Does a write statement remove or overwrite data that cannot be got back? These ask the person
+ * first (the "delete" effect). Literals and comments are already blanked by stripSql.
+ */
+function destroysData(head: string, stmt: string): boolean {
+  if (head === "DROP" || head === "REPLACE") return true;
+  if (/\bDELETE\b/i.test(stmt)) return true;
+  // SQLite's COLUMN keyword is optional: ALTER TABLE t DROP c drops the column too.
+  if (head === "ALTER" && /\bDROP\b/i.test(stmt)) return true;
+  // INSERT OR REPLACE / REPLACE INTO / UPDATE OR REPLACE delete the rows they conflict with.
+  if (/\bOR\s+REPLACE\b|\bREPLACE\s+INTO\b/i.test(stmt)) return true;
+  // An UPDATE with no WHERE overwrites every row of the table. An upsert's DO UPDATE changes only
+  // the row it conflicts with (brand-kit saves its keys that way), so it is not counted.
+  const updates = stmt.replace(/\bDO\s+UPDATE\b/gi, " ");
+  if (/\bUPDATE\b/i.test(updates) && !/\bWHERE\b/i.test(updates)) return true;
+  return false;
 }

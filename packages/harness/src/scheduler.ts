@@ -45,6 +45,9 @@ export class Scheduler {
     const existing = this.opts.store.get(id);
     const next = input.enabled ? nextRun(spec, this.now()) : undefined;
     const s: Schedule = { id, cron: input.cron.trim(), task: input.task, enabled: input.enabled };
+    // Editing a restricted schedule keeps its restriction unless the edit sets one.
+    const allowedSkills = input.allowedSkills ?? existing?.allowedSkills;
+    if (allowedSkills) s.allowedSkills = [...allowedSkills];
     if (existing?.lastRunAt) s.lastRunAt = existing.lastRunAt;
     if (next) s.nextRunAt = next.toISOString();
     return this.opts.store.put(s);

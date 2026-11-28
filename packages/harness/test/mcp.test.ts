@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { requiresApproval } from "@oneseat/contracts";
 import { McpClient, McpError, MCP_PROTOCOL_VERSION, renderMcpContent, type McpServerConfig } from "../src/mcp/client.js";
 import { loadMcpConfig, McpManager, mcpToolEffects, mcpToolName, parseMcpConfig } from "../src/mcp/manager.js";
 import { approveAll, collect, done, ofType, onCleanup, setup, task, tmpDir } from "./helpers.js";
@@ -165,13 +166,22 @@ describe("MCP config and effects", () => {
 
   it("maps annotations and overrides to effects", () => {
     const t = (annotations?: Record<string, boolean>) => ({ name: "x", inputSchema: { type: "object" }, ...(annotations ? { annotations } : {}) });
-    expect(mcpToolEffects(t({ readOnlyHint: true }))).toEqual(["read"]);
-    expect(mcpToolEffects(t({ readOnlyHint: true, openWorldHint: true }))).toEqual(["read", "network"]);
-    expect(mcpToolEffects(t({ readOnlyHint: true, destructiveHint: true }))).toEqual(["read"]);
-    expect(mcpToolEffects(t({ destructiveHint: true }))).toEqual(["write", "delete"]);
-    expect(mcpToolEffects(t())).toEqual(["write"]);
-    expect(mcpToolEffects(t({ readOnlyHint: true }), { x: ["send"] })).toEqual(["send"]);
-    expect(mcpToolEffects(t(), { "*": ["pay"] })).toEqual(["write", "pay"]);
+    expect(mcpToolEffects(t({ readOnlyHint: true, openWorldHint: false }))).toEqual(["read"]);
+    expect(mcpToolEffects(t({ readOnlyHint: true }))).toEqual(["read", "network"]);
+    expect(mcpToolEffects(t({ readOnlyHint: true, destructiveHint: true, openWorldHint: false }))).toEqual(["read"]);
+    expect(mcpToolEffects(t({ destructiveHint: true, openWorldHint: false }))).toEqual(["write", "delete"]);
+    // Security scan F1: an unannotated tool (send_email, delete_file) takes the spec defaults,
+    // destructive and open-world, so it asks the person before it runs.
+    expect(mcpToolEffects(t())).toEqual(["write", "network", "send", "delete"]);
+    expect(requiresApproval(mcpToolEffects(t()))).toBe(true);
+    // An honest send_email: not destructive, but open-world, so still a send.
+    expect(mcpToolEffects(t({ destructiveHint: false, openWorldHint: true }))).toEqual(["write", "network", "send"]);
+    // Only a tool that states it is neither destructive nor open-world runs without asking.
+    expect(mcpToolEffects(t({ destructiveHint: false, openWorldHint: false }))).toEqual(["write"]);
+    expect(requiresApproval(mcpToolEffects(t({ destructiveHint: false, openWorldHint: false })))).toBe(false);
+    expect(mcpToolEffects(t({ readOnlyHint: true, openWorldHint: false }), { x: ["send"] })).toEqual(["send"]);
+    expect(mcpToolEffects(t({ readOnlyHint: true }), { x: ["send"] })).toEqual(["network", "send"]);
+    expect(mcpToolEffects(t({ destructiveHint: false, openWorldHint: false }), { "*": ["pay"] })).toEqual(["write", "pay"]);
     expect(mcpToolName("github", "create-issue")).toBe("mcp__github__create-issue");
     expect(mcpToolName("srv", "a.b c")).toBe("mcp__srv__a_b_c");
     const long = mcpToolName("server", "x".repeat(80));
@@ -206,9 +216,10 @@ describe("McpManager and the harness", () => {
     ]);
     expect(mgr.client("fake")!.connected).toBe(true);
     const byName = new Map(mgr.tools().map((t) => [t.definition.name, t.definition]));
-    expect(byName.get("mcp__fake__echo")).toMatchObject({ effects: ["read"], source: "mcp", owner: "fake", description: "Echo text back" });
-    expect(byName.get("mcp__fake__send_email")!.effects).toEqual(["write", "send"]);
-    expect(byName.get("mcp__fake__delete_file")!.effects).toEqual(["write", "delete"]);
+    // Spec defaults: no openWorldHint means open-world; no destructiveHint means destructive.
+    expect(byName.get("mcp__fake__echo")).toMatchObject({ effects: ["read", "network"], source: "mcp", owner: "fake", description: "Echo text back" });
+    expect(byName.get("mcp__fake__send_email")!.effects).toEqual(["write", "network", "send", "delete"]);
+    expect(byName.get("mcp__fake__delete_file")!.effects).toEqual(["write", "network", "send", "delete"]);
     expect(byName.get("mcp__fake__web_search")!.effects).toEqual(["read", "network"]);
     expect(byName.get("mcp__fake__add")!.description).toBe("Add numbers");
     expect(byName.get("mcp__fake__bad")!.description).toBe("bad (from fake)");
@@ -238,7 +249,12 @@ describe("McpManager and the harness", () => {
       ["mcp__fake__rpc_error", true, "server exploded"],
       ["mcp__fake__echo", true, "Invalid input for mcp__fake__echo: input.text is required"],
     ]);
-    expect(ofType(events, "approval_request").map((a) => a.summary)).toEqual(["Send email to ada@example.com: 'Your invoice'"]);
+    // The unannotated fail_tool and rpc_error take the spec defaults, so they ask too (scan F1).
+    expect(ofType(events, "approval_request").map((a) => a.summary)).toEqual([
+      "Send email to ada@example.com: 'Your invoice'",
+      "Send with fail tool: {}",
+      "Send with rpc error: {}",
+    ]);
     expect(done(events).text).toBe("all done");
 
     // A server that went away gives a clear tool error.

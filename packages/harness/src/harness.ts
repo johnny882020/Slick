@@ -597,7 +597,7 @@ export class Harness implements HarnessApi {
     else if (ctx.signal.aborted) out = { content: "Cancelled before it ran.", isError: true };
     else {
       let decision: ApprovalDecision | undefined;
-      if (requiresApproval(effects)) {
+      if (requiresApproval(effects) || p.tool.alwaysAsk === true) {
         const approvalId = newId("apr");
         // Register the waiter before anyone can see the request, so an instant answer is never lost.
         const pending = onApproval({ approvalId, call, effects, summary: p.summary });

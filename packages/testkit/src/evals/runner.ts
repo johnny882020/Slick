@@ -13,6 +13,7 @@ import type {
   SkillEvalVerdict,
   TaskRequest,
 } from "@oneseat/contracts";
+import { requiresApproval } from "@oneseat/contracts";
 import { createModelJudge } from "./judge.js";
 import { compareScores, gate5Decision, scoreCase, scoreCheck, TIE_EPSILON, weightedScore, type JudgeFn } from "./score.js";
 import { prepareRunDirs } from "./seed.js";
@@ -101,7 +102,15 @@ export interface EvalReport {
   noSkill: NoSkillFinding[];
 }
 
-export const DENY_ALL_APPROVALS: ApprovalHandler = async () => ({ approved: false, note: "Eval run: outward actions are never performed. Describe what you would do instead." });
+/**
+ * Eval runs never send, pay or delete. A request with none of those effects is asked only because
+ * the tool always asks (schedule_task), and an eval harness records schedules without firing
+ * them, so it is approved.
+ */
+export const DENY_ALL_APPROVALS: ApprovalHandler = async (req) =>
+  requiresApproval(req.effects)
+    ? { approved: false, note: "Eval run: outward actions are never performed. Describe what you would do instead." }
+    : { approved: true, note: "Eval run: recorded, never run." };
 
 async function pool<T>(items: readonly T[], concurrency: number, fn: (item: T) => Promise<void>): Promise<void> {
   let next = 0;
