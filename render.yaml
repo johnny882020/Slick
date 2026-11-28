@@ -1,6 +1,35 @@
+# Render blueprint. Oblige services first; oneseat-cloud is the legacy OneSeat service.
+services:
+  # Oblige web: home page, self-serve gap check (nothing stored), sample report, health check.
+  - type: web
+    name: oblige-web
+    runtime: node
+    region: frankfurt
+    plan: starter              # no cold starts for prospects
+    buildCommand: corepack enable && pnpm install --frozen-lockfile --filter "@oneseat/web..." && pnpm --filter "@oneseat/web..." build
+    startCommand: node apps/web/dist/main.js
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+
+  # Weekly rulebook check: re-reads every cited source and fails when a confirmed quote breaks.
+  - type: cron
+    name: oblige-citation-check
+    runtime: node
+    region: frankfurt
+    plan: starter
+    schedule: "17 4 * * 1"     # Mondays 04:17 UTC
+    buildCommand: corepack enable && pnpm install --frozen-lockfile --filter "@oneseat/rulebook..." && pnpm --filter "@oneseat/rulebook..." build
+    startCommand: node packages/rulebook/dist/bin.js citations rules --baseline rules/citation-baseline.txt
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+
+  # ---- legacy ----
 # OneSeat Cloud on Render: website, Stripe billing webhooks, licenses and pilot feedback.
 # The desktop app keeps customer data and model keys on each computer; none of it comes here.
-services:
   - type: web
     name: oneseat-cloud
     runtime: node

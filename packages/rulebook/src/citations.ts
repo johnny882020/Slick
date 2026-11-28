@@ -159,3 +159,18 @@ export async function checkCitations(packs: RulePack[], fetcher: Fetcher, concur
 
 /** Outcomes that mean the rule pack must change: gate R2 fails on these. */
 export const FAILING_OUTCOMES: readonly CitationOutcome[] = ["quote_missing", "http_error"];
+
+/**
+ * Citations that were "ok" in a previous run's output (lines "<outcome> <pack> <id> ...") but are
+ * not ok now. Citations confirmed by hand stay out of the baseline's "ok" set, so they never alarm.
+ */
+export function citationRegressions(baselineText: string, results: CitationCheck[]): CitationCheck[] {
+  const wasOk = new Set(
+    baselineText
+      .split(/\r?\n/)
+      .map((l) => l.trim().split(/\s+/))
+      .filter((p) => p[0] === "ok" && p.length >= 3)
+      .map((p) => `${p[1]} ${p[2]}`),
+  );
+  return results.filter((r) => !r.ok && wasOk.has(`${r.pack} ${r.id}`));
+}

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // oblige-rules lint <dir> | citations <dir> | hash <dir>
 import { loadRulebook } from "./load.js";
-import { checkCitations, FAILING_OUTCOMES } from "./citations.js";
+import { readFile } from "node:fs/promises";
+import { checkCitations, citationRegressions, FAILING_OUTCOMES } from "./citations.js";
 import { packHash } from "./sign.js";
 
 async function main(argv: string[]): Promise<number> {
@@ -24,13 +25,21 @@ async function main(argv: string[]): Promise<number> {
     const counts = new Map<string, number>();
     for (const r of results) counts.set(r.outcome, (counts.get(r.outcome) ?? 0) + 1);
     console.log([...counts].map(([k, v]) => `${k}: ${v}`).join(", "));
+    const baselineFile = argv[argv.indexOf("--baseline") + 1];
+    if (argv.includes("--baseline") && baselineFile) {
+      // Weekly job: fail only when a citation that was confirmed before no longer is.
+      const regressions = citationRegressions(await readFile(baselineFile, "utf8"), results);
+      for (const r of regressions) console.log(`REGRESSION ${r.pack} ${r.id}: ${r.outcome} ${r.url}`);
+      console.log(`${regressions.length} regression(s) against ${baselineFile}`);
+      return regressions.length > 0 ? 1 : 0;
+    }
     return results.some((r) => FAILING_OUTCOMES.includes(r.outcome)) ? 1 : 0;
   }
   if (cmd === "hash") {
     for (const p of packs) console.log(`${packHash(p)}  ${p.id}@${p.version} (${p.review.status})`);
     return 0;
   }
-  console.error("usage: oblige-rules lint|citations|hash <rules dir>");
+  console.error("usage: oblige-rules lint|citations|hash <rules dir> [--baseline <file>]");
   return 2;
 }
 

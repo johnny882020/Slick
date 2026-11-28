@@ -1,0 +1,35 @@
+{
+  "name": "@oneseat/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Oblige web: home page, self-serve gap check (nothing stored), sample report, health check.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@oneseat/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "dev": "tsx --conditions=@oneseat/source src/main.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist coverage"
+  },
+  "dependencies": {
+    "@oneseat/contracts": "workspace:*",
+    "@oneseat/obligations": "workspace:*",
+    "@oneseat/rulebook": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.12"
+  }
+}

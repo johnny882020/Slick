@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { RulePack } from "@oneseat/contracts";
 import { inEffect, loadPackText, loadRulebook } from "../src/load.js";
 import { canonicalJson, generateSigningKey, packHash, signPack, verifyPack } from "../src/sign.js";
-import { checkCitation, checkCitations, decodePage, eurLexFallback, FAILING_OUTCOMES, normalizeText, packLanguages, quoteInText } from "../src/citations.js";
+import { checkCitation, checkCitations, citationRegressions, decodePage, eurLexFallback, FAILING_OUTCOMES, normalizeText, packLanguages, quoteInText } from "../src/citations.js";
 import { PACK_YAML } from "./fixtures.js";
 
 const pack = (): RulePack => loadPackText(PACK_YAML, "de").pack!;
@@ -168,5 +168,17 @@ describe("EUR-Lex fallback", () => {
     expect(r.outcome).toBe("blocked");
     expect(packLanguages("xx.gpsr")).toEqual(["eng"]);
     expect(packLanguages("de.packaging_epr")).toEqual(["deu", "eng"]);
+  });
+});
+
+describe("citationRegressions", () => {
+  it("flags only citations that were ok in the baseline and are not now", () => {
+    const baseline = "ok            de.packaging_epr a 200 https://x\nquote_missing de.packaging_epr b 200 https://y\nok            eu.gpsr c 200 https://z\nok: 2, quote_missing: 1";
+    const now = [
+      { pack: "de.packaging_epr", id: "a", url: "https://x", outcome: "quote_missing" as const, ok: false },
+      { pack: "de.packaging_epr", id: "b", url: "https://y", outcome: "quote_missing" as const, ok: false },
+      { pack: "eu.gpsr", id: "c", url: "https://z", outcome: "ok" as const, ok: true },
+    ];
+    expect(citationRegressions(baseline, now).map((r) => r.id)).toEqual(["a"]);
   });
 });
