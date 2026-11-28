@@ -1,0 +1,50 @@
+{
+  "name": "@oneseat/testkit",
+  "version": "0.1.0",
+  "description": "Contract conformance suites, the gate 5 eval runner and the release gates runner for OneSeat.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@oneseat/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./evals": {
+      "@oneseat/source": "./src/evals/index.ts",
+      "types": "./dist/evals/index.d.ts",
+      "default": "./dist/evals/index.js"
+    },
+    "./gates": {
+      "@oneseat/source": "./src/gates/index.ts",
+      "types": "./dist/gates/index.d.ts",
+      "default": "./dist/gates/index.js"
+    }
+  },
+  "bin": {
+    "oneseat-evals": "./bin/oneseat-evals.js",
+    "oneseat-gates": "./bin/oneseat-gates.js"
+  },
+  "files": ["dist", "bin", "templates"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "gates": "turbo run build --filter=@oneseat/testkit --output-logs=errors-only && node ./bin/oneseat-gates.js",
+    "evals": "turbo run build --filter=@oneseat/testkit --output-logs=errors-only && node ./bin/oneseat-evals.js",
+    "clean": "rm -rf dist coverage"
+  },
+  "dependencies": {
+    "@oneseat/contracts": "workspace:*",
+    "yaml": "^2.8.0"
+  },
+  "peerDependencies": {
+    "vitest": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.12"
+  }
+}

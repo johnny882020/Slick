@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "OneSeat",
+  "version": "0.1.0",
+  "identifier": "app.oneseat",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "OneSeat",
+        "width": 1120,
+        "height": 780,
+        "minWidth": 760,
+        "minHeight": 540,
+        "resizable": true,
+        "create": false,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost; frame-src 'none'; object-src 'none'; worker-src 'none'; form-action 'none'; base-uri 'none'",
+      "devCsp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost ws://localhost:1421 http://localhost:1420; frame-src 'none'; object-src 'none'; worker-src 'none'; form-action 'none'; base-uri 'none'",
+      "freezePrototype": true,
+      "capabilities": ["main", "pinned-apps"]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis", "dmg", "app"],
+    "publisher": "OneSeat",
+    "category": "Productivity",
+    "shortDescription": "One desktop app, one skills library, any model.",
+    "longDescription": "OneSeat runs repetitive business tasks as Agent Skills with the model you choose. Keys stay in the OS keychain.",
+    "copyright": "",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "externalBin": ["binaries/oneseat-daemon", "binaries/deno"],
+    "resources": { "../../../skills/": "skills/" },
+    "createUpdaterArtifacts": false,
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true },
+      "nsis": { "installMode": "currentUser", "displayLanguageSelector": false },
+      "wix": { "language": "en-US" }
+    },
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": null,
+      "providerShortName": null,
+      "entitlements": null,
+      "hardenedRuntime": true
+    }
+  }
+}

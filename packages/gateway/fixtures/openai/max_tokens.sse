@@ -1,0 +1,12 @@
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_incomplete_0001","object":"response","created_at":1764250300,"status":"in_progress","model":"gpt-5-mini","output":[],"usage":null}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":1,"output_index":0,"item":{"id":"msg_incomplete_0002","type":"message","status":"in_progress","content":[],"role":"assistant"}}
+
+event: response.output_text.delta
+data: {"type":"response.output_text.delta","sequence_number":2,"item_id":"msg_incomplete_0002","output_index":0,"content_index":0,"delta":"Once upon a time, in a city"}
+
+event: response.incomplete
+data: {"type":"response.incomplete","sequence_number":3,"response":{"id":"resp_incomplete_0001","object":"response","created_at":1764250300,"status":"incomplete","incomplete_details":{"reason":"max_output_tokens"},"model":"gpt-5-mini","output":[],"usage":{"input_tokens":30,"input_tokens_details":{"cached_tokens":0},"output_tokens":8,"output_tokens_details":{"reasoning_tokens":0},"total_tokens":38}}}
+

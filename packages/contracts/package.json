@@ -1,0 +1,32 @@
+{
+  "name": "@oneseat/contracts",
+  "version": "0.1.0",
+  "description": "Frozen contracts: ModelProvider, SkillManifest, ToolCall, ArtifactBundle, harness protocol.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@oneseat/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.12"
+  }
+}

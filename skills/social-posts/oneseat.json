@@ -1,0 +1,11 @@
+{
+  "permissions": {},
+  "effects": ["send", "delete"],
+  "reasons": {},
+  "scripts": {
+    "length": {
+      "file": "scripts/length.ts",
+      "description": "Counts post length per channel (x weighted: URLs 23, emoji 2) and flags posts over the limit or with too many hashtags. No permissions."
+    }
+  }
+}

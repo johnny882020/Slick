@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "The OneSeat main window: daemon calls (allowlisted in Rust), key management, pinning. Never bridge_run.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "allow-daemon-call",
+    "allow-daemon-status",
+    "allow-key-save",
+    "allow-key-delete",
+    "allow-key-status",
+    "allow-pin-open",
+    "allow-app-export"
+  ]
+}

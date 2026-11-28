@@ -1,0 +1,11 @@
+{
+  "permissions": {},
+  "effects": [],
+  "reasons": {},
+  "scripts": {
+    "contrast": {
+      "file": "scripts/contrast.ts",
+      "description": "WCAG contrast ratios for brand color pairs (light, dark, buttons) with a passing shade suggested for each failure. No permissions."
+    }
+  }
+}

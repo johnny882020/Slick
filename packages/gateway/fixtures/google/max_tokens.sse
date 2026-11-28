@@ -1,0 +1,2 @@
+data: {"candidates": [{"content": {"parts": [{"text": "Once upon a time, in a city"}],"role": "model"},"finishReason": "MAX_TOKENS","index": 0}],"usageMetadata": {"promptTokenCount": 30,"candidatesTokenCount": 8,"totalTokenCount": 38},"modelVersion": "gemini-2.5-flash","responseId": "maxtokens0resp"}
+

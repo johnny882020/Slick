@@ -1,0 +1,36 @@
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_reasoning_0001","object":"response","created_at":1764250400,"status":"in_progress","model":"gpt-5-codex","output":[],"reasoning":{"effort":"high","summary":"auto"},"usage":null}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":1,"output_index":0,"item":{"id":"rs_reasoning_0002","type":"reasoning","summary":[],"encrypted_content":null}}
+
+event: response.reasoning_summary_part.added
+data: {"type":"response.reasoning_summary_part.added","sequence_number":2,"item_id":"rs_reasoning_0002","output_index":0,"summary_index":0,"part":{"type":"summary_text","text":""}}
+
+event: response.reasoning_summary_text.delta
+data: {"type":"response.reasoning_summary_text.delta","sequence_number":3,"item_id":"rs_reasoning_0002","output_index":0,"summary_index":0,"delta":"**Checking the weather**\n\nThe user asked about Paris, "}
+
+event: response.reasoning_summary_text.delta
+data: {"type":"response.reasoning_summary_text.delta","sequence_number":4,"item_id":"rs_reasoning_0002","output_index":0,"summary_index":0,"delta":"so I will call get_weather."}
+
+event: response.reasoning_summary_text.done
+data: {"type":"response.reasoning_summary_text.done","sequence_number":5,"item_id":"rs_reasoning_0002","output_index":0,"summary_index":0,"text":"**Checking the weather**\n\nThe user asked about Paris, so I will call get_weather."}
+
+event: response.reasoning_summary_part.done
+data: {"type":"response.reasoning_summary_part.done","sequence_number":6,"item_id":"rs_reasoning_0002","output_index":0,"summary_index":0,"part":{"type":"summary_text","text":"**Checking the weather**\n\nThe user asked about Paris, so I will call get_weather."}}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":7,"output_index":0,"item":{"id":"rs_reasoning_0002","type":"reasoning","summary":[{"type":"summary_text","text":"**Checking the weather**\n\nThe user asked about Paris, so I will call get_weather."}],"encrypted_content":"gAAAAABoX1ENCRYPTEDREASONINGBLOBexample0123456789=="}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":8,"output_index":1,"item":{"id":"fc_reasoning_0003","type":"function_call","status":"in_progress","arguments":"","call_id":"call_ReasonedCall0001","name":"get_weather"}}
+
+event: response.function_call_arguments.done
+data: {"type":"response.function_call_arguments.done","sequence_number":9,"item_id":"fc_reasoning_0003","output_index":1,"arguments":"{\"city\":\"Paris\"}"}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":10,"output_index":1,"item":{"id":"fc_reasoning_0003","type":"function_call","status":"completed","arguments":"{\"city\":\"Paris\"}","call_id":"call_ReasonedCall0001","name":"get_weather"}}
+
+event: response.completed
+data: {"type":"response.completed","sequence_number":11,"response":{"id":"resp_reasoning_0001","object":"response","created_at":1764250400,"status":"completed","model":"gpt-5-codex","output":[],"usage":{"input_tokens":88,"input_tokens_details":{"cached_tokens":0},"output_tokens":210,"output_tokens_details":{"reasoning_tokens":192},"total_tokens":298}}}
+
