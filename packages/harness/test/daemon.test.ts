@@ -222,6 +222,62 @@ describe("daemon JSON-RPC", () => {
     expect(await rpc.call("harness.approve", { approvalId: req.approvalId, approved: true })).toEqual({ ok: false });
   });
 
+  it("round-trips questions through harness.answer, and only runs a person started can ask", async () => {
+    const clock = { t: new Date(2026, 2, 13, 8, 0) };
+    const { rpc, provider, daemon } = make([
+      { steps: [{ tool: "ask_user", input: { question: "Which month?", options: ["March", "April"] } }] },
+      (req) => {
+        const r = req.messages.at(-1)!.content.find((p) => p.type === "tool_result") as { content: string };
+        expect(r.content).toBe("April");
+        return { steps: [{ tool: "ask_user", input: { question: "Anything else?" } }] };
+      },
+      (req) => {
+        const r = req.messages.at(-1)!.content.find((p) => p.type === "tool_result") as { content: string };
+        expect(r.content).toBe("The person skipped this question.");
+        return { steps: [{ text: "April report." }] };
+      },
+      { steps: [{ text: "scheduled" }] },
+    ], { now: () => clock.t });
+    await rpc.call("auth.set", { provider: "anthropic", apiKey: KEY });
+    const { runId } = (await rpc.call("harness.run", run("monthly report"))) as { runId: string };
+    const q = (await rpc.event(runId, "question")) as Extract<HarnessEvent, { type: "question" }>;
+    expect(q).toMatchObject({ question: "Which month?", options: ["March", "April"] });
+    expect(provider.requests[0]!.tools.map((t) => t.name)).toContain("ask_user");
+    expect(await rpc.call("harness.answer", { questionId: "q_unknown", answer: "x" })).toEqual({ ok: false });
+    await expect(rpc.call("harness.answer", { questionId: q.questionId })).rejects.toMatchObject({ code: RPC_ERRORS.invalidParams });
+    await expect(rpc.call("harness.answer", { questionId: "", answer: "x" })).rejects.toMatchObject({ code: RPC_ERRORS.invalidParams });
+    expect(await rpc.call("harness.answer", { questionId: q.questionId, answer: "April" })).toEqual({ ok: true });
+    expect(await rpc.call("harness.answer", { questionId: q.questionId, answer: "April" })).toEqual({ ok: false });
+    const second = await rpc.nextNote(
+      (m) => m.method === "harness.event" && (m.params!["event"] as HarnessEvent).type === "question" && (m.params!["event"] as { questionId: string }).questionId !== q.questionId,
+    );
+    const id2 = (second.params!["event"] as { questionId: string }).questionId;
+    // An empty answer is a skip.
+    expect(await rpc.call("harness.answer", { questionId: id2, answer: "" })).toEqual({ ok: true });
+    expect(await rpc.event(runId, "done")).toMatchObject({ stopReason: "end_turn", text: "April report." });
+    expect(rpc.events(runId).filter((e) => e.type === "question_answered").map((e) => (e as { answer: string }).answer)).toEqual(["April", ""]);
+
+    // A scheduled run has nobody to ask: no ask_user.
+    daemon.scheduler.upsert({ id: "s1", cron: "30 8 * * *", task: run("scheduled") as never, enabled: true });
+    clock.t = new Date(2026, 2, 13, 8, 30);
+    const fired = await daemon.scheduler.tick();
+    expect(fired).toHaveLength(1);
+    await rpc.event(fired[0]!.runId, "done");
+    expect(provider.requests.at(-1)!.tools.map((t) => t.name)).not.toContain("ask_user");
+  });
+
+  it("cancelling a run releases its pending question", async () => {
+    const { rpc } = make([{ steps: [{ tool: "ask_user", input: { question: "Which one?" } }] }]);
+    await rpc.call("auth.set", { provider: "anthropic", apiKey: KEY });
+    const { runId } = (await rpc.call("harness.run", run("x"))) as { runId: string };
+    const q = (await rpc.event(runId, "question")) as { questionId: string };
+    expect(await rpc.call("harness.cancel", { runId })).toEqual({ ok: true });
+    expect(await rpc.event(runId, "done")).toMatchObject({ stopReason: "cancelled" });
+    expect(rpc.events(runId).filter((e) => e.type === "question_answered")).toHaveLength(0);
+    await new Promise((r) => setTimeout(r, 10));
+    expect(await rpc.call("harness.answer", { questionId: q.questionId, answer: "late" })).toEqual({ ok: false });
+  });
+
   it("delegates skills.* to the SkillStore", async () => {
     const { rpc } = make([]);
     const list = (await rpc.call("skills.list")) as { skills: { manifest: { frontmatter: { name: string } } }[] };

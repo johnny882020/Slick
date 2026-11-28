@@ -103,6 +103,48 @@ describe("fake daemon", () => {
     expect(done.event).toMatchObject({ stopReason: "cancelled" });
   });
 
+  it("asks a question, waits for harness.answer, then continues the session and turns it into an app", async () => {
+    const { runId } = await c.call("harness.run", { input: "ask me which month, then write the report", provider: "anthropic", model: "m" });
+    const q = (await c.waitFor((e) => e.runId === runId && e.event.type === "question")).event as Extract<HarnessEvent, { type: "question" }>;
+    expect(q).toMatchObject({ question: "Which month should the report cover?", options: ["October", "November"] });
+    expect(await c.call("harness.answer", { questionId: "q_unknown", answer: "x" })).toEqual({ ok: false });
+    expect((await c.raw("harness.answer", { questionId: q.questionId })).error?.code).toBe(-32602);
+    expect(await c.call("harness.answer", { questionId: q.questionId, answer: "November" })).toEqual({ ok: true });
+    expect(await c.call("harness.answer", { questionId: q.questionId, answer: "November" })).toEqual({ ok: false });
+    const done = (await c.waitFor((e) => e.runId === runId && e.event.type === "done")).event as Extract<HarnessEvent, { type: "done" }>;
+    expect(done.text).toContain("November report");
+    const answered = c.events.find((e) => e.runId === runId && e.event.type === "question_answered")!.event;
+    expect(answered).toEqual({ type: "question_answered", questionId: q.questionId, answer: "November" });
+    const sessionId = (c.events.find((e) => e.runId === runId && e.event.type === "session_start")!.event as { sessionId: string }).sessionId;
+
+    // A reply in the same session continues it.
+    const second = await c.call("harness.run", { input: "make it shorter", provider: "anthropic", model: "m", sessionId });
+    const d2 = (await c.waitFor((e) => e.runId === second.runId && e.event.type === "done")).event as Extract<HarnessEvent, { type: "done" }>;
+    expect(d2.text).toContain("You said “make it shorter”");
+    expect(c.events.find((e) => e.runId === second.runId && e.event.type === "session_start")!.event).toMatchObject({ sessionId });
+
+    // Turn into app: brand-kit makes a draft from the last result.
+    const third = await c.call("harness.run", {
+      input: "Turn the result above into a small, self-contained app (an HTML page) I can pin.",
+      provider: "anthropic",
+      model: "m",
+      sessionId,
+      skill: "brand-kit",
+    });
+    const end = await c.waitFor((e) => e.runId === third.runId && e.event.type === "tool_end");
+    expect(c.events.find((e) => e.runId === third.runId && e.event.type === "skill_loaded")!.event).toMatchObject({ name: "brand-kit", reason: "forced" });
+    const { draftId } = JSON.parse((end.event as Extract<HarnessEvent, { type: "tool_end" }>).result.content);
+    const bundle = await c.call("apps.draft", { draftId });
+    expect(bundle.app).toMatchObject({ id: "weekly-summary", allowedSkills: ["weekly-report"] });
+    expect(bundle.html).toContain("You said “make it shorter”");
+
+    // Cancelling releases a pending question.
+    const fourth = await c.call("harness.run", { input: "ask first", provider: "anthropic", model: "m" });
+    await c.waitFor((e) => e.runId === fourth.runId && e.event.type === "question");
+    expect(await c.call("harness.cancel", { runId: fourth.runId })).toEqual({ ok: true });
+    expect((await c.waitFor((e) => e.runId === fourth.runId && e.event.type === "done")).event).toMatchObject({ stopReason: "cancelled" });
+  });
+
   it("inspects and installs skills by verdict", async () => {
     const pass = await c.call("skills.inspect", { source: "acme/support-replies" });
     expect(pass.scan.verdict).toBe("pass");

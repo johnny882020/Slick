@@ -3,7 +3,7 @@
 import type { ArtifactBundle, HarnessEvent } from "@oneseat/contracts";
 import { makeDraft, type ArtifactDraft } from "./artifacts";
 import type { DaemonNotification, DaemonStatus, KeyStatus } from "./protocol";
-import { addDrafts, draftIdFromToolResult, initialRun, pendingApprovals, reduceRun, type ApprovalItem, type RunState } from "./run-state";
+import { addDrafts, draftIdFromToolResult, initialRun, pendingApprovals, reduceRun, type ApprovalItem, type RunMeta, type RunState } from "./run-state";
 
 export type Change =
   | { type: "keys" }
@@ -67,9 +67,9 @@ export class Store {
   }
 
   /** Register a run this UI started (events may already have arrived). */
-  startRun(runId: string, input: string): RunState {
+  startRun(runId: string, input: string, meta: RunMeta = {}): RunState {
     const existing = this.runs.get(runId);
-    const run = existing ? { ...existing, input } : initialRun(runId, input);
+    const run = { ...(existing ?? initialRun(runId, input)), input, ...meta };
     this.runs.set(runId, run);
     this.currentRunId = runId;
     this.trim();
@@ -122,6 +122,26 @@ export class Store {
   handleNotification(n: DaemonNotification): void {
     if (n.method === "harness.event") this.applyEvent(n.params.runId, n.params.event);
     else if (n.method === "schedule.fired") this.emit({ type: "schedule.fired", scheduleId: n.params.scheduleId, runId: n.params.runId });
+  }
+
+  /** The conversation a run belongs to, oldest turn first, ending with this run. */
+  conversation(runId: string): RunState[] {
+    const out: RunState[] = [];
+    const seen = new Set<string>();
+    let run = this.runs.get(runId);
+    while (run && !seen.has(run.runId)) {
+      seen.add(run.runId);
+      out.unshift(run);
+      run = run.followsRunId ? this.runs.get(run.followsRunId) : undefined;
+    }
+    return out;
+  }
+
+  /** The latest run of each conversation, oldest first. */
+  conversationTips(): RunState[] {
+    const followed = new Set<string>();
+    for (const r of this.runs.values()) if (r.followsRunId) followed.add(r.followsRunId);
+    return [...this.runs.values()].filter((r) => !followed.has(r.runId));
   }
 
   /** Approvals still waiting for a person, oldest first, across all runs. */

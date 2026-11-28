@@ -35,6 +35,7 @@ import type { ScriptSandbox } from "./sandbox.js";
 import type { ScheduleInput } from "./scheduler.js";
 import { validateSchema } from "./schema.js";
 import { ActionLog, ArtifactDrafts, MemoryStore, SessionStore } from "./stores.js";
+import { createAskUserTool } from "./tools/ask.js";
 import { createBuiltinTools } from "./tools/builtins.js";
 import { ToolRegistry, type RegisteredTool, type ToolContext, type ToolOutput } from "./tools/registry.js";
 import { createSkillTools, SKILL_TOOL_NAMES } from "./tools/skills.js";
@@ -212,6 +213,14 @@ export class Harness implements HarnessApi {
         return { ...e, message: this.redactor.redact(e.message) };
       case "approval_request":
         return { ...e, summary: this.redactor.redact(e.summary) };
+      case "question":
+        return {
+          ...e,
+          question: this.redactor.redact(e.question),
+          ...(e.options ? { options: e.options.map((o) => this.redactor.redact(o)) } : {}),
+        };
+      case "question_answered":
+        return { ...e, answer: this.redactor.redact(e.answer) };
       default:
         return e;
     }
@@ -294,6 +303,8 @@ export class Harness implements HarnessApi {
       append({ role: "user", content: [{ type: "text", text: this.redactor.redactKnown(task.input) }] });
 
       const ctx: ToolContext = { runId, sessionId: sid, task, signal, skills, emit };
+      // Tools that exist only for this run: ask_user needs someone to answer.
+      const runTools = opts.onQuestion ? [createAskUserTool(opts.onQuestion, this.redactor)] : [];
       const maxTurns = Math.max(1, Math.min(200, task.maxTurns ?? this.opts.maxTurns ?? DEFAULT_MAX_TURNS));
       let turn = 0;
       let finalText = "";
@@ -310,13 +321,13 @@ export class Harness implements HarnessApi {
           break;
         }
         turn++;
-        const tools = await this.availableTools(skills);
+        const tools = await this.availableTools(skills, runTools);
         const specs: ToolSpec[] = tools.map((t) => ({
           name: t.definition.name,
           description: t.definition.description,
           inputSchema: t.definition.inputSchema,
         }));
-        const req = await this.buildRequest(task, skills, [...history, ...added], specs, signal);
+        const req = await this.buildRequest(task, skills, [...history, ...added], specs, signal, runTools.length > 0);
         let resp: ModelTurn;
         try {
           resp = await this.callModel(provider, req, emit, signal);
@@ -337,7 +348,7 @@ export class Harness implements HarnessApi {
           stop = resp.stopReason;
           break;
         }
-        const results = await this.runTools(resp.calls, ctx, onApproval);
+        const results = await this.runTools(resp.calls, ctx, onApproval, runTools);
         append({ role: "user", content: results });
         this.sessions.setLoadedSkills(sid, [...skills.loaded]);
         if (signal.aborted) {
@@ -373,6 +384,7 @@ export class Harness implements HarnessApi {
     messages: Message[],
     tools: ToolSpec[],
     signal: AbortSignal,
+    canAsk: boolean,
   ): Promise<ChatRequest> {
     const index = await skills.index();
     const active = [];
@@ -387,6 +399,7 @@ export class Harness implements HarnessApi {
       index,
       active,
       ...(this.opts.preamble ? { preamble: this.opts.preamble } : {}),
+      ...(canAsk ? { canAsk } : {}),
     };
     let system = buildSystemPrompt(base);
     const fit = fitContext({ system, messages, tools }, { budgetTokens: this.opts.contextBudgetTokens ?? 150_000 });
@@ -405,9 +418,10 @@ export class Harness implements HarnessApi {
   }
 
   /** Tools the model may use right now: skill tools (unless disabled), built-ins, MCP, then the allowed-tools filter. */
-  private async availableTools(skills: SkillSession): Promise<RegisteredTool[]> {
+  private async availableTools(skills: SkillSession, runTools: RegisteredTool[]): Promise<RegisteredTool[]> {
     const out: RegisteredTool[] = [];
-    const seen = new Set<string>();
+    // A run's own tools (ask_user) win over a registry or MCP tool of the same name.
+    const seen = new Set(runTools.map((t) => t.definition.name));
     const all = [...this.registry.list(), ...(this.opts.mcp?.tools() ?? [])];
     for (const t of all) {
       const name = t.definition.name;
@@ -417,7 +431,7 @@ export class Harness implements HarnessApi {
       if (!(await skills.toolAllowed(name))) continue;
       out.push(t);
     }
-    return out;
+    return [...out, ...runTools];
   }
 
   private async callModel(
@@ -517,9 +531,11 @@ export class Harness implements HarnessApi {
   // ---------------------------------------------------------------------------
   // Tool execution
 
-  private async prepare(call: ToolCall, ctx: ToolContext): Promise<PreparedCall> {
+  private async prepare(call: ToolCall, ctx: ToolContext, runTools: RegisteredTool[]): Promise<PreparedCall> {
     const tool =
-      this.registry.get(call.name) ?? this.opts.mcp?.tools().find((t) => t.definition.name === call.name);
+      runTools.find((t) => t.definition.name === call.name) ??
+      this.registry.get(call.name) ??
+      this.opts.mcp?.tools().find((t) => t.definition.name === call.name);
     const unknown = (msg: string): PreparedCall => ({
       call,
       effects: tool?.definition.effects ?? [],
@@ -547,8 +563,13 @@ export class Harness implements HarnessApi {
     }
   }
 
-  private async runTools(calls: ToolCall[], ctx: ToolContext, onApproval: ApprovalHandler): Promise<ToolResultPart[]> {
-    const prepared = await Promise.all(calls.map((c) => this.prepare(c, ctx)));
+  private async runTools(
+    calls: ToolCall[],
+    ctx: ToolContext,
+    onApproval: ApprovalHandler,
+    runTools: RegisteredTool[],
+  ): Promise<ToolResultPart[]> {
+    const prepared = await Promise.all(calls.map((c) => this.prepare(c, ctx, runTools)));
     const parallel = prepared.length > 1 && prepared.every((p) => p.error !== undefined || isReadOnly(p.effects));
     let results: ToolResult[];
     if (parallel) results = await Promise.all(prepared.map((p) => this.execOne(p, ctx, onApproval)));

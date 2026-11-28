@@ -818,25 +818,151 @@ details[open] > summary::before {
 
 @media (min-width: 1060px) {
   /* Composer and output side by side once there is output. */
-  .view-run:has(> .run-output:not([hidden])) {
+  .view-run:has(> .conversation:not([hidden])) {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-auto-flow: row dense;
   }
-  .view-run:has(> .run-output:not([hidden])) > form {
+  .view-run:has(> .conversation:not([hidden])) > form {
     grid-column: 1;
   }
-  .view-run:has(> .run-output:not([hidden])) > .run-output {
+  .view-run:has(> .conversation:not([hidden])) > .conversation {
     grid-column: 2;
     grid-row: span 2;
     position: sticky;
     inset-block-start: calc(var(--header-h) + 1.25rem);
   }
-  .view-run:has(> .run-output:not([hidden])) > form .grid3 {
+  /* A longer conversation scrolls with the page, so the reply box stays reachable. */
+  .view-run:has(> .conversation:not([hidden])) > .conversation:not([data-turns="1"]) {
+    position: static;
+  }
+  .view-run:has(> .conversation:not([hidden])) > form .grid3 {
     grid-template-columns: minmax(0, 1fr);
   }
-  .view-run:has(> .run-output:not([hidden])) > section:last-child {
+  .view-run:has(> .conversation:not([hidden])) > section:last-child {
     grid-column: 1;
   }
+}
+
+/* ---------- Conversation: turns, questions, replies ---------- */
+
+.conversation {
+  min-inline-size: 0;
+}
+.conversation[hidden] {
+  display: none;
+}
+.turn + .turn {
+  margin-block-start: 1.25rem;
+  padding-block-start: 1.25rem;
+  border-block-start: 1px solid var(--line);
+}
+.turn-you {
+  margin: 0 0 0.75rem;
+  padding-inline-start: 0.85rem;
+  border-inline-start: 3px solid var(--line-strong);
+}
+.turn-label,
+.question-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--meta);
+  margin: 0 0 0.2rem;
+}
+.turn-text {
+  white-space: pre-wrap;
+  color: var(--ink);
+  margin: 0;
+  max-inline-size: 72ch;
+  unicode-bidi: plaintext;
+}
+.turn > .run-output {
+  margin-block-end: 0;
+}
+
+.question-card {
+  border: 1px solid rgb(27 59 130 / 22%);
+  border-inline-start: 3px solid var(--cobalt);
+  background: var(--cobalt-tint);
+  border-radius: var(--radius);
+  padding-block: 0.85rem;
+  padding-inline: 1rem;
+  margin: 0.75rem 0;
+}
+.question-card:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+}
+.question-card .question-label {
+  color: var(--cobalt);
+}
+.question-text {
+  color: var(--ink);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+  white-space: pre-wrap;
+  unicode-bidi: plaintext;
+}
+.question-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.85rem;
+}
+.btn.option {
+  border-color: var(--cobalt);
+  color: var(--cobalt);
+  background: var(--surface);
+  white-space: normal;
+  text-align: start;
+}
+.btn.option:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--cobalt-hover);
+  color: var(--cobalt-hover);
+  box-shadow: 0 0 0 3px rgb(27 59 130 / 12%);
+}
+.question-form textarea {
+  background: var(--surface);
+}
+.question-state {
+  margin: 0;
+  color: var(--body);
+}
+.question-state:empty {
+  display: none;
+}
+.question-state strong {
+  color: var(--ink);
+}
+.question-card[data-status="answered"],
+.question-card[data-status="skipped"],
+.question-card[data-status="closed"] {
+  background: var(--surface);
+  border-color: var(--line);
+  border-inline-start-color: var(--line-strong);
+}
+.question-card[data-status="answered"] .question-text,
+.question-card[data-status="skipped"] .question-text,
+.question-card[data-status="closed"] .question-text {
+  margin-block-end: 0.35rem;
+}
+.question-card .error-text:empty {
+  display: none;
+}
+
+.followups {
+  margin-block-start: 1rem;
+}
+.followups[hidden] {
+  display: none;
+}
+.followups .row > .btn.ghost:last-child {
+  margin-inline-start: auto;
 }
 
 .view-run > form textarea {
@@ -875,7 +1001,8 @@ details[open] > summary::before {
   background: currentColor;
   flex: none;
 }
-.run-output[data-status="running"] .run-status::before {
+.run-output[data-status="running"] .run-status::before,
+.run-output[data-status="asking"] .run-status::before {
   animation: pulse 1.2s ease-in-out infinite;
 }
 .run-output[data-status="done"] .run-status {
@@ -1565,7 +1692,8 @@ details[open] > summary::before {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .run-output[data-status="running"] .run-status::before {
+  .run-output[data-status="running"] .run-status::before,
+  .run-output[data-status="asking"] .run-status::before {
     animation: none;
   }
 }

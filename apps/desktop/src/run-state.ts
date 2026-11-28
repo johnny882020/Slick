@@ -3,7 +3,11 @@
 import type { HarnessEvent, ToolCall, ToolEffect, Usage } from "@oneseat/contracts";
 import { bundleFromToolContent, bundlesFromText, makeDraft, type ArtifactDraft } from "./artifacts";
 
-export type RunStatus = "running" | "waiting" | "done" | "cancelled" | "error";
+/** waiting: an approval is pending. asking: a question (ask_user) is pending. */
+export type RunStatus = "running" | "waiting" | "asking" | "done" | "cancelled" | "error";
+
+/** The harness tool behind question events; its tool rows are shown as the question card instead. */
+export const ASK_USER_TOOL = "ask_user";
 
 export interface TextItem {
   kind: "text";
@@ -40,9 +44,28 @@ export interface ErrorItem {
   retryable: boolean;
 }
 
-export type RunItem = TextItem | ToolItem | ApprovalItem | ErrorItem;
+export interface QuestionItem {
+  kind: "question";
+  key: string;
+  questionId: string;
+  question: string;
+  options: string[];
+  /** closed: the run ended before anyone answered. */
+  status: "pending" | "answered" | "skipped" | "closed";
+  answer?: string;
+}
 
-export interface RunState {
+export type RunItem = TextItem | ToolItem | ApprovalItem | QuestionItem | ErrorItem;
+
+/** How this UI started a run, so a reply can continue it the same way. */
+export interface RunMeta {
+  provider?: string;
+  model?: string;
+  /** The run this one replies to (same session): runs chain into a conversation. */
+  followsRunId?: string;
+}
+
+export interface RunState extends RunMeta {
   runId: string;
   /** The task text, when this UI started the run. */
   input?: string;
@@ -106,6 +129,38 @@ export function pendingApprovals(s: RunState): ApprovalItem[] {
   return s.items.filter((i): i is ApprovalItem => i.kind === "approval" && i.status === "pending");
 }
 
+export function pendingQuestions(s: RunState): QuestionItem[] {
+  return s.items.filter((i): i is QuestionItem => i.kind === "question" && i.status === "pending");
+}
+
+/** Status while the run is live: an approval wins over a question, both over running. */
+function liveStatus(prev: RunState, next: RunState): RunStatus {
+  if (isFinished(prev)) return prev.status;
+  if (pendingApprovals(next).length > 0) return "waiting";
+  if (pendingQuestions(next).length > 0) return "asking";
+  return "running";
+}
+
+/** The run's result text: done.text, else what streamed. */
+export function resultText(s: RunState): string {
+  return (s.finalText ?? "").trim() || runText(s).trim();
+}
+
+/**
+ * Can the person reply to this run (continue its session)? Yes once it finished, unless it
+ * was cancelled or failed with nothing to continue.
+ */
+export function canReply(s: RunState): boolean {
+  if (!isFinished(s) || !s.sessionId) return false;
+  if (s.status === "done") return true;
+  return s.items.some((i) => (i.kind === "text" && i.text.trim() !== "") || i.kind === "tool");
+}
+
+/** Offer "Turn into app": a finished run with text output that made no app yet. */
+export function canMakeApp(s: RunState): boolean {
+  return s.status === "done" && !!s.sessionId && resultText(s) !== "" && s.artifacts.length === 0;
+}
+
 export function reduceRun(s: RunState, ev: HarnessEvent): RunState {
   switch (ev.type) {
     case "session_start":
@@ -126,6 +181,7 @@ export function reduceRun(s: RunState, ev: HarnessEvent): RunState {
       return push(s, { kind: "text", text: ev.text });
     }
     case "tool_start":
+      if (ev.call.name === ASK_USER_TOOL) return s;
       return push(s, {
         kind: "tool",
         callId: ev.call.id,
@@ -135,6 +191,7 @@ export function reduceRun(s: RunState, ev: HarnessEvent): RunState {
         status: "running",
       });
     case "tool_end": {
+      if (ev.result.name === ASK_USER_TOOL) return s;
       const idx = findLastIndex(s.items, (i) => i.kind === "tool" && i.callId === ev.result.callId && i.status === "running");
       let next: RunState;
       if (idx === -1) {
@@ -178,15 +235,41 @@ export function reduceRun(s: RunState, ev: HarnessEvent): RunState {
         i.kind === "approval" && i.approvalId === ev.approvalId ? { ...i, status: ev.approved ? ("approved" as const) : ("denied" as const) } : i,
       );
       const next = { ...s, items };
-      const waiting = pendingApprovals(next).length > 0;
-      return { ...next, status: isFinished(s) ? s.status : waiting ? "waiting" : "running" };
+      return { ...next, status: liveStatus(s, next) };
+    }
+    case "question": {
+      if (s.items.some((i) => i.kind === "question" && i.questionId === ev.questionId)) return s;
+      const next = push(s, {
+        kind: "question",
+        questionId: ev.questionId,
+        question: ev.question,
+        options: ev.options ?? [],
+        status: "pending",
+      });
+      return { ...next, status: liveStatus(s, next) };
+    }
+    case "question_answered": {
+      const answer = ev.answer.trim();
+      const items = s.items.map((i) =>
+        i.kind === "question" && i.questionId === ev.questionId
+          ? { ...i, status: answer ? ("answered" as const) : ("skipped" as const), ...(answer ? { answer } : {}) }
+          : i,
+      );
+      const next = { ...s, items };
+      return { ...next, status: liveStatus(s, next) };
     }
     case "turn_end":
       return { ...s, turns: Math.max(s.turns, ev.turn), usage: addUsage(s.usage, ev.usage) };
     case "done": {
       const hasUsage = ev.usage.inputTokens > 0 || ev.usage.outputTokens > 0;
-      // Pending approvals can no longer be answered.
-      const items = s.items.map((i) => (i.kind === "approval" && i.status === "pending" ? { ...i, status: "denied" as const } : i));
+      // Pending approvals and questions can no longer be answered.
+      const items = s.items.map((i) =>
+        i.kind === "approval" && i.status === "pending"
+          ? { ...i, status: "denied" as const }
+          : i.kind === "question" && i.status === "pending"
+            ? { ...i, status: "closed" as const }
+            : i,
+      );
       const next: RunState = {
         ...s,
         items,
