@@ -11,6 +11,10 @@
 //   contains "app" / "dashboard" / "tracker" -> produces an artifact draft (tool_end with an ArtifactBundle)
 //   contains "fail"                         -> emits an error event
 //   contains "slow"                         -> streams slowly (for cancel)
+//   contains the word "ask"                 -> asks a question with options (question event, waits
+//                                              for harness.answer), then writes the report for the answer
+//   "Turn the result above into ... app"    -> the UI's "Turn into app": an app draft of the last result
+//   a reply in a known session (sessionId)  -> continues the conversation ("You said ...")
 //   anything else                           -> skill_loaded + a read tool + streamed text
 //
 // Skills: three starter skills (invoice-chaser, weekly-report, social-posts) are installed.
@@ -67,7 +71,8 @@ const now = () => new Date().toISOString();
 // ---------------------------------------------------------------- state
 
 const auth = new Map(); // provider -> { baseUrl? }   (the key itself is dropped on purpose)
-const runs = new Map(); // runId -> { cancelled, approvals: Map<approvalId, resolve> }
+const runs = new Map(); // runId -> { cancelled, approvals: Map<approvalId, resolve>, questions: Map<questionId, resolve> }
+const sessions = new Map(); // sessionId -> { turns, lastText }
 const apps = new Map(); // id -> PinnedApp
 
 // Like the real daemon, pinned apps survive a restart: reload them from $ONESEAT_HOME/apps.
@@ -139,6 +144,16 @@ const STARTERS = new Map([
         "social-posts",
         "Plans and drafts social media posts for the week in your brand voice. Use when asked for posts or a content calendar.",
         { kind: "local", path: "/skills/social-posts" },
+      ),
+  ],
+  [
+    "brand-kit",
+    () =>
+      makeSkill(
+        "brand-kit",
+        "Keeps the company brand and builds self-contained branded HTML pages and small apps that can be pinned. Use for pages, apps and dashboards.",
+        { kind: "local", path: "/skills/brand-kit" },
+        { files: ["references/design-rules.md"] },
       ),
   ],
 ]);
@@ -338,6 +353,48 @@ function artifactBundle() {
   };
 }
 
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+/** "Turn into app": a branded page that shows the session's last result and can refresh it. */
+function summaryAppBundle(lastText) {
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Weekly summary</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 24px; color: #1b1b1b; background: #fff; }
+  h1 { color: #1f4e79; }
+  button { font: inherit; padding: 6px 14px; border-radius: 8px; border: 1px solid #1f4e79; background: #1f4e79; color: #fff; }
+  p.result { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>Weekly summary</h1>
+<p class="result" id="out" aria-live="polite">${escapeHtml(lastText)}</p>
+<button id="refresh" type="button">Refresh</button>
+<script>
+  document.getElementById("refresh").addEventListener("click", async () => {
+    const out = document.getElementById("out");
+    const r = await oneseat.run("weekly-report", "This week's summary");
+    out.textContent = r.ok ? r.text : "Error: " + r.error;
+  });
+</script>
+</body>
+</html>`;
+  return {
+    html,
+    app: {
+      id: "weekly-summary",
+      name: "Weekly summary",
+      version: "1.0.0",
+      window: { width: 560, height: 420, resizable: true },
+      allowedSkills: ["weekly-report"],
+      createdBy: "brand-kit",
+    },
+  };
+}
+
 // ---------------------------------------------------------------- scripted runs
 
 async function emit(runId, event) {
@@ -357,6 +414,28 @@ function waitApproval(run, approvalId) {
   return new Promise((resolve) => run.approvals.set(approvalId, resolve));
 }
 
+function waitAnswer(run, questionId) {
+  return new Promise((resolve) => run.questions.set(questionId, resolve));
+}
+
+/** Like the real harness's ask_user: tool_start, question, (answer), question_answered, tool_end. */
+async function askUser(run, runId, question, options) {
+  const questionId = `q_${randomUUID().slice(0, 8)}`;
+  const callId = `call_${questionId}`;
+  await emit(runId, { type: "tool_start", call: { id: callId, name: "ask_user", input: { question, options } }, effects: [] });
+  // Register the waiter before emitting: a client may answer at once.
+  const pending = waitAnswer(run, questionId);
+  await emit(runId, { type: "question", questionId, question, options });
+  const answer = String((await pending) ?? "").trim();
+  run.questions.delete(questionId);
+  // Cancelled: nobody answered, so no question_answered (done closes the question).
+  if (!run.cancelled) await emit(runId, { type: "question_answered", questionId, answer });
+  const content = run.cancelled ? "The run was cancelled before the person answered." : answer || "The person skipped this question.";
+  await emit(runId, { type: "tool_end", result: { callId, name: "ask_user", content, isError: run.cancelled }, durationMs: 5 });
+  logAction(runId, "ask_user", [], null, false, `Ask the person: ${question}`);
+  return answer;
+}
+
 async function finishCancelled(runId, text) {
   await emit(runId, { type: "done", stopReason: "cancelled", text, usage: usage(0, 0) });
 }
@@ -366,6 +445,9 @@ async function runScript(runId, task) {
   const input = String(task.input ?? "");
   const sessionId = task.sessionId ?? `ses_${randomUUID().slice(0, 8)}`;
   const forced = typeof task.skill === "string" && task.skill.length > 0;
+  // A reply continues a session this daemon has seen: it remembers the last result.
+  const session = sessions.get(sessionId);
+  const remember = (text) => sessions.set(sessionId, { turns: (session?.turns ?? 0) + 1, lastText: text || session?.lastText || "" });
   await emit(runId, { type: "session_start", sessionId, runId });
 
   if (/fail/i.test(input)) {
@@ -423,8 +505,28 @@ async function runScript(runId, task) {
       text = decision.note ? `Okay, I did not send it. Your note: "${decision.note}".` : "Okay, I did not send it.";
     }
     if (!(await streamText(run, runId, text))) return finishCancelled(runId, text);
+    remember(text);
     await emit(runId, { type: "turn_end", turn: 1, usage: usage(1830, 240) });
     await emit(runId, { type: "done", stopReason: "end_turn", text, usage: usage(1830, 240) });
+  } else if (/turn the result above into/.test(lower)) {
+    // "Turn into app": brand-kit builds a page from the session's last result.
+    const skill = forced ? task.skill : "brand-kit";
+    if (!task.disableSkills) await emit(runId, { type: "skill_loaded", name: skill, reason: forced ? "forced" : "router" });
+    const bundle = summaryAppBundle(session?.lastText || "No earlier result in this conversation.");
+    const draftId = `draft_${runId}`;
+    drafts.set(draftId, { bundle, createdAt: new Date().toISOString() });
+    await emit(runId, { type: "tool_start", call: { id: "call_b1", name: "make_artifact", input: { name: bundle.app.name } }, effects: ["write"] });
+    await emit(runId, {
+      type: "tool_end",
+      result: { callId: "call_b1", name: "make_artifact", content: JSON.stringify({ draftId, appId: bundle.app.id, name: bundle.app.name }), isError: false },
+      durationMs: 38,
+    });
+    logAction(runId, "make_artifact", ["write"], null, false, "Drafted the Weekly summary app");
+    text = "I turned the summary into a small Weekly summary app in your brand colors. Pin it to open it in its own window.";
+    if (!(await streamText(run, runId, text))) return finishCancelled(runId, text);
+    remember(text);
+    await emit(runId, { type: "turn_end", turn: 1, usage: usage(2980, 1710) });
+    await emit(runId, { type: "done", stopReason: "end_turn", text, usage: usage(2980, 1710) });
   } else if (/\b(app|dashboard|tracker)\b/.test(lower)) {
     const skill = forced ? task.skill : "invoice-chaser";
     if (!task.disableSkills) await emit(runId, { type: "skill_loaded", name: skill, reason: forced ? "forced" : "router" });
@@ -442,8 +544,30 @@ async function runScript(runId, task) {
     logAction(runId, "make_artifact", ["write"], null, false, "Drafted the Invoice tracker app");
     text = "I made a small Invoice tracker app. Pin it to open it in its own window.";
     if (!(await streamText(run, runId, text))) return finishCancelled(runId, text);
+    remember(text);
     await emit(runId, { type: "turn_end", turn: 1, usage: usage(2410, 1630) });
     await emit(runId, { type: "done", stopReason: "end_turn", text, usage: usage(2410, 1630) });
+  } else if (/\bask\b/.test(lower)) {
+    // The skill needs a detail only the person knows: ask, wait, then carry on with the answer.
+    const skill = forced ? task.skill : "weekly-report";
+    if (!task.disableSkills) await emit(runId, { type: "skill_loaded", name: skill, reason: forced ? "forced" : "router" });
+    if (!(await streamText(run, runId, "I can write that report. One thing first. "))) return finishCancelled(runId, text);
+    const answer = await askUser(run, runId, "Which month should the report cover?", ["October", "November"]);
+    if (run.cancelled) return finishCancelled(runId, text);
+    text = answer
+      ? `${answer} report: revenue was $48,200, up 6% on the month before. Nine tickets are still open. Do you want it sent to the team?`
+      : "You skipped the question, so I used last month. Revenue was $48,200. Do you want a different month?";
+    if (!(await streamText(run, runId, text))) return finishCancelled(runId, text);
+    remember(text);
+    await emit(runId, { type: "turn_end", turn: 2, usage: usage(2210, 180) });
+    await emit(runId, { type: "done", stopReason: "end_turn", text, usage: usage(2210, 180) });
+  } else if (session) {
+    // A reply in the same session: no new skill load, the model has the earlier turns.
+    text = `You said “${input}”. Here is the updated summary: revenue was $12,450, three tickets are open, and I noted your reply for next time. (Turn ${session.turns + 1} of this conversation.)`;
+    if (!(await streamText(run, runId, text))) return finishCancelled(runId, text);
+    remember(text);
+    await emit(runId, { type: "turn_end", turn: 1, usage: usage(1980, 88) });
+    await emit(runId, { type: "done", stopReason: "end_turn", text, usage: usage(1980, 88) });
   } else {
     const skill = forced ? task.skill : "weekly-report";
     if (!task.disableSkills) {
@@ -466,6 +590,7 @@ async function runScript(runId, task) {
     const chunk = /slow/i.test(input) ? 4 : 12;
     if (/slow/i.test(input)) await sleep(STEP_MS * 4);
     if (!(await streamText(run, runId, text, chunk))) return finishCancelled(runId, text);
+    remember(text);
     await emit(runId, { type: "turn_end", turn: 1, usage: usage(1520, 96) });
     await emit(runId, { type: "done", stopReason: "end_turn", text, usage: usage(1520, 96) });
   }
@@ -523,7 +648,7 @@ const methods = {
     requireString(p, "model");
     if (!auth.has(provider)) throw new RpcError(ERR.notAuthorised, `no key set for ${provider}`);
     const runId = `run_${randomUUID().slice(0, 8)}`;
-    runs.set(runId, { cancelled: false, approvals: new Map() });
+    runs.set(runId, { cancelled: false, approvals: new Map(), questions: new Map() });
     setImmediate(() =>
       runScript(runId, p).catch((e) => {
         log(`run ${runId} crashed: ${e.message}`);
@@ -538,7 +663,22 @@ const methods = {
     if (!run) return { ok: false };
     run.cancelled = true;
     for (const resolve of run.approvals.values()) resolve({ approved: false, note: "cancelled" });
+    for (const resolve of run.questions.values()) resolve("");
     return { ok: true };
+  },
+  "harness.answer": (p) => {
+    requireObject(p);
+    const questionId = requireString(p, "questionId");
+    if (typeof p.answer !== "string") throw new RpcError(ERR.invalidParams, "answer must be a string");
+    for (const run of runs.values()) {
+      const resolve = run.questions.get(questionId);
+      if (resolve) {
+        run.questions.delete(questionId);
+        resolve(p.answer);
+        return { ok: true };
+      }
+    }
+    return { ok: false };
   },
   "harness.approve": (p) => {
     requireObject(p);

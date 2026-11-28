@@ -9,6 +9,9 @@ import type { LoadedSkill } from "./stores.js";
 /** Tools a loaded skill can always use, whatever its allowed-tools says. */
 export const CORE_SKILL_TOOLS = ["load_skill", "read_skill_file", "run_skill_script"] as const;
 
+/** Harness tools that a skill's allowed-tools never hides (asking the person is not a capability). */
+export const ALWAYS_ALLOWED_TOOLS = ["ask_user"] as const;
+
 /** ~100 tokens per skill in the index (4 characters per token). */
 export const INDEX_DESCRIPTION_CHARS = 400;
 
@@ -52,6 +55,8 @@ export interface SystemPromptInput {
   /** Router-loaded skills whose load_skill result was dropped from the context. */
   reloadHints?: string[];
   preamble?: string;
+  /** The run can ask the person questions (ask_user is offered). */
+  canAsk?: boolean;
 }
 
 export const DEFAULT_PREAMBLE = `You are OneSeat, a careful assistant that does repetitive business tasks for a small team.
@@ -65,8 +70,13 @@ Remember lasting facts with memory_save and look them up with memory_search.
 Any action that sends, pays or deletes asks the person first. If they decline, do not try again another way: say what you would have done and stop.
 When you are done, reply with the result itself, short and plain.`;
 
+export const ASKING_SECTION = `## Asking the person
+Someone is watching this run and can answer questions. Call ask_user only when you truly cannot go on without them: required details are missing (and not in the database, memory or workspace), or there is a real choice only they can make.
+Ask one short question at a time, with short options when there are natural choices. Otherwise make a sensible assumption, say what you assumed, and carry on. If they skip a question, go on with your best assumption or say what you still need.`;
+
 export function buildSystemPrompt(input: SystemPromptInput): string {
   const parts = [input.preamble ?? DEFAULT_PREAMBLE, `Today is ${formatLocalDate(input.now)}.`];
+  if (input.canAsk) parts.push(ASKING_SECTION);
   if (input.skillsEnabled && input.index.length > 0) {
     parts.push(
       [
@@ -182,7 +192,7 @@ export class SkillSession {
   }
 
   async toolAllowed(name: string): Promise<boolean> {
-    if ((CORE_SKILL_TOOLS as readonly string[]).includes(name)) return true;
+    if ((CORE_SKILL_TOOLS as readonly string[]).includes(name) || (ALWAYS_ALLOWED_TOOLS as readonly string[]).includes(name)) return true;
     const patterns = await this.allowedToolPatterns();
     return patterns === undefined || patterns.some((p) => toolMatches(name, p));
   }

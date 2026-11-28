@@ -1,20 +1,23 @@
 // Renders a RunState into DOM incrementally: each item keeps its element, so streaming
 // text only updates one text node and focus/scroll are not disturbed.
 
-import { button, h, replace } from "./dom";
+import { announce, button, field, h, replace, uid } from "./dom";
 import { effectLabel, formatBytes, formatDuration, formatUsage, truncate } from "./format";
-import type { ApprovalItem, ErrorItem, RunItem, RunState, RunStatus, TextItem, ToolItem } from "./run-state";
+import type { ApprovalItem, ErrorItem, QuestionItem, RunItem, RunState, RunStatus, TextItem, ToolItem } from "./run-state";
 import type { ArtifactDraft } from "./artifacts";
 
 export interface RunOutputHandlers {
   onReview(approvalId: string): void;
   onPin(draft: ArtifactDraft): void;
   isPinned(draft: ArtifactDraft): boolean;
+  /** Answer a question (harness.answer). "" skips. Resolves false when it is no longer waiting. */
+  onAnswer?(questionId: string, answer: string): Promise<boolean>;
 }
 
 export const STATUS_LABEL: Record<RunStatus, string> = {
   running: "Working…",
   waiting: "Waiting for your approval",
+  asking: "Waiting for your answer",
   done: "Done",
   cancelled: "Cancelled",
   error: "Stopped with an error",
@@ -94,6 +97,120 @@ function approvalEntry(item: ApprovalItem, handlers: RunOutputHandlers): Entry {
   return { el, update };
 }
 
+/** Ctrl+Enter (⌘+Enter on Mac) submits the textarea's form, like the task box. */
+export function submitOnCtrlEnter(area: HTMLTextAreaElement): void {
+  area.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      area.form?.requestSubmit();
+    }
+  });
+}
+
+/**
+ * A question the model asked mid-run: the question, one button per option, a free-text
+ * answer, Send answer and Skip. Focus moves to the card when it arrives.
+ */
+function questionEntry(item: QuestionItem, handlers: RunOutputHandlers): Entry {
+  const textId = uid("question");
+  const options = h("div", { class: "question-options", attrs: { role: "group", "aria-label": "Choices" } });
+  const answer = h("textarea", { name: "answer", rows: 2, placeholder: "Type your answer", attrs: { dir: "auto" } });
+  submitOnCtrlEnter(answer);
+  const send = h("button", { type: "submit", class: "btn primary", text: "Send answer" });
+  const skip = button("Skip", () => void submit(""), { kind: "ghost" });
+  const error = h("p", { class: "error-text", attrs: { role: "alert" } });
+  const form = h(
+    "form",
+    {
+      class: "question-form stack",
+      on: {
+        submit: (e) => {
+          e.preventDefault();
+          const text = answer.value.trim();
+          if (!text) {
+            error.textContent = "Type an answer, pick a choice, or skip.";
+            answer.focus();
+            return;
+          }
+          void submit(text);
+        },
+      },
+    },
+    field(item.options.length ? "Or type your own answer" : "Your answer", answer, "Press Ctrl+Enter (⌘+Enter on Mac) to send."),
+    h("div", { class: "row" }, send, skip),
+  );
+  const state = h("p", { class: "question-state", attrs: { role: "status" } });
+  const el = h(
+    "div",
+    { class: "question-card", tabIndex: -1, attrs: { "data-question": item.questionId, role: "group", "aria-labelledby": textId } },
+    h("p", { class: "question-label", text: "OneSeat asks" }),
+    h("p", { id: textId, class: "question-text", attrs: { dir: "auto" }, text: item.question }),
+    options,
+    form,
+    error,
+    state,
+  );
+  let last = item;
+  /** What this card sent, before question_answered confirms it. */
+  let sent: string | null = null;
+  let busy = false;
+
+  const controls = (): HTMLButtonElement[] => [...options.querySelectorAll("button"), send, skip];
+  function setBusy(b: boolean): void {
+    busy = b;
+    for (const c of controls()) c.disabled = b;
+    answer.disabled = b;
+  }
+
+  async function submit(text: string): Promise<void> {
+    if (busy || last.status !== "pending" || sent !== null) return;
+    setBusy(true);
+    error.textContent = "";
+    try {
+      const ok = handlers.onAnswer ? await handlers.onAnswer(item.questionId, text) : false;
+      if (ok) sent = text;
+      else error.textContent = "This question is no longer waiting for an answer.";
+    } catch (e) {
+      error.textContent = `Could not send your answer: ${e instanceof Error ? e.message : String(e)}`;
+    } finally {
+      setBusy(false);
+      update(last);
+    }
+    // The controls are gone now; keep keyboard focus on the card instead of losing it.
+    if (sent !== null) el.focus();
+  }
+
+  replace(
+    options,
+    ...item.options.map((o) => h("button", { type: "button", class: "btn option", attrs: { dir: "auto" }, text: o, on: { click: () => void submit(o) } })),
+  );
+  options.hidden = item.options.length === 0;
+
+  function update(i: RunItem): void {
+    last = i as QuestionItem;
+    // What the person said: confirmed by question_answered, or just sent from this card.
+    const said = last.status === "answered" ? (last.answer ?? "") : last.status === "skipped" ? "" : last.status === "pending" ? sent : null;
+    const open = last.status === "pending" && sent === null;
+    el.dataset["status"] = open ? "pending" : said === null ? "closed" : said ? "answered" : "skipped";
+    options.hidden = !open || last.options.length === 0;
+    form.hidden = !open;
+    if (open) replace(state);
+    else if (said === null) replace(state, "The run ended before this was answered.");
+    else if (said) replace(state, "You answered: ", h("strong", { attrs: { dir: "auto" }, text: said }));
+    else replace(state, "You skipped this question.");
+    if (!open) error.textContent = "";
+  }
+  update(item);
+  if (item.status === "pending") {
+    announce(`OneSeat asks: ${item.question}`);
+    // Move focus to the card once it is in the document.
+    queueMicrotask(() => {
+      if (el.isConnected) el.focus();
+    });
+  }
+  return { el, update };
+}
+
 function errorEntry(item: ErrorItem): Entry {
   const el = h(
     "div",
@@ -124,6 +241,8 @@ export function createRunOutput(handlers: RunOutputHandlers): { el: HTMLElement;
         return toolEntry(item);
       case "approval":
         return approvalEntry(item, handlers);
+      case "question":
+        return questionEntry(item, handlers);
       case "error":
         return errorEntry(item);
     }
@@ -190,6 +309,58 @@ export function createRunOutput(handlers: RunOutputHandlers): { el: HTMLElement;
         );
       }),
     );
+  }
+
+  return { el, update };
+}
+
+/**
+ * A conversation: each run of a session in order, each turn the person's message and then
+ * that run's output. `footer` (the reply composer) goes after the last turn.
+ */
+export function createConversation(
+  handlers: RunOutputHandlers,
+  footer?: HTMLElement,
+): { el: HTMLElement; update(chain: RunState[]): void } {
+  const turns = h("div", { class: "turns" });
+  const el = h("section", { class: "conversation", attrs: { "aria-label": "Conversation" } }, turns, footer ?? null);
+  const shown = new Map<string, { output: ReturnType<typeof createRunOutput>; you: HTMLElement }>();
+
+  function reset(): void {
+    shown.clear();
+    replace(turns);
+  }
+
+  function update(chain: RunState[]): void {
+    if (chain.length === 0) {
+      el.hidden = true;
+      return;
+    }
+    el.hidden = false;
+    const ids = chain.map((r) => r.runId);
+    // Another conversation, or turns that are no longer part of this one: start over.
+    if ([...shown.keys()].some((k, i) => ids[i] !== k)) reset();
+    el.dataset["turns"] = String(chain.length);
+    for (const run of chain) {
+      let turn = shown.get(run.runId);
+      if (!turn) {
+        const output = createRunOutput(handlers);
+        const you = h(
+          "div",
+          { class: "turn-you", attrs: { "data-run": run.runId } },
+          h("p", { class: "turn-label", text: "You" }),
+          h("p", { class: "turn-text", attrs: { dir: "auto" } }),
+        );
+        turn = { output, you };
+        shown.set(run.runId, turn);
+        turns.append(h("div", { class: "turn" }, you, output.el));
+      }
+      turn.you.hidden = !run.input;
+      const text = turn.you.querySelector(".turn-text")!;
+      const input = run.input ?? "";
+      if (text.textContent !== input) text.textContent = input;
+      turn.output.update(run);
+    }
   }
 
   return { el, update };

@@ -21,6 +21,7 @@ import {
   type DaemonMethods,
   type DaemonNotifications,
   type HarnessEvent,
+  type QuestionHandler,
   type ProviderConfig,
   type ProviderFactory,
   type ProviderId,
@@ -174,6 +175,7 @@ export function createDaemon(opts: DaemonOptions): Daemon {
   const keys = new Map<ProviderId, ProviderConfig>();
   const listeners = new Set<(n: Notification) => void>();
   const approvals = new Map<string, { runId: string; resolve: (d: ApprovalDecision) => void }>();
+  const questions = new Map<string, { runId: string; resolve: (answer: string) => void }>();
   const connections = new Set<LineConnection>();
   const pumps = new Set<Promise<void>>();
   let mcp: McpManager | undefined;
@@ -219,6 +221,15 @@ export function createDaemon(opts: DaemonOptions): Daemon {
         approvals.set(req.approvalId, { runId, resolve });
       });
 
+  // The harness calls this before it emits the question event, so the waiter is
+  // registered before any client can answer.
+  const questionHandler =
+    (runId: string): QuestionHandler =>
+    (req) =>
+      new Promise<string>((resolve) => {
+        questions.set(req.questionId, { runId, resolve });
+      });
+
   const scheduleStore = new ScheduleStore(db);
   const removedStarters = new RemovedStarters(opts.dataDir);
   const installedNames = async () => new Set((await opts.store.list()).map((s) => s.manifest.frontmatter.name));
@@ -253,11 +264,24 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     ...(opts.now ? { now: opts.now } : {}),
   });
 
-  /** Start a run, forward its events as notifications, and settle its approvals when it ends. */
-  function startRun(task: TaskRequest, onDone?: (events: HarnessEvent[]) => void, allowedSkills?: string[]): string {
+  /**
+   * Start a run, forward its events as notifications, and settle its approvals and questions
+   * when it ends. Only runs a person started (harness.run) are interactive: pinned apps and
+   * schedules have nobody to ask, so their model is not offered ask_user.
+   */
+  function startRun(
+    task: TaskRequest,
+    onDone?: (events: HarnessEvent[]) => void,
+    allowedSkills?: string[],
+    interactive = false,
+  ): string {
     const runId = newId("run");
     const events: HarnessEvent[] = [];
-    const stream = harness.run(task, approvalHandler(runId), { runId, ...(allowedSkills ? { allowedSkills } : {}) });
+    const stream = harness.run(task, approvalHandler(runId), {
+      runId,
+      ...(allowedSkills ? { allowedSkills } : {}),
+      ...(interactive ? { onQuestion: questionHandler(runId) } : {}),
+    });
     const pump = (async () => {
       try {
         for await (const event of stream) {
@@ -271,6 +295,11 @@ export function createDaemon(opts: DaemonOptions): Daemon {
           if (a.runId === runId) {
             approvals.delete(id);
             a.resolve({ approved: false, note: "the run ended" });
+          }
+        for (const [id, q] of questions)
+          if (q.runId === runId) {
+            questions.delete(id);
+            q.resolve("");
           }
         onDone?.(events);
       }
@@ -346,7 +375,6 @@ export function createDaemon(opts: DaemonOptions): Daemon {
   const methods: { [M in keyof AllMethods]: (p: Record<string, unknown>) => Promise<AllMethods[M]["result"]> } = {
     "daemon.hello": async () => ({ version: DAEMON_VERSION, protocol: 1 }),
     // Contract stubs (ADR-0002 work in progress): each is replaced by its implementation.
-    "harness.answer": async () => notYet("harness.answer"),
     "auth.set": async (p) => {
       const provider = providerId(p["provider"]);
       const apiKey = p["apiKey"];
@@ -384,7 +412,7 @@ export function createDaemon(opts: DaemonOptions): Daemon {
       if (!opts.providers[task.provider]) throw new RpcError(RPC_ERRORS.notFound, `no adapter for provider ${task.provider}`);
       providerConfig(task.provider);
       lastModel = { provider: task.provider, model: task.model };
-      return { runId: startRun(task) };
+      return { runId: startRun(task, undefined, undefined, true) };
     },
     "harness.cancel": async (p) => ({ ok: harness.cancel(str(p, "runId")!) }),
     "harness.approve": async (p) => {
@@ -396,6 +424,16 @@ export function createDaemon(opts: DaemonOptions): Daemon {
       const decision: ApprovalDecision = { approved: p["approved"] };
       if (typeof p["note"] === "string" && p["note"]) decision.note = p["note"];
       pending.resolve(decision);
+      return { ok: true };
+    },
+    "harness.answer": async (p) => {
+      const questionId = str(p, "questionId")!;
+      // An empty answer is allowed: it means the person skipped the question.
+      if (typeof p["answer"] !== "string") invalid("answer must be a string");
+      const pending = questions.get(questionId);
+      if (!pending) return { ok: false };
+      questions.delete(questionId);
+      pending.resolve(p["answer"].slice(0, 10_000));
       return { ok: true };
     },
     "skills.list": async () => ({ skills: await opts.store.list() }),

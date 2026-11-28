@@ -24,6 +24,8 @@ export {
   renderSkill,
   toolMatches,
   CORE_SKILL_TOOLS,
+  ALWAYS_ALLOWED_TOOLS,
+  ASKING_SECTION,
   DEFAULT_PREAMBLE,
   INDEX_DESCRIPTION_CHARS,
   type SkillSessionOptions,
@@ -32,6 +34,7 @@ export {
 export { ToolRegistry, ok, fail, type RegisteredTool, type ToolContext, type ToolOutput } from "./tools/registry.js";
 export { createBuiltinTools, type BuiltinServices } from "./tools/builtins.js";
 export { createSkillTools, scriptEffects, SKILL_TOOL_NAMES } from "./tools/skills.js";
+export { createAskUserTool, ASK_USER_TOOL, ASK_USER_DESCRIPTION, MAX_QUESTION_OPTIONS, SKIPPED_ANSWER } from "./tools/ask.js";
 export { validateSchema } from "./schema.js";
 export { checkReadSql, checkWriteSql, splitStatements, stripSql, type SqlCheck } from "./sql.js";
 export { OneSeatDb, MIGRATIONS, DB_FILE, type Migration, type OpenDbOptions } from "./db.js";
