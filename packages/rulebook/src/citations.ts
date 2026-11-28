@@ -1,20 +1,45 @@
 // Gate R2, live half: re-fetch every citation and check that the quoted passage is still there.
 // Runs on demand and in a weekly sweep, never in the per-PR unit tests (no network in CI tests).
+//
+// Outcomes separate real problems (quote missing, page gone) from pages a script cannot judge
+// (bot challenges, PDFs, server errors), which go to a verifier agent or a person instead.
 
 import type { Citation, RulePack } from "@oneseat/contracts";
+
+export type CitationOutcome =
+  /** Page loaded and the quote is on it (or the citation has no quote). */
+  | "ok"
+  /** Page loaded but the quote is not on it: the source changed or the quote is wrong. */
+  | "quote_missing"
+  /** The page is gone (4xx other than bot blocks). */
+  | "http_error"
+  /** Bot challenge or rate limit (202, 403, 429) or a temporary server error (5xx): check by hand. */
+  | "blocked"
+  /** A PDF or other binary file: the script cannot read it; check by hand or with an agent. */
+  | "needs_manual"
+  /** Network error. */
+  | "fetch_error";
 
 export interface CitationCheck {
   pack: string;
   id: string;
   url: string;
+  outcome: CitationOutcome;
+  /** True only for "ok". */
   ok: boolean;
   status?: number;
-  /** true/false when the citation has a quote; undefined when it has none. */
-  quoteFound?: boolean;
   error?: string;
 }
 
-export type Fetcher = (url: string) => Promise<{ status: number; text: () => Promise<string> }>;
+export interface FetchedPage {
+  status: number;
+  headers?: { get(name: string): string | null };
+  arrayBuffer: () => Promise<ArrayBuffer>;
+}
+
+export type Fetcher = (url: string) => Promise<FetchedPage>;
+
+const BLOCK_STATUS = new Set([202, 403, 429]);
 
 /** Strip tags, decode the common entities and fold whitespace, so quotes match page text. */
 export function normalizeText(s: string): string {
@@ -27,8 +52,11 @@ export function normalizeText(s: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;|&rsquo;|&lsquo;/g, "'")
     .replace(/&laquo;|&raquo;|&ldquo;|&rdquo;|&bdquo;/g, '"')
+    .replace(/&#(\d+);/g, (_, n: string) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h: string) => String.fromCodePoint(parseInt(h, 16)))
     .replace(/[‘’]/g, "'")
     .replace(/[“”„«»]/g, '"')
+    .replace(/­/g, "")
     .replace(/[ \s]+/g, " ")
     .trim()
     .toLowerCase();
@@ -38,21 +66,58 @@ export function quoteInText(quote: string, pageText: string): boolean {
   return normalizeText(pageText).includes(normalizeText(quote));
 }
 
+/** Decode a page using the charset from the Content-Type header or the HTML meta tag. */
+export function decodePage(bytes: Uint8Array, contentType: string | null): string {
+  const fromHeader = /charset=([\w-]+)/i.exec(contentType ?? "")?.[1];
+  const head = new TextDecoder("latin1").decode(bytes.slice(0, 4096));
+  const fromMeta = /<meta[^>]+charset=["']?([\w-]+)/i.exec(head)?.[1];
+  const charset = (fromHeader ?? fromMeta ?? "utf-8").toLowerCase();
+  try {
+    return new TextDecoder(charset).decode(bytes);
+  } catch {
+    return new TextDecoder("utf-8").decode(bytes);
+  }
+}
+
+function isBinary(url: string, contentType: string | null): boolean {
+  if (contentType && /pdf|octet-stream|msword|officedocument/i.test(contentType)) return true;
+  return /\.pdf(?:$|[?#])/i.test(url);
+}
+
 export async function checkCitation(pack: string, c: Citation, fetcher: Fetcher): Promise<CitationCheck> {
   const base = { pack, id: c.id, url: c.url };
   try {
     const res = await fetcher(c.url);
-    if (res.status < 200 || res.status >= 300) return { ...base, ok: false, status: res.status, error: `HTTP ${res.status}` };
-    if (c.quote === undefined) return { ...base, ok: true, status: res.status };
-    const found = quoteInText(c.quote, await res.text());
-    return { ...base, ok: found, status: res.status, quoteFound: found, ...(found ? {} : { error: "quote not found on the page" }) };
+    if (BLOCK_STATUS.has(res.status) || res.status >= 500) {
+      return { ...base, outcome: "blocked", ok: false, status: res.status, error: `HTTP ${res.status}: check by hand` };
+    }
+    if (res.status < 200 || res.status >= 300) return { ...base, outcome: "http_error", ok: false, status: res.status, error: `HTTP ${res.status}` };
+    const contentType = res.headers?.get("content-type") ?? null;
+    if (isBinary(c.url, contentType)) {
+      return { ...base, outcome: "needs_manual", ok: false, status: res.status, error: "PDF or binary file: check the quote by hand" };
+    }
+    if (c.quote === undefined) return { ...base, outcome: "ok", ok: true, status: res.status };
+    const text = decodePage(new Uint8Array(await res.arrayBuffer()), contentType);
+    if (quoteInText(c.quote, text)) return { ...base, outcome: "ok", ok: true, status: res.status };
+    return { ...base, outcome: "quote_missing", ok: false, status: res.status, error: "quote not found on the page" };
   } catch (e) {
-    return { ...base, ok: false, error: (e as Error).message };
+    return { ...base, outcome: "fetch_error", ok: false, error: (e as Error).message };
   }
 }
 
-export async function checkCitations(packs: RulePack[], fetcher: Fetcher): Promise<CitationCheck[]> {
-  const out: CitationCheck[] = [];
-  for (const p of packs) for (const c of p.citations) out.push(await checkCitation(p.id, c, fetcher));
+export async function checkCitations(packs: RulePack[], fetcher: Fetcher, concurrency = 6): Promise<CitationCheck[]> {
+  const jobs = packs.flatMap((p) => p.citations.map((c) => () => checkCitation(p.id, c, fetcher)));
+  const out: CitationCheck[] = new Array(jobs.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < jobs.length) {
+      const i = next++;
+      out[i] = await jobs[i]!();
+    }
+  };
+  await Promise.all(Array.from({ length: Math.max(1, Math.min(concurrency, jobs.length)) }, worker));
   return out;
 }
+
+/** Outcomes that mean the rule pack must change: gate R2 fails on these. */
+export const FAILING_OUTCOMES: readonly CitationOutcome[] = ["quote_missing", "http_error"];

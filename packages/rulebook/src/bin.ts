@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // oblige-rules lint <dir> | citations <dir> | hash <dir>
 import { loadRulebook } from "./load.js";
-import { checkCitations } from "./citations.js";
+import { checkCitations, FAILING_OUTCOMES } from "./citations.js";
 import { packHash } from "./sign.js";
 
 async function main(argv: string[]): Promise<number> {
@@ -14,9 +14,14 @@ async function main(argv: string[]): Promise<number> {
     return errors > 0 ? 1 : 0;
   }
   if (cmd === "citations") {
-    const results = await checkCitations(packs, (url) => fetch(url, { redirect: "follow", headers: { "user-agent": "oblige-rules citation check" } }));
-    for (const r of results) console.log(`${r.ok ? "ok  " : "FAIL"} ${r.pack} ${r.id} ${r.status ?? ""} ${r.error ?? ""} ${r.url}`);
-    return results.some((r) => !r.ok) ? 1 : 0;
+    const results = await checkCitations(packs, (url) =>
+      fetch(url, { redirect: "follow", headers: { "user-agent": "oblige-rules citation check", "accept-language": "en,de,fr,it,es,nl" } }),
+    );
+    for (const r of results) console.log(`${r.outcome.padEnd(13)} ${r.pack} ${r.id} ${r.status ?? ""} ${r.url}`);
+    const counts = new Map<string, number>();
+    for (const r of results) counts.set(r.outcome, (counts.get(r.outcome) ?? 0) + 1);
+    console.log([...counts].map(([k, v]) => `${k}: ${v}`).join(", "));
+    return results.some((r) => FAILING_OUTCOMES.includes(r.outcome)) ? 1 : 0;
   }
   if (cmd === "hash") {
     for (const p of packs) console.log(`${packHash(p)}  ${p.id}@${p.version} (${p.review.status})`);
