@@ -1,5 +1,5 @@
-import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { basename, isAbsolute, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { SkillPermissionsFile } from "@oneseat/contracts";
@@ -76,8 +76,18 @@ describe("findDeno", () => {
     expect(findDeno({ env: { ONESEAT_DENO: join(dir, "missing") } })).toBeUndefined();
     expect(findDeno({ env: { PATH: `${join(dir, "nothing")}${process.platform === "win32" ? ";" : ":"}${dir}` }, from: [] })).toBe(fake);
     expect(findDeno({ env: {}, from: [tmpDir()] })).toBeUndefined();
-    // A relative PATH entry is never used, even when it holds a deno binary.
-    expect(findDeno({ env: { PATH: relative(process.cwd(), dir) }, from: [] })).toBeUndefined();
+    // A relative PATH entry is never used, even when it holds a deno binary. The folder sits under
+    // the working folder, so the entry is relative on every OS (temp can be on another drive).
+    const local = mkdtempSync(join(process.cwd(), ".deno-rel-"));
+    try {
+      writeFileSync(join(local, basename(fake)), "#!/bin/sh\n");
+      chmodSync(join(local, basename(fake)), 0o755);
+      const rel = relative(process.cwd(), local);
+      expect(isAbsolute(rel)).toBe(false);
+      expect(findDeno({ env: { PATH: rel }, from: [] })).toBeUndefined();
+    } finally {
+      rmSync(local, { recursive: true, force: true });
+    }
     expect(DENO).toBeDefined();
     expect(DENO!.includes(`${sep}.bin${sep}`)).toBe(false);
   });
