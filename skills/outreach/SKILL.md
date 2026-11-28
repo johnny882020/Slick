@@ -76,7 +76,8 @@ email tool (the person will be asked to approve).
 - For 3 or more drafts, or when asked to keep them, `workspace_write` them to
   `drafts/outreach/<YYYY-MM-DD>-<customer-id>-<template>.md`.
 - `memory_save` one line per draft: `Drafted <template> for <customer id> on <date>, not sent.`
-  Also save tone or sign-off preferences the person states.
+  Also save tone or sign-off preferences the person states. Save before you reply, then reply
+  with the draft itself in the shape above: never "the draft is above".
 - Only after a connected send tool reports success (and the person approved it), record the real
   email: `INSERT INTO messages (id, customer_id, channel, direction, subject, body, sent_at)
   VALUES ('msg_' || lower(hex(randomblob(8))), ?, 'email', 'out', ?, ?, ?)`.
