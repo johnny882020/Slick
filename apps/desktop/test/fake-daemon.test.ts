@@ -119,6 +119,27 @@ describe("fake daemon", () => {
     await expect(c.call("skills.inspect", { source: "missing/thing" })).rejects.toMatchObject({ code: -32004 });
   });
 
+  it("searches a canned skills.sh and restores removed starter skills", async () => {
+    const { results } = await c.call("skills.search", { query: "invoice" });
+    expect(results.map((r) => r.skill)).toEqual(["invoice-chase", "invoice-organizer"]);
+    expect(results.every((r) => r.installed === false && r.repo && r.installs > 0)).toBe(true);
+    expect((await c.call("skills.search", { query: "weekly" })).results[0]).toMatchObject({ skill: "weekly-report", installed: true });
+    expect(await c.call("skills.search", { query: "  " })).toEqual({ results: [] });
+    expect(await c.call("skills.search", { query: "zzz" })).toEqual({ results: [] });
+    await expect(c.call("skills.search", { query: "offline" })).rejects.toMatchObject({ code: -32603 });
+    expect((await c.call("skills.inspect", { source: "skills.sh:acme/support-replies/support-replies" })).scan.skill).toBe("support-replies");
+
+    expect(await c.call("skills.restorable", {})).toEqual({ skills: [] });
+    expect(await c.call("skills.remove", { name: "social-posts" })).toEqual({ ok: true });
+    const { skills } = await c.call("skills.restorable", {});
+    expect(skills.map((s) => s.name)).toEqual(["social-posts"]);
+    expect(skills[0]!.description).toMatch(/social media/);
+    await expect(c.call("skills.restore", { name: "nope" })).rejects.toMatchObject({ code: -32004 });
+    expect(await c.call("skills.restore", { name: "social-posts" })).toMatchObject({ installed: true, skill: { manifest: { frontmatter: { name: "social-posts" } } } });
+    await expect(c.call("skills.restore", { name: "social-posts" })).rejects.toMatchObject({ code: -32602 });
+    expect(await c.call("skills.restorable", {})).toEqual({ skills: [] });
+  });
+
   it("pins apps to ONESEAT_HOME and enforces allowedSkills in apps.run", async () => {
     const { runId } = await c.call("harness.run", { input: "make an invoice tracker app", provider: "anthropic", model: "m" });
     const end = await c.waitFor((e) => e.runId === runId && e.event.type === "tool_end");

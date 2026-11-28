@@ -1,17 +1,21 @@
 // Wires gateway + registry + harness into one daemon.
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
-import { existsSync, readdirSync } from "node:fs";
 import { PROVIDER_IDS, type ProviderId } from "@oneseat/contracts";
 import { PROVIDER_FACTORIES } from "@oneseat/gateway";
-import { createDaemon, LicenseManager, type Daemon, type DaemonOptions } from "@oneseat/harness";
+import { createDaemon, LicenseManager, seedStarterSkills, type Daemon, type DaemonOptions } from "@oneseat/harness";
 import { DEFAULT_CLOUD_URL, ONESEAT_LICENSE_PUBLIC_KEY } from "./license-key.js";
-import { createSkillStore, type RegistrySkillStore } from "@oneseat/registry";
+import { createSkillStore, searchSkillsSh, type FetchLike, type RegistrySkillStore } from "@oneseat/registry";
 
 export interface StartOptions {
   dataDir?: string;
-  /** Folder of starter skills shipped with the app; installed on first run. */
+  /**
+   * Folder of starter skills shipped with the app. Each start installs the ones that are not
+   * installed, except the ones the person removed (skills.restore puts those back).
+   */
   bundledSkillsDir?: string;
+  /** fetch for skills.sh search (tests). Default globalThis.fetch. */
+  fetch?: FetchLike;
   defaultModel?: { provider: ProviderId; model: string };
   denoPath?: string;
   log?: (line: string) => void;
@@ -55,21 +59,12 @@ export function parseModelRef(ref: string | undefined): { provider: ProviderId; 
 export const DEFAULT_MODEL = { provider: "anthropic" as const, model: "claude-sonnet-5-5" };
 
 /**
- * Install every bundled skill that is not installed yet. A bundled skill still
+ * Install every bundled skill that is not installed yet and that the person did not remove
+ * (removed starter skills are kept in <dataDir>/removed-starters.json). A bundled skill still
  * goes through scan + lint like any other source; a failure is logged, not fatal.
  */
 export async function seedBundledSkills(store: RegistrySkillStore, dir: string, log: (l: string) => void): Promise<string[]> {
-  if (!existsSync(dir)) return [];
-  const installed = new Set((await store.list()).map((s) => s.manifest.frontmatter.name));
-  const seeded: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isDirectory() || entry.name.startsWith(".") || entry.name.startsWith("_")) continue;
-    if (installed.has(entry.name) || !existsSync(join(dir, entry.name, "SKILL.md"))) continue;
-    const res = await store.install({ kind: "local", path: join(dir, entry.name) });
-    if (res.installed) seeded.push(entry.name);
-    else log(`bundled skill ${entry.name} not installed: ${res.reason ?? res.scan.verdict}`);
-  }
-  return seeded;
+  return seedStarterSkills(store, dir, store.dataDir, log);
 }
 
 export async function startDaemon(opts: StartOptions = {}): Promise<StartedDaemon> {
@@ -84,6 +79,8 @@ export async function startDaemon(opts: StartOptions = {}): Promise<StartedDaemo
     store,
     providers: PROVIDER_FACTORIES,
     dataDir,
+    ...(opts.bundledSkillsDir ? { bundledSkillsDir: resolve(opts.bundledSkillsDir) } : {}),
+    searchSkills: (query) => searchSkillsSh(query, opts.fetch ? { fetch: opts.fetch } : {}),
     // Without this the daemon never loaded connectors, so Pro/Team's MCP connectors did nothing.
     mcpConfigPath: opts.mcpConfigPath ?? join(dataDir, "mcp.json"),
     defaultModel: opts.defaultModel ?? DEFAULT_MODEL,

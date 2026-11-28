@@ -1174,6 +1174,53 @@ details[open] > summary::before {
 .skill > p:nth-of-type(1) {
   color: var(--body);
 }
+
+/* skills.sh search results: one hairline-separated row each. */
+.search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.search-results:empty {
+  display: none;
+}
+.search-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  border-block-start: 1px solid var(--line);
+  padding-block: 0.75rem;
+  min-inline-size: 0;
+}
+.search-result:first-child {
+  border-block-start: 0;
+}
+.search-result h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.98rem;
+  overflow-wrap: anywhere;
+}
+.search-result p {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.search-result > .row {
+  flex: none;
+}
+.plan-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+}
 .app {
   display: flex;
   gap: 1rem;

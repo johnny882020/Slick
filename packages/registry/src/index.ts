@@ -23,6 +23,19 @@ export {
   type SkillCheck,
 } from "./inspect.js";
 export { describeSource, download, skillNameOf, stageSource, tarballUrl, type FetchLike, type StagedSource, type StageOptions } from "./sources.js";
+export {
+  parseSearchEntry,
+  searchSkillsSh,
+  skillsShSource,
+  REGISTRY_HOSTS,
+  SEARCH_LIMIT,
+  SEARCH_MAX_BYTES,
+  SEARCH_QUERY_MAX,
+  SEARCH_TIMEOUT_MS,
+  SKILLS_SH_URL,
+  type SearchOptions,
+  type SkillsShResult,
+} from "./search.js";
 export { checkArchivePath, extractTarGz, gunzipLimited, readTar, type TarFile, type TarOptions } from "./tar.js";
 export { copyTree, discoverSkillDirs, loadSkillDir, writeSkill, type LoadedSkill, type SkillEntry } from "./files.js";
 export { InstallSigner, hashDir, hashFiles, type HashInput } from "./integrity.js";
