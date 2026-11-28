@@ -144,6 +144,23 @@ describe("runEvals", () => {
     expect(r.noSkill.find((f) => f.caseId === "case-2")).toBeUndefined();
   });
 
+  it("labels a row BLOCKED (account) when every failed run is the provider account out of credit", async () => {
+    const broke = smart((req) =>
+      /report 2\b/.test(JSON.stringify(req.messages))
+        ? { steps: [{ error: { kind: "invalid_request", message: "Anthropic API error 400: Your credit balance is too low to access the Anthropic API." } }] }
+        : answer(req),
+    );
+    const r = await runEvals({ harness, providers: [{ provider: broke, model: "m1" }], suites: [suite()] });
+    expect(r.verdicts[0]!.pass).toBe(false); // the gate stays strict
+    const md = renderEvalMarkdown(r);
+    expect(md).toContain("BLOCKED (account)");
+    expect(md).toMatch(/Not fully measured: the anthropic account ran out of credit/);
+    // An ordinary failure stays a plain FAIL.
+    const flaky = smart((req) => (/report 2\b/.test(JSON.stringify(req.messages)) ? { steps: [{ error: { kind: "server", message: "down" } }] } : answer(req)));
+    const r2 = await runEvals({ harness, providers: [{ provider: flaky, model: "m1" }], suites: [suite()] });
+    expect(renderEvalMarkdown(r2)).not.toContain("BLOCKED");
+  });
+
   it("reports setup failures and harness timeouts as run errors", async () => {
     const broken: EvalHarnessFactory = () => {
       throw new Error("no harness");

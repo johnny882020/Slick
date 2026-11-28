@@ -82,11 +82,25 @@ export function describeCheck(c: EvalCheck): string {
   }
 }
 
+/** Provider messages that mean the account itself is blocked (same rule as @oneseat/gateway OUT_OF_CREDIT, plus spent quotas). */
+const ACCOUNT_BLOCKED = /credit balance is too low|credit_balance_exhausted|no credits remaining|insufficient_quota|billing_hard_limit|RESOURCE_EXHAUSTED|exceeded your current quota/i;
+
+/** True when a skill/provider row has failed runs and every one of them failed because the provider account was blocked. */
+export function blockedByAccount(report: EvalReport, skill: string, provider: string): boolean {
+  const errs = report.runs.filter((r) => r.skill === skill && r.provider === provider && r.error);
+  return errs.length > 0 && errs.every((r) => ACCOUNT_BLOCKED.test(r.error ?? ""));
+}
+
 /** Markdown summary: one row per skill and provider, then failures and no-skill findings. */
 export function renderEvalMarkdown(report: EvalReport): string {
   const lines: string[] = [];
   lines.push(`# Skill evals (gate 5) — ${report.pass ? "PASS" : "FAIL"}`);
   lines.push("");
+  const blocked = [...new Set(report.verdicts.filter((v) => blockedByAccount(report, v.skill, v.provider)).map((v) => v.provider))];
+  if (blocked.length > 0) {
+    lines.push(`> Not fully measured: the ${blocked.join(" and ")} account ran out of credit or quota during the run (rows marked BLOCKED). That is the provider account, not the skill; add credit or wait for the quota to reset, then run again.`);
+    lines.push("");
+  }
   lines.push(`Mode: ${report.mode}. Providers: ${report.providers.map((p) => `${p.name} (${p.model})`).join(", ") || "none"}.${report.judge ? ` Judge: ${report.judge.provider} (${report.judge.model}).` : ""}`);
   lines.push(`Pass rule: the skill wins or ties (within ${report.tieEpsilon}) the no-skill baseline on every case, with at least ${report.minCases} cases and no failed runs.`);
   lines.push("");
@@ -94,7 +108,7 @@ export function renderEvalMarkdown(report: EvalReport): string {
   lines.push("|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|");
   for (const v of report.verdicts) {
     const n = (r: CaseOutcome) => v.outcomes.filter((o) => o.result === r).length;
-    lines.push(`| ${cell(v.skill)} | ${cell(v.provider)} | ${cell(v.model)} | ${v.cases} | ${n("win")} | ${n("tie")} | ${n("loss")} | ${v.errors} | ${pct(v.withSkillScore)} | ${pct(v.baselineScore)} | ${v.pass ? "PASS" : "FAIL"} |`);
+    lines.push(`| ${cell(v.skill)} | ${cell(v.provider)} | ${cell(v.model)} | ${v.cases} | ${n("win")} | ${n("tie")} | ${n("loss")} | ${v.errors} | ${pct(v.withSkillScore)} | ${pct(v.baselineScore)} | ${v.pass ? "PASS" : blockedByAccount(report, v.skill, v.provider) ? "BLOCKED (account)" : "FAIL"} |`);
   }
   if (report.verdicts.length === 0) lines.push("| — | — | — | 0 | 0 | 0 | 0 | 0 | — | — | FAIL |");
   const failed = report.verdicts.filter((v) => !v.pass || v.notes.length > 0);

@@ -113,7 +113,9 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
     return f2.requests[0]?.body as Record<string, unknown>;
   }
 
-  it("anthropic: tool_use in the assistant turn, tool_result with the same id in a user turn", async () => {
+  it("anthropic: tool_use in the assistant turn, tool_result with the same id in a user turn", async (ctx) => {
+    // A blocked account's recording holds its error, not a tool call: nothing to link.
+    if (blockedProviders.has("anthropic")) return ctx.skip("the account was blocked while recording turn 1");
     const body = await turn2Body("anthropic");
     expect(body["system"]).toBe("You are a weather bot");
     expect(body["messages"]).toEqual([
@@ -126,7 +128,9 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
     ]);
   });
 
-  it("openai: function_call then function_call_output with the same call_id, store false", async () => {
+  it("openai: function_call then function_call_output with the same call_id, store false", async (ctx) => {
+    // A blocked account's recording holds its error, not a tool call: nothing to link.
+    if (blockedProviders.has("openai")) return ctx.skip("the account was blocked while recording turn 1");
     const body = await turn2Body("openai");
     expect(body["instructions"]).toBe("You are a weather bot");
     expect(body["store"]).toBe(false);
@@ -137,7 +141,9 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
     ]);
   });
 
-  it("google: functionCall keeps its thoughtSignature; functionResponse is keyed by name", async () => {
+  it("google: functionCall keeps its thoughtSignature; functionResponse is keyed by name", async (ctx) => {
+    // A blocked account's recording holds its error, not a tool call: nothing to link.
+    if (blockedProviders.has("google")) return ctx.skip("the account was blocked while recording turn 1");
     const body = await turn2Body("google");
     expect(body["systemInstruction"]).toEqual({ parts: [{ text: "You are a weather bot" }] });
     expect(body["contents"]).toEqual([
@@ -155,7 +161,9 @@ describe("gate 2: turn 2 request bodies link the tool result to the call", () =>
     ]);
   });
 
-  it("local: assistant tool_calls then a tool message with the same tool_call_id", async () => {
+  it("local: assistant tool_calls then a tool message with the same tool_call_id", async (ctx) => {
+    // A blocked account's recording holds its error, not a tool call: nothing to link.
+    if (blockedProviders.has("local")) return ctx.skip("the account was blocked while recording turn 1");
     const body = await turn2Body("local");
     expect(body["messages"]).toEqual([
       { role: "system", content: "You are a weather bot" },
