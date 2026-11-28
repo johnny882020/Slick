@@ -256,3 +256,71 @@ describe("daemon wiring", () => {
     for (const f of walk(dir)) expect(readFileSync(f).includes(Buffer.from(KEY))).toBe(false);
   });
 });
+
+describe("starter skills and skills.sh search", () => {
+  it("a removed starter skill stays removed after a restart and can be restored", async () => {
+    const d = mkdtempSync(join(tmpdir(), "oneseat-restore-"));
+    const start = () => startDaemon({ dataDir: d, bundledSkillsDir: SKILLS, log: () => {}, startScheduler: false, cloudUrl: "http://127.0.0.1:9" });
+    try {
+      const first = await start();
+      expect(first.seeded).toContain("social-posts");
+      expect(await first.daemon.handle("skills.restorable", {})).toEqual({ skills: [] });
+      expect(await first.daemon.handle("skills.remove", { name: "social-posts" })).toEqual({ ok: true });
+      await first.daemon.close();
+
+      // The bug: seeding put it back on every start. Now it stays removed and is offered for restore.
+      const second = await start();
+      expect(second.seeded).toEqual([]);
+      const names = (await second.daemon.handle("skills.list", {})).skills.map((s) => s.manifest.frontmatter.name);
+      expect(names).not.toContain("social-posts");
+      const { skills } = await second.daemon.handle("skills.restorable", {});
+      expect(skills.map((s) => s.name)).toEqual(["social-posts"]);
+      expect(skills[0]!.description).toMatch(/social/i);
+
+      // Free plan: restoring a starter skill needs no license; it is scanned, linted and signed.
+      expect((await second.daemon.handle("license.status", {})).tier).toBe("free");
+      const res = await second.daemon.handle("skills.restore", { name: "social-posts" });
+      expect(res).toMatchObject({ installed: true, lint: { ok: true } });
+      expect(res.scan.verdict).not.toBe("block");
+      expect((await second.store.verify("social-posts")).ok).toBe(true);
+      expect(await second.daemon.handle("skills.restorable", {})).toEqual({ skills: [] });
+      await second.daemon.close();
+
+      const third = await start();
+      expect(third.seeded).toEqual([]);
+      expect((await third.daemon.handle("skills.list", {})).skills).toHaveLength(7);
+      await third.daemon.close();
+    } finally {
+      rmSync(d, { recursive: true, force: true });
+    }
+  });
+
+  it("searches skills.sh on Free (stub fetch) and gates installing a result", async () => {
+    const d = mkdtempSync(join(tmpdir(), "oneseat-search-"));
+    const urls: string[] = [];
+    const fetch = async (url: string) => {
+      urls.push(url);
+      return new Response(
+        JSON.stringify({
+          query: "posts",
+          skills: [
+            { id: "anthropics/knowledge-work-plugins/social-posts", source: "anthropics/knowledge-work-plugins", skillId: "social-posts", name: "social-posts", installs: 812 },
+            { id: "acme/x/bad", source: "acme/x/extra", skillId: "bad", name: "bad", installs: 1 },
+          ],
+        }),
+      );
+    };
+    const s = await startDaemon({ dataDir: d, bundledSkillsDir: SKILLS, log: () => {}, startScheduler: false, cloudUrl: "http://127.0.0.1:9", fetch });
+    try {
+      const { results } = await s.daemon.handle("skills.search", { query: "posts" });
+      expect(urls).toEqual(["https://skills.sh/api/search?q=posts"]);
+      expect(results).toEqual([
+        { id: "anthropics/knowledge-work-plugins/social-posts", repo: "anthropics/knowledge-work-plugins", skill: "social-posts", name: "social-posts", installs: 812, installed: true },
+      ]);
+      await expect(s.daemon.handle("skills.install", { source: "anthropics/knowledge-work-plugins@social-posts" })).rejects.toMatchObject({ code: -32003 });
+    } finally {
+      await s.daemon.close();
+      rmSync(d, { recursive: true, force: true });
+    }
+  });
+});

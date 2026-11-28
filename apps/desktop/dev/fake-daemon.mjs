@@ -13,6 +13,11 @@
 //   contains "slow"                         -> streams slowly (for cancel)
 //   anything else                           -> skill_loaded + a read tool + streamed text
 //
+// Skills: three starter skills (invoice-chaser, weekly-report, social-posts) are installed.
+// Removing one offers it under skills.restorable; skills.restore puts it back. skills.search
+// answers from a small canned skills.sh catalogue ("offline" in the query fails like a
+// network error).
+//
 // Env:
 //   ONESEAT_HOME            data dir (pinned apps are written under it)
 //   FAKE_DAEMON_STEP_MS     delay between streamed events (default 25)
@@ -106,21 +111,49 @@ function makeSkill(name, description, source, extra = {}) {
   };
 }
 
-const skills = new Map(
+/** Starter skills shipped with the app: name -> builder (a fresh record on each restore). */
+const STARTERS = new Map([
   [
-    makeSkill(
-      "invoice-chaser",
-      "Drafts and sends polite payment reminders for overdue invoices. Use when invoices are past due.",
-      { kind: "local", path: "/skills/invoice-chaser" },
-      { effects: ["send"], files: ["templates/reminder.md"] },
-    ),
-    makeSkill(
-      "weekly-report",
-      "Summarises the week's sales, tickets and posts into a short report. Use on Mondays or when asked for a recap.",
-      { kind: "skills.sh", owner: "oneseat", repo: "starter", skill: "weekly-report" },
-    ),
-  ].map((s) => [s.manifest.frontmatter.name, s]),
-);
+    "invoice-chaser",
+    () =>
+      makeSkill(
+        "invoice-chaser",
+        "Drafts and sends polite payment reminders for overdue invoices. Use when invoices are past due.",
+        { kind: "local", path: "/skills/invoice-chaser" },
+        { effects: ["send"], files: ["templates/reminder.md"] },
+      ),
+  ],
+  [
+    "weekly-report",
+    () =>
+      makeSkill(
+        "weekly-report",
+        "Summarises the week's sales, tickets and posts into a short report. Use on Mondays or when asked for a recap.",
+        { kind: "skills.sh", owner: "oneseat", repo: "starter", skill: "weekly-report" },
+      ),
+  ],
+  [
+    "social-posts",
+    () =>
+      makeSkill(
+        "social-posts",
+        "Plans and drafts social media posts for the week in your brand voice. Use when asked for posts or a content calendar.",
+        { kind: "local", path: "/skills/social-posts" },
+      ),
+  ],
+]);
+const skills = new Map([...STARTERS.values()].map((make) => { const s = make(); return [s.manifest.frontmatter.name, s]; }));
+/** Starter skills the person removed (the real daemon keeps these in removed-starters.json). */
+const removedStarters = new Set();
+
+/** A canned slice of skills.sh for skills.search. */
+const CATALOGUE = [
+  { id: "anthropics/knowledge-work-plugins/invoice-chase", repo: "anthropics/knowledge-work-plugins", skill: "invoice-chase", name: "invoice-chase", installs: 2258 },
+  { id: "composiohq/awesome-claude-skills/invoice-organizer", repo: "composiohq/awesome-claude-skills", skill: "invoice-organizer", name: "invoice-organizer", installs: 5661 },
+  { id: "acme/support-replies/support-replies", repo: "acme/support-replies", skill: "support-replies", name: "support-replies", installs: 1840 },
+  { id: "acme/notes/warn-notes", repo: "acme/notes", skill: "warn-notes", name: "Meeting notes (warn-notes)", installs: 312 },
+  { id: "oneseat/starter/weekly-report", repo: "oneseat/starter", skill: "weekly-report", name: "weekly-report", installs: 950 },
+];
 
 // ---------------------------------------------------------------- helpers
 
@@ -141,7 +174,9 @@ function requireProvider(p) {
 }
 
 function parseSource(input) {
-  const s = input.trim();
+  let s = input.trim();
+  // Like the real daemon: "skills.sh:owner/repo/skill" (a search result id) and "skills.sh:owner/repo@skill".
+  if (s.startsWith("skills.sh:")) s = s.slice("skills.sh:".length).replace(/^([^/@\s]+\/[^/@\s]+)\/([^/@\s]+)$/, "$1@$2");
   const gh = s.match(/^https?:\/\/github\.com\/([^/\s]+)\/([^/\s#?]+?)(?:\.git)?(?:\/tree\/([^/\s]+)(?:\/(.+))?)?\/?$/);
   if (gh) return { kind: "github", owner: gh[1], repo: gh[2], ...(gh[3] ? { ref: gh[3] } : {}), ...(gh[4] ? { path: gh[4] } : {}) };
   const short = s.match(/^([A-Za-z0-9][A-Za-z0-9-]*)\/([A-Za-z0-9._-]+?)(?:@([a-z0-9-]+))?$/);
@@ -538,7 +573,37 @@ const methods = {
   },
   "skills.remove": (p) => {
     const name = requireString(requireObject(p), "name");
-    return { ok: skills.delete(name) };
+    const ok = skills.delete(name);
+    if (ok && STARTERS.has(name)) removedStarters.add(name);
+    return { ok };
+  },
+  "skills.search": (p) => {
+    const o = requireObject(p);
+    if (typeof o.query !== "string") throw new RpcError(ERR.invalidParams, "query must be a string");
+    const q = o.query.trim().toLowerCase();
+    if (!q) return { results: [] };
+    if (/offline/.test(q)) throw new RpcError(ERR.internal, "could not reach skills.sh: getaddrinfo ENOTFOUND skills.sh");
+    const words = q.split(/\s+/);
+    const results = CATALOGUE.filter((r) => words.some((w) => `${r.id} ${r.name}`.toLowerCase().includes(w))).map((r) => ({ ...r, installed: skills.has(r.skill) }));
+    return { results };
+  },
+  "skills.restorable": () => ({
+    skills: [...STARTERS.keys()]
+      .filter((name) => !skills.has(name))
+      .sort()
+      .map((name) => ({ name, description: STARTERS.get(name)().manifest.frontmatter.description })),
+  }),
+  "skills.restore": (p) => {
+    const name = requireString(requireObject(p), "name");
+    const make = STARTERS.get(name);
+    if (!make) throw new RpcError(ERR.notFound, `"${name}" is not one of OneSeat's starter skills`);
+    if (skills.has(name)) throw new RpcError(ERR.invalidParams, `"${name}" is already installed`);
+    const skill = make();
+    skill.installedAt = now();
+    skills.set(name, skill);
+    removedStarters.delete(name);
+    const { scan, lint } = inspect(`/skills/${name}`);
+    return { installed: true, skill, scan, lint };
   },
   "apps.pin": (p) => {
     requireFeature("pinned_apps", "Pin apps as their own windows");

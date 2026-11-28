@@ -6,7 +6,16 @@ export {
   type Daemon,
   type DaemonOptions,
   type DaemonExtraMethods,
+  parseSourceText,
 } from "./daemon.js";
+export {
+  listBundledSkills,
+  seedStarterSkills,
+  RemovedStarters,
+  REMOVED_STARTERS_FILE,
+  installResult,
+  type BundledSkill,
+} from "./starters.js";
 export {
   SkillSession,
   buildSystemPrompt,

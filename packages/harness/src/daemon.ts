@@ -25,6 +25,8 @@ import {
   type ProviderFactory,
   type ProviderId,
   type Schedule,
+  type SkillSearchResult,
+  type SkillSource,
   type SkillStore,
   type TaskRequest,
 } from "@oneseat/contracts";
@@ -38,6 +40,7 @@ import { RpcError, serveLines, type LineConnection } from "./rpc.js";
 import { ScriptSandbox, findDeno } from "./sandbox.js";
 import { Scheduler } from "./scheduler.js";
 import { ScheduleStore } from "./stores.js";
+import { installResult, listBundledSkills, RemovedStarters } from "./starters.js";
 import { createLogger, errorMessage, isRecord, newId, Redactor, type Logger } from "./util.js";
 
 export const DAEMON_VERSION = "0.1.0";
@@ -66,6 +69,16 @@ export interface DaemonOptions {
    * schedules, MCP connectors) need a plan that includes them. When unset nothing is gated.
    */
   license?: LicenseManager;
+  /**
+   * Starter skills shipped with the app. A removed starter skill is remembered (so the next
+   * start does not put it back) and can be put back with skills.restore.
+   */
+  bundledSkillsDir?: string;
+  /**
+   * Search skills.sh (the sidecar wires @oneseat/registry's searchSkillsSh). Without it,
+   * skills.search answers "not available".
+   */
+  searchSkills?: (query: string) => Promise<Omit<SkillSearchResult, "installed">[]>;
 }
 
 /** Methods the daemon adds beyond the contract (see the stream B report). */
@@ -107,6 +120,23 @@ function str(p: Record<string, unknown>, key: string, opts: { optional?: boolean
   if (typeof v !== "string" || v === "") invalid(`${key} must be a non-empty string`);
   return v;
 }
+
+/**
+ * A skill source from the UI. Also takes "skills.sh:owner/repo/skill" (a search result id,
+ * as the contract names it) and "skills.sh:owner/repo@skill".
+ */
+export function parseSourceText(text: string): SkillSource {
+  const t = text.trim();
+  if (!t.startsWith("skills.sh:")) return parseSkillSource(t);
+  const rest = t.slice("skills.sh:".length);
+  const id = rest.match(/^([^/@\s]+)\/([^/@\s]+)\/([^/@\s]+)$/);
+  const src = parseSkillSource(id ? `${id[1]}/${id[2]}@${id[3]}` : rest);
+  if (src.kind !== "skills.sh") invalid(`"${text}" is not a skills.sh name like owner/repo@skill`);
+  return src;
+}
+
+/** Longest skills.search query. */
+const SEARCH_QUERY_MAX = 200;
 
 function providerId(v: unknown): ProviderId {
   if (typeof v !== "string" || !(PROVIDER_IDS as readonly string[]).includes(v))
@@ -190,6 +220,8 @@ export function createDaemon(opts: DaemonOptions): Daemon {
       });
 
   const scheduleStore = new ScheduleStore(db);
+  const removedStarters = new RemovedStarters(opts.dataDir);
+  const installedNames = async () => new Set((await opts.store.list()).map((s) => s.manifest.frontmatter.name));
 
   const scheduler = new Scheduler({
     store: scheduleStore,
@@ -315,9 +347,6 @@ export function createDaemon(opts: DaemonOptions): Daemon {
     "daemon.hello": async () => ({ version: DAEMON_VERSION, protocol: 1 }),
     // Contract stubs (ADR-0002 work in progress): each is replaced by its implementation.
     "harness.answer": async () => notYet("harness.answer"),
-    "skills.search": async () => notYet("skills.search"),
-    "skills.restorable": async () => notYet("skills.restorable"),
-    "skills.restore": async () => notYet("skills.restore"),
     "license.trial": async () => notYet("license.trial"),
     "auth.set": async (p) => {
       const provider = providerId(p["provider"]);
@@ -371,13 +400,57 @@ export function createDaemon(opts: DaemonOptions): Daemon {
       return { ok: true };
     },
     "skills.list": async () => ({ skills: await opts.store.list() }),
-    "skills.inspect": async (p) => opts.store.inspect(parseSkillSource(str(p, "source")!)),
+    "skills.inspect": async (p) => opts.store.inspect(parseSourceText(str(p, "source")!)),
     "skills.install": async (p) => {
       requireFeature("import_skills");
       if (p["allowWarnings"] !== undefined && typeof p["allowWarnings"] !== "boolean") invalid("allowWarnings must be a boolean");
-      return opts.store.install(parseSkillSource(str(p, "source")!), { allowWarnings: p["allowWarnings"] === true });
+      return opts.store.install(parseSourceText(str(p, "source")!), { allowWarnings: p["allowWarnings"] === true });
     },
-    "skills.remove": async (p) => ({ ok: await opts.store.remove(str(p, "name")!) }),
+    "skills.remove": async (p) => {
+      const name = str(p, "name")!;
+      const ok = await opts.store.remove(name);
+      // Remember a removed starter skill so the next start does not put it back.
+      if (ok && listBundledSkills(opts.bundledSkillsDir).some((b) => b.name === name)) removedStarters.add(name);
+      return { ok };
+    },
+    // Searching is allowed on every plan; installing a result is skills.install (plan gate).
+    "skills.search": async (p) => {
+      const query = p["query"];
+      if (typeof query !== "string") invalid("query must be a string");
+      if (query.length > SEARCH_QUERY_MAX) invalid(`query must be at most ${SEARCH_QUERY_MAX} characters`);
+      if (!opts.searchSkills) throw new RpcError(RPC_ERRORS.notFound, "skill search is not available in this build");
+      if (!query.trim()) return { results: [] };
+      let found: Omit<SkillSearchResult, "installed">[];
+      try {
+        found = await opts.searchSkills(query);
+      } catch (e) {
+        logger.warn(`skills.sh search failed: ${errorMessage(e)}`);
+        throw new RpcError(RPC_ERRORS.internal, errorMessage(e));
+      }
+      const installed = await installedNames();
+      return { results: found.map((r) => ({ ...r, installed: installed.has(r.skill) })) };
+    },
+    "skills.restorable": async () => {
+      const installed = await installedNames();
+      return {
+        skills: listBundledSkills(opts.bundledSkillsDir)
+          .filter((b) => !installed.has(b.name))
+          .map((b) => ({ name: b.name, description: b.description })),
+      };
+    },
+    // No plan gate: starter skills ship with the app. Still scanned and linted like any source.
+    "skills.restore": async (p) => {
+      const name = str(p, "name")!;
+      const bundled = listBundledSkills(opts.bundledSkillsDir).find((b) => b.name === name);
+      if (!bundled) throw new RpcError(RPC_ERRORS.notFound, `"${name}" is not one of OneSeat's starter skills`);
+      if ((await installedNames()).has(name)) invalid(`"${name}" is already installed`);
+      const res = await opts.store.install({ kind: "local", path: bundled.dir });
+      if (res.installed) {
+        removedStarters.delete(name);
+        logger.info(`restored starter skill ${name}`);
+      }
+      return installResult(res);
+    },
     "apps.pin": async (p) => {
       requireFeature("pinned_apps");
       try {
