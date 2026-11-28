@@ -1,0 +1,638 @@
+id: de.packaging_epr
+version: 2026.11.1
+jurisdiction: DE
+obligation: packaging_epr
+title: Packaging registration and take-back in Germany
+# Since 12 Aug 2026 the duties come from the EU Packaging Regulation (EU) 2025/40 (PPWR) and the
+# German Verpackungsrecht-Durchführungsgesetz (VerpackDG), which replaced the Verpackungsgesetz.
+effectiveFrom: "2026-08-12"
+effectiveTo: null
+confidence: medium
+review:
+  status: draft
+  notes: >
+    Drafted 2026-11-28 from the VerpackDG text on gesetze-im-internet.de (Stand: Art. 4 G v.
+    13.7.2026 I Nr. 207), the PPWR text in the Official Journal (read through the Publications
+    Office, because EUR-Lex returned empty pages to the research agent), the ZSVR / LUCID pages,
+    and marketplace policy pages for Amazon.de, eBay.de, Kaufland.de and Zalando. The old
+    Verpackungsgesetz (VerpackG) is no longer in force (gesetze-im-internet.de now returns 404 for
+    it), so the old section numbers (§ 9 registration, § 36 fines) are not cited.
+openQuestions:
+  - >
+    Law change: the Verpackungsgesetz (VerpackG) ended on 11 Aug 2026 and was replaced by the
+    VerpackDG (BGBl. 2026 I Nr. 207) together with the PPWR. This pack cites only the new law.
+    Duties keep the same shape (register, join a system, report, Vollständigkeitserklärung), but
+    section numbers changed (registration now § 6, system participation § 7, data reports § 9,
+    Vollständigkeitserklärung § 10, sales bans § 13, fines § 66). Please confirm no further
+    amendment after BGBl. 2026 I Nr. 207.
+  - >
+    Who is the "Hersteller": the PPWR producer test (Art. 3(1)(15)) depends on the supply chain
+    (own brand on the packaging, first company in the German supply chain, or direct delivery from
+    abroad to a German end user). The engine only knows seller.roles, so the rules apply to
+    manufacturer, importer, brand_owner and distributor. A distributor that buys from a German
+    supplier is usually a producer only for the shipping packaging it fills; a distributor that
+    adds no packaging at all may not be a producer. Reviewer to decide whether `distributor`
+    belongs in appliesWhen, or whether a packaging-level test is needed.
+  - >
+    Authorised representative test uses seller.establishedIn != DE. The law says "keine
+    Niederlassung im Bundesgebiet": a foreign company with a German branch needs no
+    representative. The context has no branch field, so such sellers are over-flagged.
+  - >
+    Authorised representative timing for sellers already registered before 12 Aug 2026: § 68(2)
+    VerpackDG keeps old registrations valid and set 12 Nov 2026 as the deadline for changes under
+    § 6(1) sentence 2 (which include naming the representative). Not settled: whether an existing
+    LUCID registration without a named representative now counts as "nicht ordnungsgemäß
+    registriert" (sales ban under § 13(1), fine under § 66(1) no. 1). The rule is therefore
+    severity high, not blocking.
+  - >
+    EU deferral of the representative duty: the Commission proposal COM(2025) 982 (procedure
+    2025/0395(COD)) would suspend PPWR Art. 45(3) for EU-established producers until 2035. Its
+    status could not be confirmed from an official source (a secondary source says the Council
+    closed the file in June 2026 without a deferral). Even if adopted, check how it interacts with
+    § 5(2) VerpackDG, whose sentence 2 (third-country producers) is a national choice under Art.
+    45(3) sentence 2.
+  - >
+    Who may file: § 5(1) VerpackDG bars handing the LUCID registration and the LUCID data reports
+    to third parties; ZSVR says the authorised representative takes over data reports and the
+    Vollständigkeitserklärung for foreign producers, but never the registration. whoMayFile
+    therefore lists only producer for registration, and producer or authorised_representative for
+    reports. Confirm that a compliance service that is not the authorised representative may not
+    file LUCID data reports for a German-established producer.
+  - >
+    Data reports and the Vollständigkeitserklärung are judged on seller-level facts (annual
+    tonnage, filed reports) that the contracts have no seller field for. The predicates read
+    product.attributes flags instead (de_lucid_quantity_reports_up_to_date,
+    de_packaging_below_ve_thresholds, de_ve_filed_for_last_year). The tonnage thresholds (10 t for
+    simplified reporting; 80 t glass, 50 t paper and cardboard, 30 t other materials for the
+    Vollständigkeitserklärung) cannot be computed from the catalogue. A seller-level field may be
+    needed in a later contracts version.
+  - >
+    Fulfilment and shipping packaging: who is the producer of the shipping box when a fulfilment
+    service packs (Amazon FBA, Zalando ZFS) is not settled in the sources read. Zalando's Germany
+    page says partners have been responsible for shipping packaging since 1 July 2022, while
+    Zalando's PPWR page says ZFS takes care of the shipping packaging. No Amazon page on FBA
+    shipping packaging after the PPWR was found. Also not modelled: the fulfilment provider's own
+    duty (§ 13(4) VerpackDG, PPWR Art. 45(7)-(8)) to check its clients' registrations.
+  - >
+    Marketplace checks: Etsy's Seller Handbook article on the German Packaging Act returned HTTP
+    403 and could not be read; no official Otto Market policy page was found. Neither is listed.
+    Amazon's page calls the LUCID number "13-stellig", while ZSVR says "DE gefolgt von 13
+    Ziffern"; confirm what Amazon's validation accepts. Zalando says it will block assortments
+    without EPR details from 1 Jan 2027 (future date). Kaufland's page still describes the rules
+    that applied from 1 July 2022.
+  - >
+    Platform duty: the old national ban on marketplaces serving unregistered sellers is now based
+    on PPWR Art. 45(4)-(6) together with the Digital Services Act Art. 30, plus § 13(4) VerpackDG
+    for fulfilment providers. German fines for platforms that fail to collect the information (§
+    66(2) no. 33) apply only from 12 Feb 2027 (§ 68(17)). The DSA text was not re-read for this pack.
+  - >
+    Lead times: ZSVR says the LUCID number is issued minutes after the application is sent, but
+    login activation, finding and contracting a German authorised representative, and marketplace
+    validation add time. leadTimeDays [1, 7] for registration is an estimate; no lead time is given
+    for appointing a representative.
+  - >
+    Not modelled: the exemptions in § 11 VerpackDG (reusable packaging in a reuse system, deposit
+    beverage packaging, sales packaging of hazardous contents, packaging shown not to reach end
+    users in Germany); sellers who only use pre-licensed service packaging (§ 7(2)), who must still
+    register but need no own system contract; and B2B-only sellers, whose product packaging may not
+    need system participation (shipping packaging always does, according to ZSVR).
+  - >
+    Related but out of scope: the single-use plastics fund (EWKFondsG, DIVID platform) and the new
+    approval (Zulassung) for packaging that does not need system participation, required from the
+    end of 2027.
+  - >
+    Source check: the PPWR quotes were copied from the German Official Journal text obtained from
+    publications.europa.eu (cellar), because eur-lex.europa.eu returned empty pages. The verifier
+    should re-check them at the EUR-Lex URL.
+citations:
+  - id: verpackdg-5-1
+    title: VerpackDG § 5 Abs. 1 Beauftragung Dritter
+    url: https://www.gesetze-im-internet.de/verpackdg/__5.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Satz 1 gilt nicht für die Registrierung nach § 6 und nicht für die Abgabe von Datenmeldungen nach § 9."
+  - id: verpackdg-5-2
+    title: VerpackDG § 5 Abs. 2 Bevollmächtigter für Hersteller ohne Niederlassung im Bundesgebiet
+    url: https://www.gesetze-im-internet.de/verpackdg/__5.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Hersteller nach Artikel 45 Absatz 3 Satz 1 der Verordnung (EU) 2025/40, die keine Niederlassung im Bundesgebiet haben, haben ihren Bevollmächtigten für die erweiterte Herstellerverantwortung vor dem erstmaligen Bereitstellen einer Verpackung oder eines verpackten Produkts im Bundesgebiet"
+  - id: verpackdg-5-5
+    title: VerpackDG § 5 Abs. 5 Benennung des Bevollmächtigten im Rahmen der Registrierung
+    url: https://www.gesetze-im-internet.de/verpackdg/__5.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Die Benennung erfolgt im Rahmen der Registrierung nach § 6 Absatz 1 und 2 Satz 1 Nummer 2 und bedarf der Bestätigung durch die Zentrale Stelle Verpackungsregister."
+  - id: verpackdg-6
+    title: VerpackDG § 6 Registrierung; zuständige Behörde
+    url: https://www.gesetze-im-internet.de/verpackdg/__6.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Hersteller sind verpflichtet, sich im Falle des Artikels 3 Absatz 1 Nummer 15 Buchstabe a bis d der Verordnung (EU) 2025/40 in der Fassung vom 19. Dezember 2024 vor dem erstmaligen Bereitstellen"
+  - id: verpackdg-7
+    title: VerpackDG § 7 Systembeteiligungspflicht
+    url: https://www.gesetze-im-internet.de/verpackdg/__7.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Dabei haben sie Materialart und Masse der zu beteiligenden Verpackungen sowie die Registrierungsnummer nach § 6 Absatz 3 Satz 2 anzugeben."
+  - id: verpackdg-9-1
+    title: VerpackDG § 9 Abs. 1 Datenmeldungen
+    url: https://www.gesetze-im-internet.de/verpackdg/__9.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Hersteller nach § 7 Absatz 1 Satz 1 sind verpflichtet, die im Rahmen einer Systembeteiligung getätigten Angaben zu den Verpackungen unverzüglich nach Übermittlung an das System auch der Zentralen Stelle Verpackungsregister unter Nennung mindestens der folgenden Daten zu übermitteln:"
+  - id: verpackdg-9-2
+    title: VerpackDG § 9 Abs. 2 Vereinfachte Datenmeldung unter 10 Tonnen
+    url: https://www.gesetze-im-internet.de/verpackdg/__9.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Hat ein Hersteller im vorangegangenen Kalenderjahr im Bundesgebiet eine Masse an systembeteiligungspflichtigen Verpackungen von insgesamt weniger als 10 Tonnen als Hersteller bereitgestellt"
+  - id: verpackdg-10-1
+    title: VerpackDG § 10 Abs. 1 Vollständigkeitserklärungen
+    url: https://www.gesetze-im-internet.de/verpackdg/__10.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Hersteller nach § 7 Absatz 1 Satz 1 sind verpflichtet, jährlich bis zum 15. Mai eine Vollständigkeitserklärung zu hinterlegen."
+  - id: verpackdg-10-4
+    title: VerpackDG § 10 Abs. 4 Schwellenwerte der Vollständigkeitserklärung
+    url: https://www.gesetze-im-internet.de/verpackdg/__10.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Von der Pflicht nach Absatz 1 Satz 1 ist befreit, wer systembeteiligungspflichtige Verpackungen bestimmter Materialien im vorangegangenen Kalenderjahr höchstens in folgenden Mengen im Bundesgebiet bereitgestellt hat:"
+  - id: verpackdg-13-3
+    title: VerpackDG § 13 Abs. 3 Verkaufsverbot für Vertreiber
+    url: https://www.gesetze-im-internet.de/verpackdg/__13.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Vertreiber dürfen Verpackungen im Bundesgebiet nicht bereitstellen, wenn die Hersteller nicht oder nicht ordnungsgemäß nach § 6 Absatz 1 Satz 1 registriert sind."
+  - id: verpackdg-13-3-system
+    title: VerpackDG § 13 Abs. 3 Satz 2 Verkaufsverbot ohne Systembeteiligung
+    url: https://www.gesetze-im-internet.de/verpackdg/__13.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Sie dürfen systembeteiligungspflichtige Verpackungen nicht im Bundesgebiet bereitstellen, wenn sich die Hersteller mit diesen Verpackungen nicht nach § 7 Absatz 1 Satz 1 an einem System beteiligt haben."
+  - id: verpackdg-13-4
+    title: VerpackDG § 13 Abs. 4 Fulfilment-Dienstleister
+    url: https://www.gesetze-im-internet.de/verpackdg/__13.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Fulfilment-Dienstleister dürfen keine der in Artikel 3 Absatz 1 Nummer 11 der Verordnung (EU) 2019/1020 in der Fassung vom 12. August 2026 genannten Tätigkeiten in Bezug auf Verpackungen oder verpackte Produkte erbringen, wenn die Hersteller dieser Verpackungen nicht"
+  - id: verpackdg-66-3
+    title: VerpackDG § 66 Abs. 3 Bußgeldrahmen
+    url: https://www.gesetze-im-internet.de/verpackdg/__66.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "mit einer Geldbuße bis zu zweihunderttausend Euro, in den Fällen des Absatzes 1 Nummer 1, 5, 6, 8, 9, 11 bis 16, 19 bis 23, 25 und 27 und des Absatzes 2 Nummer 28, 33 und 35 bis 37 mit einer Geldbuße bis zu hunderttausend Euro"
+  - id: verpackdg-68-1
+    title: VerpackDG § 68 Abs. 1 Übergang alter Systembeteiligungen
+    url: https://www.gesetze-im-internet.de/verpackdg/__68.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Systembeteiligungen nach § 7 Absatz 1 Satz 1, auch in Verbindung mit Absatz 2 des Verpackungsgesetzes in der bis zum 11. August 2026 geltenden Fassung, die vor dem 12. August 2026 erfolgt sind, fort, längstens jedoch bis zum Ablauf des 31. Dezember 2026."
+  - id: verpackdg-68-2
+    title: VerpackDG § 68 Abs. 2 Übergang alter Registrierungen
+    url: https://www.gesetze-im-internet.de/verpackdg/__68.html
+    publisher: Bundesministerium der Justiz und für Verbraucherschutz
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Wer nach § 9 des Verpackungsgesetzes in der bis zum 11. August 2026 geltenden Fassung registriert ist, gilt auch nach § 6 als registriert. Änderungen nach § 6 Absatz 1 Satz 2 sind bis zum 12. November 2026 vorzunehmen."
+  - id: ppwr-3-15-d
+    title: Verordnung (EU) 2025/40 Art. 3 Abs. 1 Nr. 15 Buchst. d (Hersteller im Fernabsatz)
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj
+    publisher: Amt für Veröffentlichungen der Europäischen Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "der Erzeuger, Importeur oder Vertreiber ist in einem Mitgliedstaat oder in einem Drittland niedergelassen und stellt im Hoheitsgebiet eines anderen Mitgliedstaats Produkte, die in anderen Verpackungen als den in Buchstabe c genannten verpackt sind, direkt an Endabnehmer erstmals bereit"
+  - id: ppwr-44-4
+    title: Verordnung (EU) 2025/40 Art. 44 Abs. 4 Bereitstellungsverbot ohne Registrierung
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj
+    publisher: Amt für Veröffentlichungen der Europäischen Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Hersteller dürfen Verpackungen oder verpackte Produkte nicht im Hoheitsgebiet eines Mitgliedstaats erstmals bereitstellen oder verpackte Produkte auspacken, ohne Endabnehmer zu sein, wenn sie oder gegebenenfalls, gemäß Artikel 45, ihre Bevollmächtigten"
+  - id: ppwr-45-3
+    title: Verordnung (EU) 2025/40 Art. 45 Abs. 3 Bevollmächtigter für die erweiterte Herstellerverantwortung
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj
+    publisher: Amt für Veröffentlichungen der Europäischen Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Ein Hersteller gemäß Artikel 3 Absatz 1 Nummer 15 Buchstaben c und d benennt mittels schriftlicher Vollmacht einen Bevollmächtigten für die erweiterte Herstellerverantwortung in jedem Mitgliedstaat, in dem der Hersteller erstmals Verpackungen oder verpackte Produkte bereitstellt,"
+  - id: ppwr-45-4-a
+    title: Verordnung (EU) 2025/40 Art. 45 Abs. 4 Buchst. a Prüfpflicht der Online-Plattformen
+    url: https://eur-lex.europa.eu/eli/reg/2025/40/oj
+    publisher: Amt für Veröffentlichungen der Europäischen Union (EUR-Lex)
+    kind: law
+    retrieved: "2026-11-28"
+    quote: "Informationen über die Registrierung der Hersteller gemäß Artikel 44 der vorliegenden Verordnung in dem Mitgliedstaat, in dem der Verbraucher ansässig ist, und die Registriernummer(n) des Herstellers in diesem Register;"
+  - id: zsvr-registration
+    title: So registrieren Sie sich im Verpackungsregister LUCID
+    url: https://www.verpackungsregister.org/registrierung/alle-informationen-zur-registrierung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Sie sind Hersteller im Sinne der europäischen Verpackungsverordnung (PPWR)? Dann müssen Sie sich im Verpackungsregister LUCID registrieren. Für die Registrierung fallen keine Kosten an."
+  - id: zsvr-faq-number
+    title: Hilfe – Registrierung in LUCID (Registrierungsnummer)
+    url: https://www.verpackungsregister.org/hilfe/registrierung-in-lucid
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Gleichzeitig erhalten Sie auch Ihre LUCID-Registrierungsnummer (DE gefolgt von 13 Ziffern)."
+  - id: zsvr-faq-no-threshold
+    title: Hilfe – Rollen und Pflichten (keine Bagatellgrenze)
+    url: https://www.verpackungsregister.org/hilfe/rollen-pflichten
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Ja. Bei gewerbsmäßiger Tätigkeit gibt es keine Bagatellgrenze oder Befreiung für Unternehmen mit geringen Verpackungsmengen."
+  - id: zsvr-online-shipping
+    title: Versand- und Onlinehandel – Was ändert sich durch die PPWR?
+    url: https://www.verpackungsregister.org/themen/versand-und-onlinehandel
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Verpackungen für den Versand sind ausnahmslos systembeteiligungspflichtig."
+  - id: zsvr-online-abroad
+    title: Versand- und Onlinehandel – Versand direkt aus dem Ausland
+    url: https://www.verpackungsregister.org/themen/versand-und-onlinehandel
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Versendet Ihr Unternehmen mit Sitz außerhalb Deutschlands verpackte Produkte direkt an Endabnehmer in Deutschland, sind Sie nach der PPWR mindestens für die dabei eingesetzten Verpackungen, die für den Versand bestimmt sind, Erzeuger und Hersteller."
+  - id: zsvr-online-platforms
+    title: Versand- und Onlinehandel – Prüfpflicht der Online-Plattformen
+    url: https://www.verpackungsregister.org/themen/versand-und-onlinehandel
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Fehlen diese Nachweise oder ergeben sich dabei Unstimmigkeiten, dürfen die verpackten Produkte über die Online-Plattform nicht angeboten werden."
+  - id: zsvr-status-check
+    title: Registrierungsstatus Ihrer Geschäftspartner digital prüfen
+    url: https://www.verpackungsregister.org/themen/pruefung-registrierungsstatus
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Elektronische Marktplätze, Fulfillment-Dienstleister, Dropshipping-Verkäufer und sonstige Weitervertreiber müssen regelmäßig prüfen, ob ihre Geschäftspartner die verpackungsrechtlichen Pflichten erfüllen."
+  - id: zsvr-data-report
+    title: Datenmeldung
+    url: https://www.verpackungsregister.org/systembeteiligung-und-datenmeldung/datenmeldung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Unternehmen müssen jede Datenmeldung an ihren Systembetreiber unverzüglich auch 1:1 im Verpackungsregister LUCID hinterlegen."
+  - id: zsvr-data-report-small
+    title: Datenmeldung – vereinfachte Meldepflicht unter 10 Tonnen
+    url: https://www.verpackungsregister.org/systembeteiligung-und-datenmeldung/datenmeldung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Für Hersteller, die im vorangegangenen Kalenderjahr weniger als 10 Tonnen systembeteiligungspflichtiger Verpackungen im Bundesgebiet erstmals bereitgestellt haben, gilt eine vereinfachte Meldepflicht"
+  - id: zsvr-system
+    title: Systembeteiligung
+    url: https://www.verpackungsregister.org/systembeteiligung-und-datenmeldung/systembeteiligung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Um das Recycling Ihrer Verpackungen mit Systembeteiligungspflicht zu finanzieren, müssen Sie einen Systembeteiligungsvertrag mit einem Systembetreiber schließen."
+  - id: zsvr-ve
+    title: Pflicht zur Vollständigkeitserklärung bei hohen Verpackungsmengen
+    url: https://www.verpackungsregister.org/systembeteiligung-und-datenmeldung/vollstaendigkeitserklaerung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Die Pflicht zur Abgabe besteht für Unternehmen, wenn ihre Verpackungsmengen im vorangegangenen Kalenderjahr mindestens einen der drei folgenden Schwellenwerte erreichen oder überschreiten:"
+  - id: zsvr-ve-2026
+    title: Vollständigkeitserklärung – Hinweis zur neuen Rechtslage (Bezugsjahr 2026)
+    url: https://www.verpackungsregister.org/systembeteiligung-und-datenmeldung/vollstaendigkeitserklaerung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Für das Bezugsjahr 2026 ist eine einheitliche Vollständigkeitserklärung formal nach dem Verpackungsrecht-Durchführungsgesetz (VerpackDG), inhaltlich jedoch nach dem Verpackungsgesetz (VerpackG) abzugeben."
+  - id: zsvr-ar
+    title: Alles auf einen Blick – die Bevollmächtigung
+    url: https://www.verpackungsregister.org/themen/bevollmaechtigung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Der Bevollmächtigte übernimmt für Sie alle Pflichten der erweiterten Herstellerverantwortung. Einzige Ausnahme: Die Registrierung im Verpackungsregister LUCID. Diese müssen Sie selbst vornehmen – denn das ist eine höchstpersönliche Pflicht."
+  - id: zsvr-ar-since
+    title: PPWR und VerpackDG – was sich für Sie ändert (Bevollmächtigung)
+    url: https://www.verpackungsregister.org/ich-moechte-wissen-was-seit-dem-12-august-2026-gilt
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Unternehmen mit Sitz im Ausland, die ohne Niederlassung im Bundesgebiet leere Verpackungen oder verpackte Produkte direkt an Endabnehmer in Deutschland vertreiben, konnten bislang freiwillig einen Bevollmächtigten benennen. Ab dem 12. August 2026 sind sie dazu verpflichtet."
+  - id: zsvr-ar-faq
+    title: Hilfe – Bevollmächtigung (Erstregistrierung ohne Bevollmächtigten)
+    url: https://www.verpackungsregister.org/hilfe/bevollmaechtigung
+    publisher: Stiftung Zentrale Stelle Verpackungsregister (ZSVR)
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "Ohne diese Angabe können Sie Ihre Registrierung im Verpackungsregister LUCID nicht abschließen."
+  - id: amazon-epr-de
+    title: Einhaltung der erweiterten Herstellerverantwortung (EPR) – Deutschland, Verpackung
+    url: https://sell.amazon.de/einhaltung-der-erweiterten-herstellerverantwortung
+    publisher: Amazon EU S.à r.l. (Verkaufen bei Amazon)
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Wenn es um Verpackungen geht, können Sie die Konformität Amazon gegenüber anhand einer 13-stelligen Registrierungsnummer, Ihrer LUCID-Nummer, nachweisen."
+  - id: amazon-epr-deactivate
+    title: Einhaltung der erweiterten Herstellerverantwortung (EPR) – Folgen bei Nichteinhaltung
+    url: https://sell.amazon.de/einhaltung-der-erweiterten-herstellerverantwortung
+    publisher: Amazon EU S.à r.l. (Verkaufen bei Amazon)
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Wenn Sie als nicht konform eingestuft werden, muss Amazon möglicherweise Ihre nicht-konformen Angebote deaktivieren — oder in Ihrem Namen die Vorschriften einhalten."
+  - id: ebay-ppwr
+    title: EU-Verordnung über Verpackungen und Verpackungsabfälle (eBay-Hilfe)
+    url: https://www.ebay.de/help/account/regulatory/extended-producer-responsibility/eu-packaging-waste-packaging-regulation?id=5878
+    publisher: eBay GmbH
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Wenn Ihre Registrierungsnummer für Verpackungen fehlt oder ungültig ist, werden Ihre Angebote für Käufer in dem betreffenden Land eventuell ausgeblendet und Sie unterliegen möglicherweise Sanktionen der örtlichen Behörden."
+  - id: ebay-ppwr-selfcert
+    title: EU-Verordnung über Verpackungen und Verpackungsabfälle (eBay-Hilfe) – Bestätigung
+    url: https://www.ebay.de/help/account/regulatory/extended-producer-responsibility/eu-packaging-waste-packaging-regulation?id=5878
+    publisher: eBay GmbH
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Aktivieren Sie das Kontrollkästchen, um zu bestätigen, dass Ihre Verpackung die geltenden Anforderungen erfüllt."
+  - id: kaufland-epr
+    title: EPR – General information (Kaufland Seller University)
+    url: https://www.kauflandglobalmarketplace.com/en/seller-university/formal-framework/epr-guidelines/epr-general-information/
+    publisher: Kaufland e-commerce
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "A valid LUCID registration number is a prerequisite for registration and to sell on Kaufland.de and can be saved during the registration process."
+  - id: zalando-de
+    title: What are the Extended Producer Responsibility (EPR) obligations in Germany and what do I need to do?
+    url: https://partner.zalando.com/university/article/epr-obligations-in-germany
+    publisher: Zalando SE (Partner University)
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Failure to provide Zalando with your EPR number will suspend you from selling in Germany."
+  - id: zalando-de-proof
+    title: Zalando EPR Germany – proof of system participation
+    url: https://partner.zalando.com/university/article/epr-obligations-in-germany
+    publisher: Zalando SE (Partner University)
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "Please note that Zalando may request further proof such as the corresponding confirmation of system participation (Bestätigung der Systembeteiligung bei einem dualen System) at any time."
+  - id: zalando-ppwr
+    title: What are the Extended Producer Responsibility (EPR) requirements for packaging and what do I need to do?
+    url: https://partner.zalando.com/university/article/what-is-ppwr-and-what-to-do
+    publisher: Zalando SE (Partner University)
+    kind: marketplace_policy
+    retrieved: "2026-11-28"
+    quote: "From 1 January 2027, if you do not provide EPR details your assortment will be blocked."
+  - id: amazon-study-registration
+    title: Fragmentation in EPR packaging registration and opportunities to harmonize (Amazon study, March 2026)
+    url: https://assets.aboutamazon.com/4a/4f/533903e94ec3befeb991ab514a03/fragmentation-in-epr-packaging-registration-and-opportunities-to-harmonize-march-2026.pdf
+    publisher: Amazon
+    kind: secondary
+    retrieved: "2026-11-28"
+    quote: "In DE, a third party is not allowed to complete registration."
+rules:
+  - id: de.packaging_epr.registration
+    title: Register in the LUCID packaging register before you sell packaged goods in Germany
+    summary: >
+      If you are the first business to put packaged goods on the German market, or you ship
+      packaged goods from abroad straight to customers in Germany, you are a packaging producer and
+      must register in LUCID before you sell. This covers at least the boxes, mailers, tape and
+      filler you ship in, and there is no minimum quantity. Only you can register: a service
+      provider or your authorised representative cannot do it for you.
+    severity: blocking
+    consequence: >
+      Selling packaged goods in Germany without a LUCID registration is banned, and resellers may
+      not sell your goods either. Fines go up to €100,000. Amazon, eBay, Kaufland and Zalando hide,
+      deactivate or suspend German listings without a valid number, and fulfilment providers may
+      not handle goods of unregistered producers.
+    citations: [verpackdg-6, ppwr-44-4, verpackdg-5-1, verpackdg-13-3, verpackdg-13-4, verpackdg-66-3, verpackdg-68-2, zsvr-registration, zsvr-faq-number, zsvr-faq-no-threshold, zsvr-online-abroad, zsvr-online-platforms, zsvr-ar, ppwr-3-15-d, ppwr-45-4-a, amazon-study-registration]
+    appliesWhen:
+      all:
+        - { eq: [ market, DE ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - { contains: [ seller.roles, distributor ] }
+    requires:
+      - key: registration_number
+        label: LUCID registration number
+        kind: registration
+        satisfiedWhen: { registered: { obligation: packaging_epr, jurisdiction: DE, register: LUCID } }
+        whoMayFile: [producer]
+        numberFormat: '^DE\d{13}$'
+        filing:
+          channel: portal
+          url: https://lucid.verpackungsregister.org/
+          leadTimeDays: [1, 7]
+          feeNote: >
+            Registration is free. You must list every brand name shown on your packaging. Sellers
+            without a German branch must contract an authorised representative first, because
+            LUCID will not complete the registration without one.
+    marketplaceChecks:
+      - channel: amazon
+        blocksListing: true
+        note: Amazon.de asks for the LUCID number in its EPR compliance portal and may deactivate non-compliant listings.
+        citations: [amazon-epr-de, amazon-epr-deactivate]
+      - channel: ebay
+        blocksListing: true
+        note: eBay asks for the number per country in the account settings; listings for German buyers may be hidden if it is missing or invalid.
+        citations: [ebay-ppwr]
+      - channel: kaufland
+        blocksListing: true
+        note: Kaufland.de requires a valid LUCID number to register as a seller and to sell.
+        citations: [kaufland-epr]
+      - channel: zalando
+        blocksListing: true
+        note: Zalando suspends selling in Germany without an EPR number and validates it against the public LUCID register.
+        citations: [zalando-de, zalando-ppwr]
+
+  - id: de.packaging_epr.system_participation
+    title: Join a German dual system for the packaging your customers throw away
+    summary: >
+      Before you sell, you must sign a contract with a German dual system (Systembeteiligung) and
+      pay for the recycling of packaging that ends up with households, by material and weight.
+      Shipping packaging always counts. Contracts made under the old Verpackungsgesetz end on
+      31 December 2026 at the latest, so check that you have a contract for 2027.
+    severity: blocking
+    consequence: >
+      Selling this packaging without a system contract is banned for you and for anyone reselling
+      your goods. Fines go up to €200,000. Marketplaces may ask for your system's confirmation at
+      any time.
+    citations: [verpackdg-7, verpackdg-13-3-system, verpackdg-66-3, verpackdg-68-1, zsvr-system, zsvr-online-shipping, zalando-de-proof, ebay-ppwr-selfcert]
+    appliesWhen:
+      all:
+        - { eq: [ market, DE ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - { contains: [ seller.roles, distributor ] }
+    requires:
+      - key: system_contract
+        label: Contract with a German dual system covering your packaging
+        kind: scheme_contract
+        satisfiedWhen: { inScheme: { obligation: packaging_epr, jurisdiction: DE } }
+        whoMayFile: [producer, authorised_representative]
+        filing:
+          channel: scheme
+          url: https://www.verpackungsregister.org/systembeteiligung-und-datenmeldung/uebersicht-systembetreiber
+          feeNote: >
+            Each system sets its own price, based on material and weight. You need your LUCID
+            number to sign. If you have no German branch, your authorised representative signs the
+            contract.
+        recurring:
+          every: year
+          note: >
+            Contracts usually run for a calendar year. Have next year's contract and planned
+            quantities in place before 1 January. Contracts signed before 12 Aug 2026 under the old
+            law end on 31 Dec 2026 at the latest.
+    marketplaceChecks:
+      - channel: zalando
+        blocksListing: false
+        note: Zalando may ask for the system's confirmation of participation at any time.
+        citations: [zalando-de-proof]
+      - channel: ebay
+        blocksListing: false
+        note: eBay asks you to tick a box confirming your packaging meets the requirements when you add the number.
+        citations: [ebay-ppwr-selfcert]
+
+  - id: de.packaging_epr.data_reporting
+    title: Report your packaging quantities in LUCID
+    summary: >
+      Every quantity you report to your dual system (planned amounts, changes, year-end totals) must
+      also be entered in LUCID, under the same registration number. If you placed less than 10
+      tonnes of household packaging in Germany last year, one year-end report in LUCID by 1 June of
+      the next year is enough.
+    severity: medium
+    consequence: >
+      ZSVR compares your LUCID reports with your system's reports. Missing or wrong reports can be
+      fined up to €10,000, and gaps can lead to checks on whether you paid for all your packaging.
+    citations: [verpackdg-9-1, verpackdg-9-2, verpackdg-5-1, verpackdg-66-3, zsvr-data-report, zsvr-data-report-small]
+    appliesWhen:
+      all:
+        - { eq: [ market, DE ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - { contains: [ seller.roles, distributor ] }
+    requires:
+      - key: lucid_quantity_reports
+        label: Packaging quantity reports in LUCID match what you reported to your system
+        kind: declaration
+        satisfiedWhen: { eq: [ product.attributes.de_lucid_quantity_reports_up_to_date, true ] }
+        whoMayFile: [producer, authorised_representative]
+        filing:
+          channel: portal
+          url: https://lucid.verpackungsregister.org/
+          feeNote: Free in LUCID. Quantities are entered in kilograms with three decimals, by material.
+        recurring:
+          every: year
+          note: >
+            10 tonnes or more last year: copy each report you give your system into LUCID straight
+            away (initial plan by 31 December for the next year, changes during the year, year-end
+            totals by 1 June). Under 10 tonnes: one year-end report in LUCID by 1 June for the
+            previous year. Only you or your authorised representative may file; other service
+            providers may not.
+
+  - id: de.packaging_epr.completeness_declaration
+    title: File an audited Vollständigkeitserklärung if your packaging volumes are large
+    summary: >
+      Producers whose household packaging last year reached 80 tonnes of glass, 50 tonnes of paper
+      and cardboard, or 30 tonnes of plastics, metals and composites combined must file an audited
+      declaration of completeness (Vollständigkeitserklärung) in LUCID by 15 May. Most small sellers
+      are below these limits, but ZSVR can ask anyone for one.
+    severity: medium
+    consequence: >
+      A missing or late declaration can be fined up to €100,000. There is no extension of the
+      15 May deadline, and a late declaration must still be filed.
+    citations: [verpackdg-10-1, verpackdg-10-4, verpackdg-66-3, zsvr-ve, zsvr-ve-2026]
+    appliesWhen:
+      all:
+        - { eq: [ market, DE ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - { contains: [ seller.roles, distributor ] }
+    requires:
+      - key: vollstaendigkeitserklaerung
+        label: Vollständigkeitserklärung filed for last year, or confirmation that you are below the thresholds
+        kind: declaration
+        satisfiedWhen:
+          any:
+            - { eq: [ product.attributes.de_packaging_below_ve_thresholds, true ] }
+            - { eq: [ product.attributes.de_ve_filed_for_last_year, true ] }
+        whoMayFile: [producer, authorised_representative]
+        filing:
+          channel: portal
+          url: https://lucid.verpackungsregister.org/
+          feeNote: >
+            Filing is free, but an auditor registered with ZSVR (expert, auditor, tax adviser) must
+            check and sign it with a qualified electronic signature, and charges a fee.
+        recurring:
+          every: year
+          note: >
+            Due 15 May for the previous calendar year (next working day if 15 May falls on a
+            weekend or holiday). Thresholds per year: glass 80 t; paper and cardboard 50 t; all
+            other materials together 30 t. The declaration for 2026, due 15 May 2027, is filed
+            under the VerpackDG but its content follows the old Verpackungsgesetz.
+
+  - id: de.packaging_epr.authorised_representative
+    title: Appoint a German authorised representative if your business is not in Germany
+    summary: >
+      Since 12 August 2026, sellers without a branch in Germany who send packaged goods directly to
+      customers in Germany must appoint one authorised representative based in Germany, by written
+      contract in German, and name it in LUCID. The representative then joins the dual system,
+      reports quantities and files declarations for you. You still do the LUCID registration
+      yourself.
+    severity: high
+    consequence: >
+      LUCID will not complete a new registration without a confirmed representative, so you cannot
+      get the number marketplaces ask for. An existing registration without one may count as
+      incomplete, which can be fined up to €100,000.
+    citations: [verpackdg-5-2, verpackdg-5-5, ppwr-45-3, ppwr-3-15-d, zsvr-ar, zsvr-ar-since, zsvr-ar-faq, zsvr-online-abroad, verpackdg-68-2]
+    appliesWhen:
+      all:
+        - { eq: [ market, DE ] }
+        - { eq: [ product.shipsPackaged, true ] }
+        - not: { eq: [ seller.establishedIn, DE ] }
+        - any:
+            - { contains: [ seller.roles, manufacturer ] }
+            - { contains: [ seller.roles, importer ] }
+            - { contains: [ seller.roles, brand_owner ] }
+            - { contains: [ seller.roles, distributor ] }
+    requires:
+      - key: epr_representative
+        label: Authorised representative for packaging in Germany, named and confirmed in LUCID
+        kind: representative
+        satisfiedWhen: { hasRepresentative: { obligation: packaging_epr, jurisdiction: DE } }
+        whoMayFile: [producer]
+        filing:
+          channel: portal
+          url: https://lucid.verpackungsregister.org/
+          feeNote: >
+            The representative charges its own fees. It must be based in Germany, hold its own
+            representative login in LUCID, and confirm the appointment there. You may appoint only
+            one, and ZSVR publishes no list of providers.
