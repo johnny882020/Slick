@@ -137,6 +137,9 @@ describe("memory skill store", () => {
     await writeFile(join(multi, "a-skill", "SKILL.md"), renderSkillMd({ name: "a-skill", description: "A. Use when a." }));
     await mkdir(join(multi, "not-a-skill"));
     expect((await (await createSkillStoreFromDir(multi)).index()).map((e) => e.name)).toEqual(["a-skill"]);
+    // The folder's path is kept, so the sandbox can run the skill's scripts (gate 5 evals).
+    expect((await (await createSkillStoreFromDir(multi)).get("a-skill"))!.manifest.dir).toBe(join(multi, "a-skill"));
+    expect((await createMemorySkillStore([{ name: "mem", description: "M. Use when m.", body: "Body" }]).get("mem"))!.manifest.dir).toBe("");
     await mkdir(join(multi, "b-skill"));
     await writeFile(join(multi, "b-skill", "SKILL.md"), "---\nname: wrong\ndescription: d\n---\n");
     await expect(createSkillStoreFromDir(multi)).rejects.toThrow(/invalid skill folder/);

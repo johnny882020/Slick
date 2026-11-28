@@ -1,5 +1,5 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, sep } from "node:path";
+import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import type { SkillPermissionsFile } from "@oneseat/contracts";
@@ -76,6 +76,8 @@ describe("findDeno", () => {
     expect(findDeno({ env: { ONESEAT_DENO: join(dir, "missing") } })).toBeUndefined();
     expect(findDeno({ env: { PATH: `${join(dir, "nothing")}${process.platform === "win32" ? ";" : ":"}${dir}` }, from: [] })).toBe(fake);
     expect(findDeno({ env: {}, from: [tmpDir()] })).toBeUndefined();
+    // A relative PATH entry is never used, even when it holds a deno binary.
+    expect(findDeno({ env: { PATH: relative(process.cwd(), dir) }, from: [] })).toBeUndefined();
     expect(DENO).toBeDefined();
     expect(DENO!.includes(`${sep}.bin${sep}`)).toBe(false);
   });

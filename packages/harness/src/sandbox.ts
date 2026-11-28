@@ -53,7 +53,9 @@ export function findDeno(opts: { env?: NodeJS.ProcessEnv; from?: string[] } = {}
   const explicit = env["ONESEAT_DENO"];
   if (explicit) return isFile(explicit) ? explicit : undefined;
   for (const dir of (env["PATH"] ?? env["Path"] ?? "").split(delimiter)) {
-    if (!dir) continue;
+    // A relative entry (".", "node_modules/.bin") resolves against the working folder, which can
+    // be a workspace or a downloaded skill: never run a binary found that way.
+    if (!dir || !isAbsolute(dir)) continue;
     const p = join(dir, exeName());
     if (isFile(p) && !p.includes(`${sep}node_modules${sep}.bin${sep}`)) return p;
   }

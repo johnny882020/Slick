@@ -125,11 +125,12 @@ export function createMemorySkillStore(skills: readonly (InstalledSkill | Memory
 
   const signHash = (hash: string) => sign(null, Buffer.from(hash), privateKey).toString("base64");
 
-  function materialise(files: Map<string, Buffer>, source: SkillSource, dirName?: string): { skill?: InstalledSkill; lint: LintReport; scan: ScanReport } {
+  /** onDisk: the folder the files were read from and stay in (preloaded folders), for scripts. */
+  function materialise(files: Map<string, Buffer>, source: SkillSource, dirName?: string, onDisk?: string): { skill?: InstalledSkill; lint: LintReport; scan: ScanReport } {
     const skillMd = files.get(SKILL_FILE);
     const perms = files.get(SKILL_PERMISSIONS_FILE);
     const built = skillMd
-      ? buildManifest({ dir: "", ...(dirName ? { dirName } : {}), skillMd: skillMd.toString("utf8"), ...(perms ? { permissionsJson: perms.toString("utf8") } : {}), files: [...files.keys()] })
+      ? buildManifest({ dir: onDisk ?? "", ...(dirName ? { dirName } : {}), skillMd: skillMd.toString("utf8"), ...(perms ? { permissionsJson: perms.toString("utf8") } : {}), files: [...files.keys()] })
       : { issues: [{ severity: "error" as const, rule: "skill-md", message: `${SKILL_FILE} is missing`, file: SKILL_FILE }] };
     const name = built.manifest?.frontmatter.name ?? dirName ?? "unknown";
     const lint: LintReport = { skill: name, ok: !built.issues.some((i) => i.severity === "error"), issues: built.issues };
@@ -157,7 +158,8 @@ export function createMemorySkillStore(skills: readonly (InstalledSkill | Memory
 
   for (const folder of opts.folders ?? []) {
     const dirName = posix.basename(folder.dir.replace(/\\/g, "/").replace(/\/+$/, ""));
-    const r = materialise(new Map(folder.contents), { kind: "local", path: folder.dir }, dirName);
+    // A preloaded folder keeps its path, so run_skill_script can run its scripts (gate 5 evals).
+    const r = materialise(new Map(folder.contents), { kind: "local", path: folder.dir }, dirName, folder.dir);
     if (!r.skill) throw new Error(`invalid skill folder ${folder.dir}: ${r.lint.issues.filter((i) => i.severity === "error").map((i) => i.message).join("; ")}`);
     entries.set(r.skill.manifest.frontmatter.name, { skill: r.skill, files: new Map(folder.contents), hash: r.skill.contentHash, sig: r.skill.signature });
   }
