@@ -421,7 +421,7 @@ rules:
       not sell your goods either. Fines go up to €100,000. Amazon, eBay, Kaufland and Zalando hide,
       deactivate or suspend German listings without a valid number, and fulfilment providers may
       not handle goods of unregistered producers.
-    citations: [verpackdg-6, ppwr-44-4, verpackdg-5-1, verpackdg-13-3, verpackdg-13-4, verpackdg-66-3, verpackdg-68-2, zsvr-registration, zsvr-faq-number, zsvr-faq-no-threshold, zsvr-online-abroad, zsvr-online-platforms, zsvr-ar, ppwr-3-15-d, ppwr-45-4-a, amazon-study-registration]
+    citations: [verpackdg-6, ppwr-44-4, verpackdg-5-1, verpackdg-13-3, verpackdg-13-4, verpackdg-66-3, verpackdg-68-2, zsvr-registration, zsvr-faq-number, zsvr-faq-no-threshold, zsvr-online-abroad, zsvr-online-platforms, zsvr-status-check, zsvr-ar, ppwr-3-15-d, ppwr-45-4-a, amazon-study-registration]
     appliesWhen:
       all:
         - { eq: [ market, DE ] }
