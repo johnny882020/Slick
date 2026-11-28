@@ -17,6 +17,8 @@ export interface CloudConfig {
   priceTiers: Record<string, Tier>;
   billingPortalUrl?: string;
   downloads: { windows?: string; mac?: string };
+  /** New free trials allowed per rolling 24 hours, across all clients (TRIALS_PER_DAY, default 100). */
+  trialsPerDay: number;
 }
 
 /**
@@ -58,6 +60,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): CloudConfig {
     paymentLinkIds: (opt("PAYMENT_LINK_IDS") ?? "").split(",").map((s) => s.trim()).filter(Boolean),
     priceTiers,
     ...(opt("BILLING_PORTAL_URL") ? { billingPortalUrl: opt("BILLING_PORTAL_URL")! } : {}),
+    trialsPerDay: Math.max(0, Number(opt("TRIALS_PER_DAY") ?? 100) || 0),
     downloads: { ...(opt("DOWNLOAD_WINDOWS_URL") ? { windows: opt("DOWNLOAD_WINDOWS_URL")! } : {}), ...(opt("DOWNLOAD_MAC_URL") ? { mac: opt("DOWNLOAD_MAC_URL")! } : {}) },
   };
 }

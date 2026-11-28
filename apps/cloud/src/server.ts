@@ -277,6 +277,11 @@ export function createCloudApp(cfg: CloudConfig, store: Store, log: (line: strin
         const deviceId = str(body, "deviceId", 80)!;
         if (!/^[A-Za-z0-9_.-]{8,80}$/.test(deviceId)) throw new HttpError(400, "deviceId is not valid", "bad_device");
         const deviceName = str(body, "deviceName", 80, false) ?? "";
+        // The per-IP limit trusts X-Forwarded-For, which a script can fake; this cap does not.
+        if ((await store.countTrialsSince(new Date(Date.now() - 86_400_000).toISOString())) >= cfg.trialsPerDay) {
+          log("trial refused: the daily cap of new trials is reached");
+          throw new HttpError(429, "free trials are paused for today; please try again tomorrow, or choose a plan", "trials_paused");
+        }
         const key = generateLicenseKey();
         const endsAt = new Date(Date.now() + TRIAL_DAYS * 86_400_000).toISOString();
         const l = await store.createTrial({

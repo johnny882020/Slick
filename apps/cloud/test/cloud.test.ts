@@ -253,6 +253,25 @@ describe("pilot licenses", () => {
   });
 });
 
+describe("free Team trial daily cap", () => {
+  it("pauses new trials once the daily cap is reached, whatever IP a client claims", async () => {
+    const capped = createCloudApp(loadConfig({ LICENSE_PRIVATE_KEY: PEM.replace(/\n/g, "\\n"), TRIALS_PER_DAY: "2" }), new MemoryStore(), () => {});
+    await new Promise<void>((r) => capped.server.listen(0, "127.0.0.1", r));
+    const b = `http://127.0.0.1:${(capped.server.address() as AddressInfo).port}`;
+    const start = (i: number) =>
+      fetch(`${b}/api/v1/trials`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": `10.9.0.${i}` }, body: JSON.stringify({ email: `cap${i}@trial.example`, deviceId: `dev_cap_000${i}` }) });
+    try {
+      expect((await start(1)).status).toBe(200);
+      expect((await start(2)).status).toBe(200);
+      const third = await start(3);
+      expect(third.status).toBe(429);
+      expect(await third.json()).toMatchObject({ code: "trials_paused" });
+    } finally {
+      await new Promise<void>((r) => capped.server.close(() => r()));
+    }
+  });
+});
+
 describe("free Team trial", () => {
   // Each test uses its own client address so the trial rate limit (5 a minute) stays predictable.
   const from = (ip: string) => ({ "x-forwarded-for": ip });

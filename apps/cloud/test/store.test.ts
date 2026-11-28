@@ -74,6 +74,8 @@ function storeSuite(name: string, make: () => Promise<Store>, done?: () => Promi
       expect((await s.devices(t!.id)).map((d) => [d.deviceId, d.deviceName])).toEqual([["dev_trial_1", "Front desk"]]);
       // Same email (any case) from another computer, or the same computer with another email.
       expect(await s.createTrial({ license: lic(2), emailLc: "trial@example.com", deviceId: "dev_trial_2", deviceName: "" })).toBeUndefined();
+      expect(await s.countTrialsSince(new Date(Date.now() - 86_400_000).toISOString())).toBeGreaterThanOrEqual(1);
+      expect(await s.countTrialsSince(new Date(Date.now() + 60_000).toISOString())).toBe(0);
       expect(await s.createTrial({ license: lic(3, "other@example.com"), emailLc: "other@example.com", deviceId: "dev_trial_1", deviceName: "" })).toBeUndefined();
       // Nothing is left behind by a refused trial.
       expect(await s.licenseByKeyHash(`hash_${name}_t2`)).toBeUndefined();

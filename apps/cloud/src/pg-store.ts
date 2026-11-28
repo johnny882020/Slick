@@ -153,6 +153,11 @@ export class PgStore implements Store {
     return licenseFrom(r[0]!);
   }
 
+  async countTrialsSince(sinceIso: string) {
+    const r = await this.q("SELECT count(*)::int AS n FROM trials WHERE created_at >= $1", [sinceIso]);
+    return Number(r[0]?.["n"] ?? 0);
+  }
+
   async createTrial(t: NewTrial) {
     const l = t.license;
     const client = await this.pool.connect();

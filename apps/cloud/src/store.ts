@@ -91,6 +91,8 @@ export interface Store {
   removeDevice(licenseId: string, deviceId: string): Promise<boolean>;
   addFeedback(f: Omit<FeedbackRow, "id" | "createdAt">): Promise<FeedbackRow>;
   listFeedback(limit: number): Promise<FeedbackRow[]>;
+  /** Trials started at or after this ISO time (a daily cap that does not trust client IPs). */
+  countTrialsSince(sinceIso: string): Promise<number>;
   /** Newest first; `trial` marks licenses that came from a self-serve trial. */
   listLicenses(limit: number): Promise<(LicenseRow & { deviceCount: number; trial: boolean })[]>;
 }
@@ -159,6 +161,9 @@ export class MemoryStore implements Store {
     const row: LicenseRow = { ...l, stripeCustomer: null, stripeSubscription: null, checkoutSession: null, createdAt: nowIso(), updatedAt: nowIso() };
     this.licenses.set(row.id, row);
     return row;
+  }
+  async countTrialsSince(sinceIso: string) {
+    return this.trials.filter((t) => t.createdAt >= sinceIso).length;
   }
   async createTrial(t: NewTrial) {
     if (this.trials.some((x) => x.emailLc === t.emailLc || x.deviceId === t.deviceId)) return undefined;
