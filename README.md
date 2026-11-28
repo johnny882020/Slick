@@ -13,6 +13,7 @@ keeps the evidence. The rules are versioned, cited packs evaluated by a determin
 - Phase 0 playbook (outreach, interviews, concierge audits): [`docs/gtm/phase-0-playbook.md`](docs/gtm/phase-0-playbook.md)
 - Rule format: [`docs/rulebook-format.md`](docs/rulebook-format.md) · packs in [`rules/`](rules/)
 - Research behind the decision: [`reports/`](reports/)
+- Live: https://oblige-web.onrender.com · where everything runs: [`docs/operations.md`](docs/operations.md)
 
 Run a gap audit on the fictional example seller:
 
