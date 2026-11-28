@@ -147,7 +147,7 @@ describe("runEvals", () => {
   it("labels a row BLOCKED (account) when every failed run is the provider account out of credit", async () => {
     const broke = smart((req) =>
       /report 2\b/.test(JSON.stringify(req.messages))
-        ? { steps: [{ error: { kind: "invalid_request", message: "Anthropic API error 400: Your credit balance is too low to access the Anthropic API." } }] }
+        ? { steps: [{ error: { kind: "server", message: "Anthropic API error 400: Your credit balance is too low to access the Anthropic API." } }] }
         : answer(req),
     );
     const r = await runEvals({ harness, providers: [{ provider: broke, model: "m1" }], suites: [suite()] });
