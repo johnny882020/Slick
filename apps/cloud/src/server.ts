@@ -38,6 +38,12 @@ function readBody(req: IncomingMessage): Promise<string> {
   });
 }
 
+/** Pages use no device features and open no windows that need a link back. */
+const PAGE_HEADERS = {
+  "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()",
+  "cross-origin-opener-policy": "same-origin",
+} as const;
+
 function send(res: ServerResponse, status: number, body: string, type: string, extra: Record<string, string> = {}) {
   res.writeHead(status, {
     "content-type": type,
@@ -45,7 +51,9 @@ function send(res: ServerResponse, status: number, body: string, type: string, e
     // Not "no-referrer": with it, browsers send "Origin: null" on our own form posts, and the
     // admin form's same-origin check could not tell its page from another site.
     "referrer-policy": "same-origin",
-    ...(type.startsWith("text/html") ? { "content-security-policy": PAGE_CSP, "x-frame-options": "DENY" } : {}),
+    // The service is HTTPS only (Render); browsers should never try plain HTTP again.
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    ...(type.startsWith("text/html") ? { "content-security-policy": PAGE_CSP, "x-frame-options": "DENY", ...PAGE_HEADERS } : {}),
     ...extra,
   });
   res.end(body);

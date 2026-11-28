@@ -199,6 +199,9 @@ describe("feedback, admin and pages", () => {
     expect(home.headers.get("content-security-policy")).toContain("font-src 'self'");
     // Keeps referrers off links to other sites, and lets the admin form's origin check work.
     expect(home.headers.get("referrer-policy")).toBe("same-origin");
+    expect(home.headers.get("strict-transport-security")).toBe("max-age=31536000; includeSubDomains");
+    expect(home.headers.get("permissions-policy")).toContain("camera=()");
+    expect(home.headers.get("cross-origin-opener-policy")).toBe("same-origin");
     const font = await fetch(`${base}/fonts/newsreader-latin-wght-normal.woff2`);
     expect(font.status).toBe(200);
     expect(font.headers.get("content-type")).toBe("font/woff2");
