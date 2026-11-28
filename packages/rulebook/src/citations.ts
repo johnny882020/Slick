@@ -84,10 +84,24 @@ function isBinary(url: string, contentType: string | null): boolean {
   return /\.pdf(?:$|[?#])/i.test(url);
 }
 
+/**
+ * EUR-Lex answers automated requests with an empty bot page. The EU Publications Office serves the
+ * same Official Journal act by CELEX number. Maps ELI links for regulations and directives,
+ * e.g. /eli/reg/2025/40/oj → https://publications.europa.eu/resource/celex/32025R0040.
+ */
+export function eurLexFallback(url: string): string | undefined {
+  const m = /eur-lex\.europa\.eu\/eli\/(reg|dir|dec)\/(\d{4})\/(\d+)/i.exec(url);
+  if (!m) return undefined;
+  const type = { reg: "R", dir: "L", dec: "D" }[m[1]!.toLowerCase() as "reg" | "dir" | "dec"];
+  return `https://publications.europa.eu/resource/celex/3${m[2]}${type}${m[3]!.padStart(4, "0")}`;
+}
+
 export async function checkCitation(pack: string, c: Citation, fetcher: Fetcher): Promise<CitationCheck> {
   const base = { pack, id: c.id, url: c.url };
   try {
-    const res = await fetcher(c.url);
+    let res = await fetcher(c.url);
+    const fallback = eurLexFallback(c.url);
+    if (fallback && (BLOCK_STATUS.has(res.status) || res.status >= 500)) res = await fetcher(fallback);
     if (BLOCK_STATUS.has(res.status) || res.status >= 500) {
       return { ...base, outcome: "blocked", ok: false, status: res.status, error: `HTTP ${res.status}: check by hand` };
     }

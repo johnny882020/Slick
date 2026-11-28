@@ -15,7 +15,7 @@ async function main(argv: string[]): Promise<number> {
   }
   if (cmd === "citations") {
     const results = await checkCitations(packs, (url) =>
-      fetch(url, { redirect: "follow", headers: { "user-agent": "oblige-rules citation check", "accept-language": "en,de,fr,it,es,nl" } }),
+      fetch(url, { redirect: "follow", headers: { "user-agent": "oblige-rules citation check", "accept-language": "eng,en,de,fr,it,es,nl" } }),
     );
     for (const r of results) console.log(`${r.outcome.padEnd(13)} ${r.pack} ${r.id} ${r.status ?? ""} ${r.url}`);
     const counts = new Map<string, number>();

@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { RulePack } from "@oneseat/contracts";
 import { inEffect, loadPackText, loadRulebook } from "../src/load.js";
 import { canonicalJson, generateSigningKey, packHash, signPack, verifyPack } from "../src/sign.js";
-import { checkCitation, checkCitations, decodePage, FAILING_OUTCOMES, normalizeText, quoteInText } from "../src/citations.js";
+import { checkCitation, checkCitations, decodePage, eurLexFallback, FAILING_OUTCOMES, normalizeText, quoteInText } from "../src/citations.js";
 import { PACK_YAML } from "./fixtures.js";
 
 const pack = (): RulePack => loadPackText(PACK_YAML, "de").pack!;
@@ -131,5 +131,26 @@ describe("citations", () => {
     const c = pack().citations[0]!;
     const r = await checkCitation("de", c, async () => ({ status: 200, arrayBuffer: async () => new TextEncoder().encode(c.quote!).buffer as ArrayBuffer }));
     expect(r.outcome).toBe("ok");
+  });
+});
+
+describe("EUR-Lex fallback", () => {
+  it("maps ELI links to the Publications Office CELEX resource", () => {
+    expect(eurLexFallback("https://eur-lex.europa.eu/eli/reg/2025/40/oj")).toBe("https://publications.europa.eu/resource/celex/32025R0040");
+    expect(eurLexFallback("https://eur-lex.europa.eu/eli/dir/2012/19/oj")).toBe("https://publications.europa.eu/resource/celex/32012L0019");
+    expect(eurLexFallback("https://eur-lex.europa.eu/eli/dec/2020/1234/oj")).toBe("https://publications.europa.eu/resource/celex/32020D1234");
+    expect(eurLexFallback("https://example.com/eli/reg/2025/40")).toBeUndefined();
+  });
+
+  it("retries a blocked EUR-Lex link on the Publications Office copy", async () => {
+    const c = { id: "ppwr", title: "PPWR", url: "https://eur-lex.europa.eu/eli/reg/2025/40/oj", publisher: "EU", kind: "law" as const, retrieved: "2026-11-28", quote: "producers shall register" };
+    const seen: string[] = [];
+    const fetcher = async (url: string) => {
+      seen.push(url);
+      const blocked = url.includes("eur-lex");
+      return { status: blocked ? 202 : 200, arrayBuffer: async () => new TextEncoder().encode(blocked ? "" : "<p>Producers shall register</p>").buffer as ArrayBuffer };
+    };
+    expect((await checkCitation("eu", c, fetcher)).outcome).toBe("ok");
+    expect(seen).toEqual(["https://eur-lex.europa.eu/eli/reg/2025/40/oj", "https://publications.europa.eu/resource/celex/32025R0040"]);
   });
 });
