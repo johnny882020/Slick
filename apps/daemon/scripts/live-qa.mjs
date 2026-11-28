@@ -681,6 +681,11 @@ function runTask(rpc, task, { timeoutMs, approve = () => false }) {
         approvals.push({ ...ev, approved: ok });
         await rpc.call("harness.approve", { approvalId: ev.approvalId, approved: ok, note: ok ? undefined : "QA run: denied." }).catch(() => undefined);
       }
+      // The scenarios give the model everything it needs, so a question (ask_user) is skipped with
+      // an empty answer: the run carries on instead of waiting out the timeout, and the report shows it.
+      if (ev.type === "question") {
+        await rpc.call("harness.answer", { questionId: ev.questionId, answer: "" }).catch(() => undefined);
+      }
       if (ev.type === "done") finish();
     };
     const timer = setTimeout(() => finish(`timed out after ${timeoutMs / 1000}s`), timeoutMs);
@@ -738,6 +743,7 @@ async function runStep(env, step, index, history) {
   if (why) return { ...base, blocked: true, why, error: err.message, pass: false, seconds: Math.round((Date.now() - t0) / 1000) };
   const problems = [];
   const warnings = [];
+  for (const q of run.events.filter((e) => e.type === "question")) warnings.push(`the model asked (skipped by QA): ${String(q.question).slice(0, 160)}`);
   if (run.timeout) problems.push(run.timeout);
   if (done && done.stopReason !== "end_turn") problems.push(`run ended with ${done.stopReason}`);
   if (err) problems.push(`error: ${err.message}`);
