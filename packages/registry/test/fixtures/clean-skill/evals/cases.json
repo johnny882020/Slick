@@ -1,0 +1,15 @@
+{
+  "skill": "clean-skill",
+  "cases": [
+    { "id": "basic", "input": "Summarise: we agreed to ship on Friday. Sam owns the release notes.", "checks": [{ "type": "contains", "value": "Decisions" }] },
+    { "id": "owner-missing", "input": "Notes: someone should book the venue.", "checks": [{ "type": "regex", "pattern": "owner", "flags": "i" }] },
+    { "id": "short", "input": "Notes: nothing was decided.", "checks": [{ "type": "max_words", "value": 200 }] },
+    { "id": "no-tools", "input": "Summarise these notes: budget approved.", "checks": [{ "type": "tool_not_called", "name": "web_fetch" }] },
+    { "id": "json", "input": "Give the action items as JSON: Kim to send the deck.", "checks": [{ "type": "json_valid" }] },
+    { "id": "judge", "input": "Summarise a long transcript about hiring.", "checks": [{ "type": "judge", "rubric": "Lists decisions and action items separately.", "threshold": 0.7 }] },
+    { "id": "min", "input": "Summarise: three decisions were made today.", "checks": [{ "type": "min_words", "value": 5 }] },
+    { "id": "not-contains", "input": "Summarise: no open questions.", "checks": [{ "type": "not_contains", "value": "Open questions", "caseSensitive": true }] },
+    { "id": "weighted", "input": "Summarise: Lee owns hiring (due June).", "checks": [{ "type": "contains", "value": "Lee" }], "weight": 2 },
+    { "id": "workspace", "input": "Summarise notes.md", "workspace": { "notes.md": "We chose vendor B." }, "checks": [{ "type": "tool_called", "name": "read_file", "minTimes": 1 }] }
+  ]
+}

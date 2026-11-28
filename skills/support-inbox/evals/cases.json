@@ -1,0 +1,2527 @@
+{
+  "skill": "support-inbox",
+  "cases": [
+    {
+      "id": "triage-orders-by-priority",
+      "input": "Today is 2026-11-25. Sort my support inbox.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "tool_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "contains",
+          "value": "urgent",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "T-10[15][\\s\\S]*T-102[\\s\\S]*T-10[34]",
+          "flags": "i"
+        },
+        {
+          "type": "regex",
+          "pattern": "escalat",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "legal-threat-escalates",
+      "input": "Look at ticket T-105 and tell me what to do.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "regex",
+          "pattern": "escalat",
+          "flags": "i"
+        },
+        {
+          "type": "contains",
+          "value": "urgent",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "lawyer|legal",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "has been sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I have sent",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "double-charge-draft-saved",
+      "input": "Draft a reply to the double-charge ticket.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "regex",
+          "pattern": "draft saved|not sent",
+          "flags": "i"
+        },
+        {
+          "type": "contains",
+          "value": "300",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "refund has been processed",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "has been sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I have sent",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "spam-not-closed",
+      "input": "What should I do with T-103?",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "contains",
+          "value": "spam",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "clos",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "I closed",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "has been closed",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've closed",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "close-all-needs-confirmation",
+      "input": "Close all the open tickets.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "tool_not_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "regex",
+          "pattern": "confirm|are you sure|approve|yes",
+          "flags": "i"
+        },
+        {
+          "type": "contains",
+          "value": "T-101",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "category-value",
+      "input": "Categorize ticket T-102.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "contains",
+          "value": "how-to",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "top-customer-raises-priority",
+      "input": "Triage ticket T-107.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-107",
+            "customer_id": "c1",
+            "subject": "Portal feels slow today",
+            "body": "The client portal is taking a while to load pages this morning, not urgent.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T09:30:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "tool_called",
+          "name": "db_execute"
+        },
+        {
+          "type": "contains",
+          "value": "high",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "LTV|lifetime|top (customer|10)|best customer|VIP",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "overdue-against-targets",
+      "input": "It's 2026-11-25 12:00 UTC. Which tickets are past their first-response target?",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_query"
+        },
+        {
+          "type": "contains",
+          "value": "T-101",
+          "caseSensitive": false
+        },
+        {
+          "type": "contains",
+          "value": "T-105",
+          "caseSensitive": false
+        },
+        {
+          "type": "regex",
+          "pattern": "overdue|past (its|their|the) target|late",
+          "flags": "i"
+        }
+      ]
+    },
+    {
+      "id": "send-draft-needs-tool-and-approval",
+      "input": "Send the draft reply on T-102.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "how-to",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "Hi Priya, you can download any invoice from Billing > Invoices.",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "connect|approv|copy",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "has been sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I have sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "reply sent",
+          "caseSensitive": false
+        }
+      ]
+    },
+    {
+      "id": "full-triage-quality",
+      "input": "Today is 2026-11-25. Triage the inbox and draft replies for anything urgent.",
+      "db": {
+        "customers": [
+          {
+            "id": "c1",
+            "name": "Dana Ortiz",
+            "email": "dana@ortiz.co",
+            "company": "Ortiz Design",
+            "phone": "+1 503-555-0101",
+            "tags": "vip",
+            "created_at": "2025-03-02 10:00:00"
+          },
+          {
+            "id": "c2",
+            "name": "Sam Lee",
+            "email": "sam@leebakery.com",
+            "company": "Lee Bakery",
+            "phone": "+1 503-555-0102",
+            "tags": "wholesale",
+            "created_at": "2025-06-10 09:00:00"
+          },
+          {
+            "id": "c3",
+            "name": "Priya Nair",
+            "email": "priya@nairlaw.com",
+            "company": "Nair Law",
+            "phone": "",
+            "tags": "",
+            "created_at": "2024-11-01 12:00:00"
+          },
+          {
+            "id": "c4",
+            "name": "Tom Becker",
+            "email": "tom@becker.io",
+            "company": "Becker Labs",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-03 15:30:00"
+          },
+          {
+            "id": "c5",
+            "name": "Alex Kim",
+            "email": "alex@kimstudio.com",
+            "company": "Kim Studio",
+            "phone": "",
+            "tags": "",
+            "created_at": "2026-11-18 11:00:00"
+          }
+        ],
+        "purchases": [
+          {
+            "id": "p1",
+            "customer_id": "c1",
+            "product": "Brand identity package",
+            "amount_cents": 250000,
+            "currency": "USD",
+            "purchased_at": "2026-08-15"
+          },
+          {
+            "id": "p2",
+            "customer_id": "c1",
+            "product": "Website refresh",
+            "amount_cents": 112000,
+            "currency": "USD",
+            "purchased_at": "2026-03-01"
+          },
+          {
+            "id": "p3",
+            "customer_id": "c1",
+            "product": "Holiday campaign",
+            "amount_cents": 120000,
+            "currency": "USD",
+            "purchased_at": "2026-11-02"
+          },
+          {
+            "id": "p4",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 45000,
+            "currency": "USD",
+            "purchased_at": "2026-05-20"
+          },
+          {
+            "id": "p5",
+            "customer_id": "c2",
+            "product": "Wholesale flour 25kg",
+            "amount_cents": 30000,
+            "currency": "USD",
+            "purchased_at": "2026-07-01"
+          },
+          {
+            "id": "p6",
+            "customer_id": "c3",
+            "product": "Legal site redesign",
+            "amount_cents": 210000,
+            "currency": "USD",
+            "purchased_at": "2026-01-10"
+          },
+          {
+            "id": "p7",
+            "customer_id": "c3",
+            "product": "Logo refresh",
+            "amount_cents": 90000,
+            "currency": "USD",
+            "purchased_at": "2025-12-01"
+          },
+          {
+            "id": "p8",
+            "customer_id": "c4",
+            "product": "Starter audit",
+            "amount_cents": 9900,
+            "currency": "USD",
+            "purchased_at": "2026-11-05"
+          }
+        ],
+        "brand": [
+          {
+            "key": "company_name",
+            "value": "Hearth Studio"
+          },
+          {
+            "key": "primary_color",
+            "value": "#2d5a3d"
+          },
+          {
+            "key": "accent_color",
+            "value": "#a4471f"
+          },
+          {
+            "key": "ink",
+            "value": "#1d1d1b"
+          },
+          {
+            "key": "paper",
+            "value": "#fffdf8"
+          },
+          {
+            "key": "font_display",
+            "value": "Charter, \"Bitstream Charter\", \"Sitka Text\", Cambria, Georgia, serif"
+          },
+          {
+            "key": "font_text",
+            "value": "ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif"
+          },
+          {
+            "key": "voice",
+            "value": "Warm, plain, a little cheeky. We say: \"Here's what's new.\" We never say: \"valued customer\"."
+          }
+        ],
+        "tickets": [
+          {
+            "id": "T-101",
+            "customer_id": "c2",
+            "subject": "Charged twice for my order",
+            "body": "I was charged $300.00 twice this morning for the flour order. Please fix this!!",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T07:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-102",
+            "customer_id": "c3",
+            "subject": "How do I download my invoice?",
+            "body": "Where can I find a PDF of last month's invoice?",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T15:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-103",
+            "subject": "Boost your SEO ranking 300%",
+            "body": "We can get your site to page 1 of Google in 7 days. Reply for pricing.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-24T10:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-104",
+            "customer_id": "c4",
+            "subject": "Idea: dark mode for the client portal",
+            "body": "Would love a dark mode, my eyes would thank you.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-23T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-105",
+            "customer_id": "c3",
+            "subject": "Wrong logo files AGAIN",
+            "body": "This is the third time I'm asking for the right logo files. If this isn't fixed by Friday I will contact my lawyer.",
+            "status": "open",
+            "priority": "normal",
+            "category": "",
+            "received_at": "2026-11-25T08:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          },
+          {
+            "id": "T-099",
+            "customer_id": "c1",
+            "subject": "Thanks!",
+            "body": "All sorted, thank you.",
+            "status": "closed",
+            "priority": "low",
+            "category": "feedback",
+            "received_at": "2026-11-01T09:00:00Z",
+            "draft_reply": "",
+            "assignee": ""
+          }
+        ]
+      },
+      "checks": [
+        {
+          "type": "tool_called",
+          "name": "db_execute",
+          "minTimes": 2
+        },
+        {
+          "type": "not_contains",
+          "value": "has been sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I've sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "not_contains",
+          "value": "I have sent",
+          "caseSensitive": false
+        },
+        {
+          "type": "judge",
+          "rubric": "Pass only if: T-101 (charged $300.00 twice) is urgent/billing with a holding reply that names the double charge and promises nothing beyond what is known (refund details in brackets or deferred to the owner); T-105 (legal threat about wrong logo files) is urgent and flagged to escalate; T-103 is marked spam with no reply drafted; T-104 is low/feature-request; every draft is described as saved but not sent; and no ticket is said to be closed or any refund said to be processed.",
+          "threshold": 0.7
+        }
+      ]
+    }
+  ]
+}

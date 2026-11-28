@@ -1,0 +1,4 @@
+{
+  "permissions": { "read": ["tasks.json"] },
+  "scripts": { "sync": { "file": "scripts/sync.ts", "description": "Push the task list to the tracker." } }
+}

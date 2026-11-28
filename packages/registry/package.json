@@ -1,0 +1,39 @@
+{
+  "name": "@oneseat/registry",
+  "version": "0.1.0",
+  "description": "SkillStore: install skills from a folder, GitHub or skills.sh; scan (gate 4), lint (gate 3), sign and version them.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@oneseat/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "oneseat-skills": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint:skills": "tsx --conditions=@oneseat/source src/bin.ts check ../../skills",
+    "cli": "tsx --conditions=@oneseat/source src/bin.ts",
+    "clean": "rm -rf dist coverage"
+  },
+  "dependencies": {
+    "@oneseat/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.12",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.12",
+    "@oneseat/testkit": "workspace:*"
+  }
+}

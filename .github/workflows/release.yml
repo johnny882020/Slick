@@ -1,0 +1,143 @@
+# Release: on a v* tag, run gates 1-6 (ci.yml), then build signed installers and a draft release.
+# Windows: .msi and NSIS .exe. macOS: universal .dmg (Apple Silicon + Intel), signed and notarised.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  TURBO_TELEMETRY_DISABLED: "1"
+
+jobs:
+  gates:
+    name: Gates 1-6
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Signed installers (${{ matrix.os }})
+    needs: gates
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rust-targets: x86_64-pc-windows-msvc
+            tauri-args: --bundles msi,nsis
+          - os: macos-latest
+            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
+            tauri-args: --target universal-apple-darwin --bundles dmg
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri -> target
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      # The sidecar lands at apps/desktop/src-tauri/binaries/oneseat-daemon-<target-triple>[.exe].
+      - name: Build daemon sidecar (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        run: pnpm --filter @oneseat/daemon run build:sidecar -- --target x86_64-pc-windows-msvc
+
+      - name: Build daemon sidecar (macOS universal)
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          pnpm --filter @oneseat/daemon run build:sidecar -- --target aarch64-apple-darwin
+          pnpm --filter @oneseat/daemon run build:sidecar -- --target x86_64-apple-darwin
+          cd apps/desktop/src-tauri/binaries
+          lipo -create -output oneseat-daemon-universal-apple-darwin oneseat-daemon-aarch64-apple-darwin oneseat-daemon-x86_64-apple-darwin
+          lipo -info oneseat-daemon-universal-apple-darwin
+          lipo -create -output deno-universal-apple-darwin deno-aarch64-apple-darwin deno-x86_64-apple-darwin
+          lipo -info deno-universal-apple-darwin
+
+      - name: Check the sidecar exists
+        run: |
+          ls -la apps/desktop/src-tauri/binaries/
+          ls apps/desktop/src-tauri/binaries/oneseat-daemon-* > /dev/null
+          ls apps/desktop/src-tauri/binaries/deno-* > /dev/null
+
+      - name: Import Windows signing certificate
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          if (-not $env:WINDOWS_CERTIFICATE) { throw "The WINDOWS_CERTIFICATE secret is empty; releases must be signed." }
+          $pfx = Join-Path $env:RUNNER_TEMP "oneseat-signing.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE))
+          $password = ConvertTo-SecureString -String $env:WINDOWS_CERTIFICATE_PASSWORD -Force -AsPlainText
+          $cert = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $password
+          Remove-Item $pfx
+          $config = @{ bundle = @{ windows = @{ certificateThumbprint = $cert.Thumbprint; digestAlgorithm = "sha256"; timestampUrl = "http://timestamp.digicert.com" } } } | ConvertTo-Json -Depth 5
+          $configPath = Join-Path $env:RUNNER_TEMP "tauri-windows-signing.json"
+          Set-Content -Path $configPath -Value $config -Encoding utf8
+          "TAURI_EXTRA_ARGS=--config $configPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Check macOS signing secrets
+        if: ${{ runner.os == 'macOS' }}
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          for v in APPLE_CERTIFICATE APPLE_SIGNING_IDENTITY APPLE_ID APPLE_TEAM_ID; do
+            if [ -z "${!v}" ]; then echo "::error::The $v secret is empty; releases must be signed and notarised."; exit 1; fi
+          done
+
+      - name: Build, sign and draft the release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Updater signing (both platforms).
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # macOS code signing and notarisation.
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          projectPath: apps/desktop
+          tauriScript: pnpm tauri
+          args: ${{ matrix.tauri-args }} ${{ env.TAURI_EXTRA_ARGS }}
+          tagName: ${{ github.ref_name }}
+          releaseName: OneSeat ${{ github.ref_name }}
+          releaseBody: Draft release for ${{ github.ref_name }}. Installers for Windows (.msi, .exe) and macOS (universal .dmg) are attached.
+          releaseDraft: true
+          prerelease: false

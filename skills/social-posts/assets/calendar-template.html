@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content calendar</title>
+<style>
+/* BRAND:START - replace with brand tokens */
+:root {
+  --primary: #1f4e79;
+  --accent: #b5452f;
+  --ink: #1b1b1b;
+  --paper: #ffffff;
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-text: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+/* BRAND:END */
+:root { color-scheme: light dark; --bg: var(--paper); --fg: var(--ink); --muted: color-mix(in srgb, var(--fg) 60%, var(--bg)); --line: color-mix(in srgb, var(--fg) 15%, var(--bg)); --cell: color-mix(in srgb, var(--fg) 3%, var(--bg)); }
+@media (prefers-color-scheme: dark) { :root { --bg: #121417; --fg: #eceff3; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 var(--font-text); }
+header { padding: 20px 16px 8px; max-width: 1200px; margin: 0 auto; }
+h1 { font: 700 22px/1.2 var(--font-display); margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 12px; }
+.legend li::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+main { max-width: 1200px; margin: 0 auto; padding: 8px 16px 32px; }
+h2 { font: 700 17px/1.2 var(--font-display); margin: 24px 0 8px; }
+.grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.dow { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 4px; }
+.day { min-height: 96px; background: var(--cell); border: 1px solid var(--line); border-radius: 8px; padding: 6px; }
+.day.out { opacity: .35; }
+.day .n { font-size: 12px; color: var(--muted); }
+.post { margin-top: 4px; border-left: 3px solid var(--c); padding: 2px 6px; border-radius: 4px; background: color-mix(in srgb, var(--c) 12%, var(--bg)); font-size: 12px; overflow-wrap: anywhere; }
+.post b { font-weight: 600; }
+.post .status { color: var(--muted); font-size: 11px; }
+.empty { color: var(--muted); padding: 24px 0; }
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  .dow, .day.out, .day.blank { display: none; }
+  .day { min-height: 0; }
+}
+@media print { .day { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Content calendar</h1>
+  <p class="sub" id="range"></p>
+  <ul class="legend" id="legend"></ul>
+</header>
+<main id="months"></main>
+
+<script type="application/json" id="calendar-data">
+{
+  "title": "Content calendar",
+  "posts": [
+    {"id": "pst_example1", "date": "2026-12-01", "time": "09:00", "channel": "linkedin", "status": "scheduled", "campaign": "Holiday", "text": "Example post text"}
+  ]
+}
+</script>
+<script>
+(function () {
+  var COLORS = { x: "#5b6b7a", linkedin: "#0a66c2", instagram: "#c13584", facebook: "#1877f2", threads: "#444444", bluesky: "#1185fe", mastodon: "#6364ff", tiktok: "#ee1d52", pinterest: "#e60023", google_business: "#34a853", newsletter: "#b26b00" };
+  var data = JSON.parse(document.getElementById("calendar-data").textContent);
+  var posts = (data.posts || []).slice().sort(function (a, b) { return (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")); });
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function color(ch) { return COLORS[ch] || "var(--accent)"; }
+  document.getElementById("title").textContent = data.title || "Content calendar";
+  document.title = data.title || "Content calendar";
+  var root = document.getElementById("months");
+  if (!posts.length) { root.appendChild(el("p", "empty", "No posts in this range.")); return; }
+  document.getElementById("range").textContent = posts.length + " posts, " + posts[0].date + " to " + posts[posts.length - 1].date;
+  var legend = document.getElementById("legend");
+  Array.from(new Set(posts.map(function (p) { return p.channel; }))).forEach(function (ch) { var li = el("li", "", ch); li.style.setProperty("--c", color(ch)); legend.appendChild(li); });
+  var byDay = {};
+  posts.forEach(function (p) { (byDay[p.date] = byDay[p.date] || []).push(p); });
+  var months = Array.from(new Set(posts.map(function (p) { return p.date.slice(0, 7); })));
+  var DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  months.forEach(function (ym) {
+    var y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1;
+    var first = new Date(Date.UTC(y, m, 1));
+    root.appendChild(el("h2", "", first.toLocaleDateString(undefined, { month: "long", year: "numeric", timeZone: "UTC" })));
+    var grid = el("div", "grid");
+    DOW.forEach(function (d) { grid.appendChild(el("div", "dow", d)); });
+    var lead = (first.getUTCDay() + 6) % 7;
+    for (var i = 0; i < lead; i++) grid.appendChild(el("div", "day blank out"));
+    var days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    for (var d = 1; d <= days; d++) {
+      var iso = ym + "-" + String(d).padStart(2, "0");
+      var cell = el("div", "day" + (byDay[iso] ? "" : " out"));
+      var date = new Date(Date.UTC(y, m, d));
+      cell.appendChild(el("div", "n", date.toLocaleDateString(undefined, { weekday: "short", day: "numeric", timeZone: "UTC" })));
+      (byDay[iso] || []).forEach(function (p) {
+        var card = el("div", "post");
+        card.style.setProperty("--c", color(p.channel));
+        card.appendChild(el("b", "", (p.time ? p.time + " " : "") + p.channel));
+        card.appendChild(el("span", "status", " · " + (p.status || "draft") + (p.campaign ? " · " + p.campaign : "")));
+        var t = String(p.text || "");
+        card.appendChild(el("div", "", t.length > 140 ? t.slice(0, 137) + "..." : t));
+        card.title = t;
+        cell.appendChild(card);
+      });
+      grid.appendChild(cell);
+    }
+    root.appendChild(grid);
+  });
+})();
+</script>
+</body>
+</html>

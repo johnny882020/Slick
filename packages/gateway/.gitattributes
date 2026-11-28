@@ -1,0 +1,2 @@
+# Fixtures are byte-exact wire captures (some use CRLF on purpose). Never normalise them.
+fixtures/** -text

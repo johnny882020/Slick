@@ -1,0 +1,2 @@
+data: {"candidates": [{"content": {"parts": [],"role": "model"},"finishReason": "MALFORMED_FUNCTION_CALL","finishMessage": "Malformed function call: get_weather(city=Paris","index": 0}],"usageMetadata": {"promptTokenCount": 61,"totalTokenCount": 61},"modelVersion": "gemini-2.5-flash","responseId": "malformed0resp"}
+

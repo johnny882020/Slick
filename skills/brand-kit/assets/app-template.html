@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top customers</title>
+<style>
+/* BRAND:START - replace these values with the brand table tokens */
+:root {
+  --primary: #1f4e79;
+  --accent: #b5452f;
+  --ink: #1b1b1b;
+  --paper: #ffffff;
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-text: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+/* BRAND:END */
+:root {
+  color-scheme: light dark;
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --link: var(--primary);
+  --muted: color-mix(in srgb, var(--fg) 62%, var(--bg));
+  --line: color-mix(in srgb, var(--fg) 14%, var(--bg));
+  --surface: color-mix(in srgb, var(--fg) 4%, var(--bg));
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #121417; --fg: #eceff3; --link: color-mix(in srgb, var(--primary) 45%, white); }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 var(--font-text); }
+main { max-width: 880px; margin: 0 auto; padding: 24px 16px 40px; }
+h1 { font: 700 26px/1.2 var(--font-display); margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 20px; }
+form { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+input, button { font: inherit; min-height: 44px; border-radius: 10px; }
+input { flex: 1 1 220px; min-width: 0; padding: 0 12px; border: 1px solid color-mix(in srgb, var(--fg) 45%, var(--bg)); background: var(--bg); color: var(--fg); }
+button { padding: 0 18px; border: 0; background: var(--primary); color: var(--paper); font-weight: 600; cursor: pointer; }
+button.secondary { background: transparent; color: var(--link); border: 1px solid var(--line); }
+:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+.status { padding: 14px; border-radius: 10px; background: var(--surface); color: var(--muted); }
+.status.error { color: var(--fg); border-left: 4px solid var(--accent); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--surface); }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; }
+td .email { display: block; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .hide-sm { display: none; } h1 { font-size: 22px; } }
+@media (prefers-reduced-motion: no-preference) { button { transition: filter .15s; } button:hover { filter: brightness(1.1); } }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Top customers</h1>
+  <p class="sub">Lifetime value from your local database.</p>
+
+  <form id="search" role="search">
+    <input id="q" name="q" type="search" aria-label="Search customers" placeholder="Search by name, email or company" autocomplete="off">
+    <button type="submit">Search</button>
+    <button type="button" class="secondary" id="top">Top 10</button>
+  </form>
+
+  <div id="status" class="status" role="status" aria-live="polite">Loading...</div>
+  <div class="table-wrap" id="wrap" hidden>
+    <table>
+      <thead><tr><th>Customer</th><th class="num">Lifetime value</th><th class="num hide-sm">Orders</th><th class="hide-sm">Last purchase</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</main>
+<script>
+(function () {
+  var statusEl = document.getElementById("status");
+  var wrap = document.getElementById("wrap");
+  var rows = document.getElementById("rows");
+  var money = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
+
+  function setStatus(text, isError) {
+    statusEl.textContent = text;
+    statusEl.className = "status" + (isError ? " error" : "");
+    statusEl.hidden = false;
+    wrap.hidden = true;
+  }
+
+  function cell(tr, text, cls) {
+    var td = document.createElement("td");
+    if (cls) td.className = cls;
+    td.textContent = text;
+    tr.appendChild(td);
+    return td;
+  }
+
+  function render(list) {
+    rows.textContent = "";
+    if (!list.length) { setStatus("No customers found.", false); return; }
+    list.forEach(function (c) {
+      var tr = document.createElement("tr");
+      var who = cell(tr, c.name || "(no name)");
+      var email = document.createElement("span");
+      email.className = "email";
+      email.textContent = c.email || "";
+      who.appendChild(email);
+      cell(tr, money.format((Number(c.ltv_cents) || 0) / 100), "num");
+      cell(tr, String(c.purchase_count == null ? "" : c.purchase_count), "num hide-sm");
+      cell(tr, c.last_purchase_at ? String(c.last_purchase_at).slice(0, 10) : "-", "hide-sm");
+      rows.appendChild(tr);
+    });
+    statusEl.hidden = true;
+    wrap.hidden = false;
+  }
+
+  function handle(result) {
+    if (!result || !result.ok) { setStatus("Could not load customers: " + ((result && result.error) || "unknown error"), true); return; }
+    var data = result.data;
+    if (!data || !Array.isArray(data.customers)) {
+      setStatus((data && data.error) || "The customers skill did not return a list.", true);
+      return;
+    }
+    render(data.customers);
+  }
+
+  function noBridge() {
+    if (window.oneseat && typeof window.oneseat.run === "function") return false;
+    setStatus("Open this page from OneSeat to load your data.", true);
+    return true;
+  }
+
+  function loadTop() {
+    if (noBridge()) return;
+    document.getElementById("title").textContent = "Top customers";
+    setStatus("Loading...", false);
+    window.oneseat.run("customers", { action: "top_ltv", limit: 10 }).then(handle, function (e) { setStatus("Could not load customers: " + e, true); });
+  }
+
+  function search(query) {
+    if (noBridge()) return;
+    document.getElementById("title").textContent = "Search: " + query;
+    setStatus("Searching...", false);
+    window.oneseat.run("customers", { action: "find", query: query }).then(handle, function (e) { setStatus("Search failed: " + e, true); });
+  }
+
+  document.getElementById("search").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var q = document.getElementById("q").value.trim();
+    if (q) search(q); else loadTop();
+  });
+  document.getElementById("top").addEventListener("click", loadTop);
+  loadTop();
+})();
+</script>
+</body>
+</html>

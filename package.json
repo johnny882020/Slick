@@ -1,0 +1,23 @@
+{
+  "name": "oneseat",
+  "private": true,
+  "version": "0.1.0",
+  "description": "OneSeat: one desktop app, one skills library, any model.",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=22.12" },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint:skills": "pnpm --filter @oneseat/registry run lint:skills",
+    "gates": "pnpm --filter @oneseat/testkit run gates",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0",
+    "vitest": "^4.1.12"
+  }
+}

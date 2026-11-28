@@ -1,0 +1,54 @@
+<!doctype html>
+<!--
+  Probe page for scripts/native-smoke.mjs. It runs inside a real pinned window (label app-probe),
+  tries everything a hostile page might, and reports what happened through oneseat.run - the
+  only way out. The fake daemon logs the report; the smoke script checks it.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Probe</title>
+  </head>
+  <body>
+    <h1>Probe</h1>
+    <script>
+      (async () => {
+        const report = { surface: Object.keys(window.oneseat || {}), frozen: Object.isFrozen(window.oneseat) };
+        const I = window.__TAURI_INTERNALS__;
+        async function tryInvoke(name, cmd, args) {
+          try {
+            await I.invoke(cmd, args);
+            report[name] = "ALLOWED";
+          } catch (e) {
+            report[name] = "denied";
+          }
+        }
+        await tryInvoke("daemonCall", "daemon_call", { method: "skills.list", params: {} });
+        await tryInvoke("appsRunDirect", "daemon_call", { method: "apps.run", params: { appId: "other", skill: "x", input: "" } });
+        await tryInvoke("keyStatus", "key_status");
+        await tryInvoke("keySave", "key_save", { provider: "openai", apiKey: "sk-probe-0000000000" });
+        await tryInvoke("pinOpen", "pin_open", { appId: "probe" });
+        await tryInvoke("eventListen", "plugin:event|listen", { event: "daemon://notification", target: { kind: "Any" }, handler: 1 });
+        await tryInvoke("opener", "plugin:opener|open_url", { url: "https://example.com" });
+        await tryInvoke("windowCreate", "plugin:webview|create_webview_window", { options: { label: "x", url: "https://example.com" } });
+        try {
+          await fetch("https://example.com/");
+          report.fetchRemote = "ALLOWED";
+        } catch (e) {
+          report.fetchRemote = "blocked";
+        }
+        try {
+          await fetch("http://127.0.0.1:1420/");
+          report.fetchLocal = "ALLOWED";
+        } catch (e) {
+          report.fetchLocal = "blocked";
+        }
+        const notAllowed = await oneseat.run("weekly-report", "not in allowedSkills");
+        report.notAllowedSkill = notAllowed.ok ? "ALLOWED" : "refused";
+        await oneseat.run("invoice-chaser", { probeReport: report });
+        // Navigating away must not happen (the shell asks the person first).
+        location.href = "https://example.com/away";
+      })();
+    </script>
+  </body>
+</html>

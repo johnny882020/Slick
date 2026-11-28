@@ -1,0 +1,30 @@
+event: response.created
+data: {"type":"response.created","sequence_number":0,"response":{"id":"resp_68f1a2b3c4d5e6f70001","object":"response","created_at":1764250000,"status":"in_progress","background":false,"error":null,"incomplete_details":null,"instructions":"You are a weather bot","max_output_tokens":1024,"model":"gpt-5-codex","output":[],"parallel_tool_calls":true,"reasoning":{"effort":"medium","summary":null},"store":false,"temperature":1.0,"tool_choice":"auto","tools":[{"type":"function","description":"Get the current weather for a city","name":"get_weather","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]},"strict":false}],"top_p":1.0,"truncation":"disabled","usage":null,"metadata":{}}}
+
+event: response.in_progress
+data: {"type":"response.in_progress","sequence_number":1,"response":{"id":"resp_68f1a2b3c4d5e6f70001","object":"response","created_at":1764250000,"status":"in_progress","model":"gpt-5-codex","output":[],"usage":null}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":2,"output_index":0,"item":{"id":"rs_68f1a2b3c4d5e6f70002","type":"reasoning","summary":[]}}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":3,"output_index":0,"item":{"id":"rs_68f1a2b3c4d5e6f70002","type":"reasoning","summary":[]}}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","sequence_number":4,"output_index":1,"item":{"id":"fc_68f1a2b3c4d5e6f70003","type":"function_call","status":"in_progress","arguments":"","call_id":"call_Kp3Dq1ZtWm8xVb2Ln5Rs","name":"get_weather"}}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","sequence_number":5,"item_id":"fc_68f1a2b3c4d5e6f70003","output_index":1,"delta":"{\"city\":"}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","sequence_number":6,"item_id":"fc_68f1a2b3c4d5e6f70003","output_index":1,"delta":"\"Paris\"}"}
+
+event: response.function_call_arguments.done
+data: {"type":"response.function_call_arguments.done","sequence_number":7,"item_id":"fc_68f1a2b3c4d5e6f70003","output_index":1,"arguments":"{\"city\":\"Paris\"}"}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","sequence_number":8,"output_index":1,"item":{"id":"fc_68f1a2b3c4d5e6f70003","type":"function_call","status":"completed","arguments":"{\"city\":\"Paris\"}","call_id":"call_Kp3Dq1ZtWm8xVb2Ln5Rs","name":"get_weather"}}
+
+event: response.completed
+data: {"type":"response.completed","sequence_number":9,"response":{"id":"resp_68f1a2b3c4d5e6f70001","object":"response","created_at":1764250000,"status":"completed","error":null,"incomplete_details":null,"model":"gpt-5-codex","output":[{"id":"rs_68f1a2b3c4d5e6f70002","type":"reasoning","summary":[]},{"id":"fc_68f1a2b3c4d5e6f70003","type":"function_call","status":"completed","arguments":"{\"city\":\"Paris\"}","call_id":"call_Kp3Dq1ZtWm8xVb2Ln5Rs","name":"get_weather"}],"store":false,"usage":{"input_tokens":88,"input_tokens_details":{"cached_tokens":0},"output_tokens":84,"output_tokens_details":{"reasoning_tokens":64},"total_tokens":172}}}
+

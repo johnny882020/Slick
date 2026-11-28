@@ -1,0 +1,12 @@
+# Check out text as LF on every OS. Windows runners default to core.autocrlf=true,
+# which turned script shebangs into "#!/usr/bin/env node\r" and broke module loading.
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.icns binary
+*.jpg binary
+*.gz binary
+*.tgz binary
+
+# Nested .gitattributes files keep byte-exact fixtures (e.g. packages/gateway/fixtures).

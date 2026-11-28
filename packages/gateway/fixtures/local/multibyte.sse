@@ -1,0 +1,6 @@
+data: {"id":"chatcmpl-800","object":"chat.completion.chunk","created":1764251300,"model":"qwen3:8b","choices":[{"index":0,"delta":{"role":"assistant","content":"Grüße aus München — 東京は雨 🌧️"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-800","object":"chat.completion.chunk","created":1764251300,"model":"qwen3:8b","choices":[{"index":0,"delta":{"content":", 18°C 👩‍💻"},"finish_reason":"stop"}]}
+
+data: [DONE]
+

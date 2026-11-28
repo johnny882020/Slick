@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekly report</title>
+<style>
+/* BRAND:START - replace with brand tokens */
+:root {
+  --primary: #1f4e79;
+  --accent: #b5452f;
+  --ink: #1b1b1b;
+  --paper: #ffffff;
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-text: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+/* BRAND:END */
+:root { color-scheme: light dark; --bg: var(--paper); --fg: var(--ink); --muted: color-mix(in srgb, var(--fg) 62%, var(--bg)); --line: color-mix(in srgb, var(--fg) 14%, var(--bg)); --good: #1a7f37; --bad: #b42318; }
+@media (prefers-color-scheme: dark) { :root { --bg: #121417; --fg: #eceff3; --good: #4ac26b; --bad: #ff7b72; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--font-text); }
+main { max-width: 860px; margin: 0 auto; padding: 28px 16px 40px; }
+.kicker { color: var(--primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; margin: 0; }
+@media (prefers-color-scheme: dark) { .kicker { color: color-mix(in srgb, var(--primary) 55%, white); } }
+h1 { font: 800 28px/1.15 var(--font-display); margin: 4px 0 6px; }
+.sub { color: var(--muted); margin: 0 0 20px; }
+.headline { font-size: 18px; border-left: 4px solid var(--accent); padding: 4px 0 4px 14px; margin: 0 0 24px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.tile { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.tile .name { color: var(--muted); font-size: 13px; }
+.tile .value { font: 700 24px/1.2 var(--font-display); font-variant-numeric: tabular-nums; margin: 2px 0; }
+.tile .delta { font-size: 13px; font-variant-numeric: tabular-nums; }
+.better { color: var(--good); } .worse { color: var(--bad); } .same, .new { color: var(--muted); }
+h2 { font: 700 16px/1.3 var(--font-display); margin: 22px 0 6px; }
+ul { margin: 0; padding-left: 20px; }
+li { margin: 4px 0; }
+.cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+footer { margin-top: 32px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 700px) { .cols { grid-template-columns: 1fr; } h1 { font-size: 24px; } }
+@media print { :root { color-scheme: light; } main { padding: 0; } .tile { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<main>
+  <p class="kicker" id="company"></p>
+  <h1 id="title">Weekly report</h1>
+  <p class="sub" id="range"></p>
+  <p class="headline" id="headline"></p>
+  <section class="tiles" id="tiles" aria-label="Key numbers"></section>
+  <section class="cols">
+    <div><h2>What went well</h2><ul id="well"></ul></div>
+    <div><h2>Watch</h2><ul id="watch"></ul></div>
+    <div><h2>Next week</h2><ul id="next"></ul></div>
+  </section>
+  <footer id="notes"></footer>
+</main>
+
+<script type="application/json" id="report-data">
+{
+  "company": "Your company",
+  "current": {"label": "Nov 16 - Nov 22, 2026"},
+  "prior": {"label": "Nov 9 - Nov 15, 2026"},
+  "headline": "Revenue rose 22% to $4,820.00.",
+  "metrics": [
+    {"name": "Revenue", "current_text": "$4,820.00", "prior_text": "$3,950.00", "delta_text": "+$870.00 (+22%)", "verdict": "better"}
+  ],
+  "well": ["Example"],
+  "watch": ["Example"],
+  "next": ["Example"],
+  "notes": "Numbers from the local database."
+}
+</script>
+<script>
+(function () {
+  var d = JSON.parse(document.getElementById("report-data").textContent);
+  function text(id, v) { document.getElementById(id).textContent = v || ""; }
+  function list(id, items) { var ul = document.getElementById(id); (items || []).forEach(function (s) { var li = document.createElement("li"); li.textContent = s; ul.appendChild(li); }); }
+  text("company", d.company);
+  text("title", "Week of " + (d.current && d.current.label || ""));
+  document.title = (d.company ? d.company + " - " : "") + "Weekly report";
+  text("range", d.prior ? "Compared with " + d.prior.label : "");
+  text("headline", d.headline);
+  var tiles = document.getElementById("tiles");
+  (d.metrics || []).forEach(function (m) {
+    var t = document.createElement("div"); t.className = "tile";
+    var n = document.createElement("div"); n.className = "name"; n.textContent = m.name;
+    var v = document.createElement("div"); v.className = "value"; v.textContent = m.current_text;
+    var c = document.createElement("div"); c.className = "delta " + (m.verdict || "same");
+    c.textContent = (m.verdict === "new" ? "new this week" : m.delta_text + " vs " + m.prior_text);
+    t.appendChild(n); t.appendChild(v); t.appendChild(c); tiles.appendChild(t);
+  });
+  list("well", d.well); list("watch", d.watch); list("next", d.next);
+  text("notes", d.notes);
+})();
+</script>
+</body>
+</html>

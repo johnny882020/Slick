@@ -1,0 +1,76 @@
+# Pilot release: publish the unsigned installers that CI built and install-tested for one commit
+# as the GitHub release "pilot", under fixed names, so the website's Download page can link to them:
+#   https://github.com/<owner>/<repo>/releases/download/pilot/OneSeat-Windows-x64-setup.exe
+#   https://github.com/<owner>/<repo>/releases/download/pilot/OneSeat-macOS-AppleSilicon.dmg
+# Nothing is rebuilt: the files come from the green CI run for that commit, so testers get exactly
+# what the install smoke test installed. Run it by adding the "pilot-release" label to the pull
+# request, or from the Actions tab. Signed installers for customers come from release.yml.
+name: Pilot release
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pilot-release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  publish:
+    name: Publish pilot installers
+    if: ${{ github.event_name != 'pull_request' || github.event.label.name == 'pilot-release' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Find the green CI run for this commit
+        id: ci
+        run: |
+          id=$(gh run list -R "$REPO" --workflow ci.yml --commit "$SHA" --status success --limit 1 --json databaseId -q '.[0].databaseId')
+          if [ -z "$id" ]; then
+            echo "::error::No successful CI run for $SHA yet. Wait until CI is green on this commit, then run this again."
+            exit 1
+          fi
+          echo "run=$id" >> "$GITHUB_OUTPUT"
+          echo "CI run $id built $SHA"
+
+      - name: Download the tested installers
+        run: |
+          gh run download "${{ steps.ci.outputs.run }}" -R "$REPO" -n unsigned-windows-latest -D win
+          gh run download "${{ steps.ci.outputs.run }}" -R "$REPO" -n unsigned-macos-latest -D mac
+          exe=$(find win -name '*-setup.exe' | head -n 1)
+          dmg=$(find mac -name '*.dmg' | head -n 1)
+          if [ -z "$exe" ] || [ -z "$dmg" ]; then echo "::error::CI artifacts have no setup.exe or .dmg"; exit 1; fi
+          mkdir dist
+          cp "$exe" dist/OneSeat-Windows-x64-setup.exe
+          cp "$dmg" dist/OneSeat-macOS-AppleSilicon.dmg
+          (cd dist && sha256sum OneSeat-* > SHA256SUMS.txt && cat SHA256SUMS.txt)
+
+      - name: Publish the "pilot" release
+        run: |
+          gh release delete pilot -R "$REPO" --cleanup-tag --yes 2>/dev/null || true
+          {
+            echo "Unsigned pilot build of commit $SHA, from CI run https://github.com/$REPO/actions/runs/${{ steps.ci.outputs.run }}."
+            echo ""
+            echo "- Windows 10/11: OneSeat-Windows-x64-setup.exe installs for your user only. If SmartScreen says it protected your PC, choose More info, then Run anyway."
+            echo "- macOS 12+ on Apple silicon: open the .dmg and drag OneSeat to Applications. The first time, right-click OneSeat and choose Open."
+            echo ""
+            echo "SHA256SUMS.txt lists the checksums."
+          } > notes.md
+          gh release create pilot dist/* -R "$REPO" --target "$SHA" --prerelease --title "OneSeat pilot build" --notes-file notes.md
+          echo "## Pilot release published" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://github.com/$REPO/releases/tag/pilot" >> "$GITHUB_STEP_SUMMARY"
