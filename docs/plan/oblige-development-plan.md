@@ -12,6 +12,23 @@ sandbox, skills registry, gateway, testkit, cloud licensing, CI).
 
 ---
 
+## Status (2026-11-28, end of day 1)
+
+| Plan item | State |
+|---|---|
+| 0.5 Contracts | Done: compliance contracts v1.2 in `packages/contracts/src/compliance.ts` (v1.1 fix groups, v1.2 seller branches, yearly packaging weight per market, filed declarations, `$market`) |
+| 0.4 Rule packs v0 | Done: 6 packs, all `verified` by independent agents, none `approved` yet. DE, FR, IT, ES, NL packaging and EU GPSR: 30 rules, 222 citations. The script confirms 135 of the citations; agents confirmed the rest by hand. Waiting for the legal reviewer (gate R3) |
+| 0.9 Repo restructure | Done for Phase 0: `packages/rulebook`, `packages/obligations`, `rules/`, `examples/audit`; the desktop app is legacy |
+| 0.3 Concierge audit tooling | Done: `oblige-audit` CLI (CSV catalog + seller.json → HTML/Markdown/JSON report); sample report in `examples/audit/` |
+| 0.1–0.2 Outreach and interviews | Messages, screener, interview guide and tracking ready in `docs/gtm/phase-0-playbook.md`; sending is **[human]** |
+| 0.6–0.8 Developer access, partner LOIs, company items | **[human]**, not started |
+| CI | Gate 1 now covers rulebook and obligations (≥ 90% lines; both at 100%); gate R1 rule lint runs on every PR |
+
+**Known legal questions for the reviewer** (each pack's `openQuestions` has the full list):
+- Do non-EU sellers need an authorised representative under PPWR Art. 45(3)? Italy and Spain read it differently.
+- Should marketplace pay-on-behalf (Amazon, Cdiscount) count as meeting declaration duties?
+- GPSR scope for CE-marked (harmonised) products.
+
 ## 1. Goal and what "done" means
 
 **Goal.** A working platform that answers one question for every small EU seller: *"Can I legally keep

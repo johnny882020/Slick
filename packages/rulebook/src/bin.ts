@@ -14,8 +14,11 @@ async function main(argv: string[]): Promise<number> {
     return errors > 0 ? 1 : 0;
   }
   if (cmd === "citations") {
-    const results = await checkCitations(packs, (url) =>
-      fetch(url, { redirect: "follow", headers: { "user-agent": "oblige-rules citation check", "accept-language": "eng,en,de,fr,it,es,nl" } }),
+    const results = await checkCitations(packs, (url, opts) =>
+      fetch(url, {
+        redirect: "follow",
+        headers: { "user-agent": "oblige-rules citation check", accept: opts?.acceptLanguage ? "application/xhtml+xml" : "text/html,*/*", "accept-language": opts?.acceptLanguage ?? "en,de,fr,it,es,nl" },
+      }),
     );
     for (const r of results) console.log(`${r.outcome.padEnd(13)} ${r.pack} ${r.id} ${r.status ?? ""} ${r.url}`);
     const counts = new Map<string, number>();

@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { RulePack } from "@oneseat/contracts";
 import { inEffect, loadPackText, loadRulebook } from "../src/load.js";
 import { canonicalJson, generateSigningKey, packHash, signPack, verifyPack } from "../src/sign.js";
-import { checkCitation, checkCitations, decodePage, eurLexFallback, FAILING_OUTCOMES, normalizeText, quoteInText } from "../src/citations.js";
+import { checkCitation, checkCitations, decodePage, eurLexFallback, FAILING_OUTCOMES, normalizeText, packLanguages, quoteInText } from "../src/citations.js";
 import { PACK_YAML } from "./fixtures.js";
 
 const pack = (): RulePack => loadPackText(PACK_YAML, "de").pack!;
@@ -87,6 +87,8 @@ describe("citations", () => {
     expect(normalizeText("<p>Hello&nbsp;<b>World</b> &amp; “you” &#252;ber &#xE9;t\u00ADe</p><script>x()</script><style>a{}</style>")).toBe('hello world & "you" über éte');
     expect(quoteInText("Hersteller sind  verpflichtet", "<div>... Hersteller sind\nverpflichtet ...</div>")).toBe(true);
     expect(quoteInText("not there", "<p>something else</p>")).toBe(false);
+    expect(quoteInText("online marketplaces", '<p>online Mar<i>ketplace</i>s</p>'.toLowerCase())).toBe(true);
+    expect(quoteInText("see the law here", '<p>see <a href="/x" class="l">the law</a> here</p>')).toBe(true);
   });
 
   it("decodes pages by header or meta charset", () => {
@@ -142,15 +144,29 @@ describe("EUR-Lex fallback", () => {
     expect(eurLexFallback("https://example.com/eli/reg/2025/40")).toBeUndefined();
   });
 
-  it("retries a blocked EUR-Lex link on the Publications Office copy", async () => {
-    const c = { id: "ppwr", title: "PPWR", url: "https://eur-lex.europa.eu/eli/reg/2025/40/oj", publisher: "EU", kind: "law" as const, retrieved: "2026-11-28", quote: "producers shall register" };
+  it("retries a blocked EUR-Lex link on the Publications Office copy, in the pack's language first", async () => {
+    const c = { id: "ppwr", title: "PPWR", url: "https://eur-lex.europa.eu/eli/reg/2025/40/oj", publisher: "EU", kind: "law" as const, retrieved: "2026-11-28", quote: "Hersteller registrieren sich" };
     const seen: string[] = [];
-    const fetcher = async (url: string) => {
-      seen.push(url);
-      const blocked = url.includes("eur-lex");
-      return { status: blocked ? 202 : 200, arrayBuffer: async () => new TextEncoder().encode(blocked ? "" : "<p>Producers shall register</p>").buffer as ArrayBuffer };
+    const body = (s: string) => async () => new TextEncoder().encode(s).buffer as ArrayBuffer;
+    const fetcher = async (url: string, opts?: { acceptLanguage?: string }) => {
+      seen.push(`${url} ${opts?.acceptLanguage ?? ""}`.trim());
+      if (url.includes("eur-lex")) return { status: 202, arrayBuffer: body("") };
+      return { status: 200, arrayBuffer: body(opts?.acceptLanguage === "deu" ? "<p>Hersteller registrieren sich</p>" : "<p>Producers shall register</p>") };
     };
-    expect((await checkCitation("eu", c, fetcher)).outcome).toBe("ok");
-    expect(seen).toEqual(["https://eur-lex.europa.eu/eli/reg/2025/40/oj", "https://publications.europa.eu/resource/celex/32025R0040"]);
+    expect((await checkCitation("de.packaging_epr", c, fetcher)).outcome).toBe("ok");
+    expect(seen).toEqual(["https://eur-lex.europa.eu/eli/reg/2025/40/oj", "https://publications.europa.eu/resource/celex/32025R0040 deu"]);
+    seen.length = 0;
+    expect((await checkCitation("eu.gpsr", { ...c, quote: "Producers shall register" }, fetcher)).outcome).toBe("ok");
+    expect(seen.at(-1)).toBe("https://publications.europa.eu/resource/celex/32025R0040 eng");
+    expect((await checkCitation("fr.packaging_epr", { ...c, quote: "absent everywhere" }, fetcher)).outcome).toBe("quote_missing");
+    expect((await checkCitation("eu.gpsr", { ...c, quote: undefined }, fetcher)).outcome).toBe("ok");
+  });
+
+  it("reports the fallback's own status when it is blocked too", async () => {
+    const c = { id: "x", title: "x", url: "https://eur-lex.europa.eu/eli/reg/2023/988/oj", publisher: "EU", kind: "law" as const, retrieved: "2026-11-28", quote: "x" };
+    const r = await checkCitation("xx.gpsr", c, async () => ({ status: 503, arrayBuffer: async () => new ArrayBuffer(0) }));
+    expect(r.outcome).toBe("blocked");
+    expect(packLanguages("xx.gpsr")).toEqual(["eng"]);
+    expect(packLanguages("de.packaging_epr")).toEqual(["deu", "eng"]);
   });
 });

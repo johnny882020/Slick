@@ -37,7 +37,19 @@ export interface FetchedPage {
   arrayBuffer: () => Promise<ArrayBuffer>;
 }
 
-export type Fetcher = (url: string) => Promise<FetchedPage>;
+export type Fetcher = (url: string, opts?: { acceptLanguage?: string }) => Promise<FetchedPage>;
+
+/** Official Journal language (ISO 639-2) for a pack's jurisdiction, from its id prefix. */
+const OJ_LANGUAGE: Record<string, string> = {
+  de: "deu", at: "deu", fr: "fra", be: "fra", lu: "fra", it: "ita", es: "spa", nl: "nld", pl: "pol", pt: "por",
+  se: "swe", dk: "dan", fi: "fin", cz: "ces", sk: "slk", si: "slv", hr: "hrv", hu: "hun", ro: "ron", bg: "bul",
+  gr: "ell", ee: "est", lv: "lav", lt: "lit", mt: "mlt", ie: "eng", cy: "ell", eu: "eng",
+};
+
+export function packLanguages(pack: string): string[] {
+  const lang = OJ_LANGUAGE[pack.split(".")[0] ?? ""] ?? "eng";
+  return [...new Set([lang, "eng"])];
+}
 
 const BLOCK_STATUS = new Set([202, 403, 429]);
 
@@ -46,6 +58,8 @@ export function normalizeText(s: string): string {
   return s
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    // Inline formatting tags can sit inside a word ("Mar<i>ketplace</i>"): drop them without a space.
+    .replace(/<\/?(?:b|i|em|strong|u|span|a|abbr|sup|sub|small|mark)(?:\s[^>]*)?>/gi, "")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;|&#160;/g, " ")
     .replace(/&amp;/g, "&")
@@ -101,7 +115,17 @@ export async function checkCitation(pack: string, c: Citation, fetcher: Fetcher)
   try {
     let res = await fetcher(c.url);
     const fallback = eurLexFallback(c.url);
-    if (fallback && (BLOCK_STATUS.has(res.status) || res.status >= 500)) res = await fetcher(fallback);
+    if (fallback && (BLOCK_STATUS.has(res.status) || res.status >= 500)) {
+      // Quotes are in the pack's language: try that Official Journal language first, then English.
+      for (const lang of packLanguages(pack)) {
+        const alt = await fetcher(fallback, { acceptLanguage: lang });
+        if (alt.status !== 200) { res = alt; continue; }
+        if (c.quote === undefined) return { ...base, outcome: "ok", ok: true, status: alt.status };
+        const altText = decodePage(new Uint8Array(await alt.arrayBuffer()), alt.headers?.get("content-type") ?? null);
+        if (quoteInText(c.quote, altText)) return { ...base, outcome: "ok", ok: true, status: alt.status };
+        res = { status: alt.status, arrayBuffer: async () => new TextEncoder().encode(altText).buffer as ArrayBuffer };
+      }
+    }
     if (BLOCK_STATUS.has(res.status) || res.status >= 500) {
       return { ...base, outcome: "blocked", ok: false, status: res.status, error: `HTTP ${res.status}: check by hand` };
     }

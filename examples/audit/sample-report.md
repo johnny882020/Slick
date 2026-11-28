@@ -143,13 +143,11 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 2. Sign the contract and pay the licence fee for your expected volumes.
 3. Record the contract here so reports and renewals are tracked.
 
-### 16. Italian environmental label: material code for each packaging part and, for consumer packaging, disposal instructions, on the pack or online (record it as product attribute it_environmental_label)
- — Italy
+### 16. Italian environmental label on packaging (material codes, plus disposal instructions for consumer packaging) — Italy
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
-1. Add italian environmental label: material code for each packaging part and, for consumer packaging, disposal instructions, on the pack or online (record it as product attribute it_environmental_label)
- for 2 products; we suggest values from your documents.
+1. Add italian environmental label on packaging (material codes, plus disposal instructions for consumer packaging) for 2 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
 
 ### 17. Packaging data sent to your take-back scheme (by 28 February) — Spain
@@ -188,24 +186,7 @@ Packaging registration and take-back · 4 products · 4 listings · time: varies
 1. Add uin shown in your terms of sale and on your website or shop page for 4 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
 
-### 22. Get Verpact sign-up (needed above 50,000 kg of packaging a year, or for any single-use plastic or deposit packaging) — the Netherlands
-
-Packaging registration and take-back · 3 products · 3 listings · time: varies
-
-1. Check the company and product details we pre-filled from your catalog.
-2. Submit the registration (https://www.verpact.nl/nl/aanmeldformulier).
-3. Add the registration number here; we put it on your listings and keep it on file.
-
-### 23. Yearly packaging declaration to Verpact (needed above 50,000 kg a year, or for any single-use plastic or deposit packaging) — the Netherlands
-
-Packaging registration and take-back · 3 products · 3 listings · time: varies
-
-1. Review the yearly packaging declaration to verpact (needed above 50,000 kg a year, or for any single-use plastic or deposit packaging) we prepare from your sales and packaging data.
-2. Approve and submit it (https://packtool.verpact.nl/index.php/login).
-3. Repeat every year: Declare the previous calendar year's packaging weights and numbers before 1 April. Pay advance instalments by the last day of each quarter. If your volume will change a lot, send Verpact an updated estimate for the current year.
-
-
-### 24. Get Entry in RENAP, Italy's national producer register (packaging section not open yet; CONAI membership counts for now) — Italy
+### 22. Get Entry in RENAP, Italy's national producer register (packaging section not open yet; CONAI membership counts for now) — Italy
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -224,6 +205,8 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 | attributes de_lucid_quantity_reports_up_to_date | 5 |
 | attributes de_packaging_below_ve_thresholds | 5 |
 | attributes de_ve_filed_for_last_year | 5 |
+| annualPackagingKg $market | 3 |
+| attributes nl_sup_or_deposit_packaging | 3 |
 | whether it ships in packaging | 1 |
 
 ## Sources
@@ -319,13 +302,13 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 ## Rule packs used
 
 - de.packaging_epr 2026.11.2 (verified)
-- es.packaging_epr 2026.11.1 (draft)
+- es.packaging_epr 2026.11.2 (verified)
 - eu.gpsr 2026.11.2 (verified)
 - fr.packaging_epr 2026.11.2 (verified)
-- it.packaging_epr 2026.11.1 (draft)
-- nl.packaging_epr 2026.11.1 (draft)
+- it.packaging_epr 2026.11.2 (verified)
+- nl.packaging_epr 2026.11.2 (verified)
 
 ## Notes
 
 - This audit is information, not legal advice. Filings are made only after you approve them, and only from rules a qualified reviewer has signed off.
-- 6 of 6 rule packs used here are not yet signed off by a legal reviewer (de.packaging_epr: verified, es.packaging_epr: draft, eu.gpsr: verified, fr.packaging_epr: verified, it.packaging_epr: draft, nl.packaging_epr: draft). Treat their results as a first check.
+- 6 of 6 rule packs used here are not yet signed off by a legal reviewer (de.packaging_epr: verified, es.packaging_epr: verified, eu.gpsr: verified, fr.packaging_epr: verified, it.packaging_epr: verified, nl.packaging_epr: verified). Treat their results as a first check.
