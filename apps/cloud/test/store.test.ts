@@ -66,6 +66,26 @@ function storeSuite(name: string, make: () => Promise<Store>, done?: () => Promi
       expect(listed.find((l) => l.id === lic)?.deviceCount).toBe(1);
     });
 
+    it("starts one trial per email and per computer, all or nothing", async () => {
+      const endsAt = new Date(Date.now() + 14 * 86_400_000).toISOString();
+      const lic = (n: number, email = "Trial@Example.com") => ({ id: `lic_${name}_t${n}`, keyHash: `hash_${name}_t${n}`, email, tier: "team" as const, status: "trialing" as const, computers: 15, team: "Trial", endsAt });
+      const t = await s.createTrial({ license: lic(1), emailLc: "trial@example.com", deviceId: "dev_trial_1", deviceName: "Front desk" });
+      expect(t).toMatchObject({ id: `lic_${name}_t1`, tier: "team", status: "trialing", computers: 15, team: "Trial", endsAt, email: "Trial@Example.com" });
+      expect((await s.devices(t!.id)).map((d) => [d.deviceId, d.deviceName])).toEqual([["dev_trial_1", "Front desk"]]);
+      // Same email (any case) from another computer, or the same computer with another email.
+      expect(await s.createTrial({ license: lic(2), emailLc: "trial@example.com", deviceId: "dev_trial_2", deviceName: "" })).toBeUndefined();
+      expect(await s.createTrial({ license: lic(3, "other@example.com"), emailLc: "other@example.com", deviceId: "dev_trial_1", deviceName: "" })).toBeUndefined();
+      // Nothing is left behind by a refused trial.
+      expect(await s.licenseByKeyHash(`hash_${name}_t2`)).toBeUndefined();
+      expect(await s.licenseByKeyHash(`hash_${name}_t3`)).toBeUndefined();
+      expect(await s.devices(`lic_${name}_t2`)).toEqual([]);
+      const listed = await s.listLicenses(100);
+      expect(listed.find((l) => l.id === t!.id)).toMatchObject({ trial: true, deviceCount: 1 });
+      expect(listed.find((l) => l.id === `lic_${name}_pilot`)?.trial).toBe(false);
+      const second = await s.createTrial({ license: lic(4, "next@example.com"), emailLc: "next@example.com", deviceId: "dev_trial_4", deviceName: "" });
+      expect(second?.id).toBe(`lic_${name}_t4`);
+    });
+
     it("stores and lists feedback newest first", async () => {
       await s.addFeedback({ licenseId: k(1).id, email: "a@b.c", rating: 4, topic: "t", message: "first", appVersion: "0.1.0", os: "macos" });
       const f2 = await s.addFeedback({ licenseId: null, email: null, rating: null, topic: null, message: "second", appVersion: null, os: null });
@@ -84,7 +104,7 @@ if (PG_URL) {
     "postgres",
     async () => {
       pool = new pg.Pool({ connectionString: PG_URL });
-      await pool.query("DROP TABLE IF EXISTS stripe_events, feedback, devices, license_reveals, licenses CASCADE");
+      await pool.query("DROP TABLE IF EXISTS stripe_events, feedback, trials, devices, license_reveals, licenses CASCADE");
       return new PgStore(pool);
     },
     async () => {

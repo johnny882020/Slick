@@ -253,6 +253,97 @@ describe("pilot licenses", () => {
   });
 });
 
+describe("free Team trial", () => {
+  // Each test uses its own client address so the trial rate limit (5 a minute) stays predictable.
+  const from = (ip: string) => ({ "x-forwarded-for": ip });
+  const auth = { authorization: `Basic ${Buffer.from("admin:admin-secret").toString("base64")}` };
+  let trialKey = "";
+
+  it("issues a Team key for 14 days and activates this computer with it, once", async () => {
+    const logStart = logs.length;
+    const r = await post("/api/v1/trials", { email: "  Owner@Trial.example ", deviceId: "dev_trial_aaaa1", deviceName: "Front desk" }, from("10.1.0.1"));
+    expect(r.status).toBe(200);
+    expect(Object.keys(r.body).sort()).toEqual(["computers", "expiresAt", "licenseKey", "status", "tier", "token", "used"]);
+    expect(r.body).toMatchObject({ tier: "team", status: "trialing", computers: 15, used: 1 });
+    trialKey = String(r.body.licenseKey);
+    expect(trialKey).toMatch(/^OS(-[0-9A-HJKMNP-TV-Z]{4}){4}$/);
+    const pem = await (await fetch(`${base}/license-public-key.pem`)).text();
+    const d = decodeLicenseToken(String(r.body.token))!;
+    expect(verify(null, Buffer.from(d.signed), createPublicKey(pem), Buffer.from(d.signature))).toBe(true);
+    expect(d.payload).toMatchObject({ tier: "team", status: "trialing", deviceId: "dev_trial_aaaa1", email: "Owner@Trial.example" });
+    // The token stops on the trial's last day even without a refresh.
+    const lic = [...store.licenses.values()].find((l) => l.keyHash === hashKey(trialKey))!;
+    expect(lic).toMatchObject({ team: "Trial", tier: "team", status: "trialing", computers: 15, email: "Owner@Trial.example", stripeSubscription: null });
+    expect(Math.abs(Date.parse(lic.endsAt!) - (Date.now() + 14 * 86_400_000))).toBeLessThan(60_000);
+    expect(d.payload.exp).toBe(Math.floor(Date.parse(lic.endsAt!) / 1000));
+    expect(r.body.expiresAt).toBe(new Date(d.payload.exp * 1000).toISOString());
+    expect((await store.devices(lic.id)).map((x) => x.deviceName)).toEqual(["Front desk"]);
+    // Neither the key nor the email goes to the log.
+    const lines = logs.slice(logStart).join("\n");
+    expect(lines).toContain("trial license");
+    expect(lines).not.toContain(trialKey);
+    expect(lines.toLowerCase()).not.toContain("owner@trial.example");
+  });
+
+  it("lets the rest of the team use the trial key on their computers", async () => {
+    const a = await post("/api/v1/licenses/activate", { licenseKey: trialKey, deviceId: "dev_trial_bbbb2", deviceName: "Office PC" });
+    expect(a.status).toBe(200);
+    expect(a.body).toMatchObject({ tier: "team", status: "trialing", computers: 15, used: 2 });
+  });
+
+  it("refuses a second trial for the same email or the same computer", async () => {
+    const again = await post("/api/v1/trials", { email: "OWNER@trial.example", deviceId: "dev_trial_cccc3" }, from("10.1.0.2"));
+    expect(again.status).toBe(409);
+    expect(again.body).toMatchObject({ code: "trial_used" });
+    expect(String(again.body.error)).toContain("https://oneseat.test/#plans");
+    const sameComputer = await post("/api/v1/trials", { email: "someone.else@trial.example", deviceId: "dev_trial_aaaa1" }, from("10.1.0.2"));
+    expect(sameComputer).toMatchObject({ status: 409, body: { code: "trial_used" } });
+    expect(store.trials).toHaveLength(1);
+    expect([...store.licenses.values()].filter((l) => l.team === "Trial")).toHaveLength(1);
+  });
+
+  it("validates the email and the computer id", async () => {
+    const ip = from("10.1.0.3");
+    expect((await post("/api/v1/trials", { email: "not-an-email", deviceId: "dev_trial_dddd4" }, ip)).body).toMatchObject({ code: "bad_email" });
+    expect((await post("/api/v1/trials", { email: `${"a".repeat(250)}@x.example`, deviceId: "dev_trial_dddd4" }, ip)).status).toBe(400);
+    expect((await post("/api/v1/trials", { email: "a@b.example", deviceId: "x" }, ip)).body).toMatchObject({ code: "bad_device" });
+    expect((await post("/api/v1/trials", { deviceId: "dev_trial_dddd4" }, ip)).status).toBe(400);
+    expect((await post("/api/v1/trials", { email: "a@b.example" }, ip)).status).toBe(400);
+    expect(store.trials).toHaveLength(1);
+  });
+
+  it("rate limits trial requests to 5 a minute per client", async () => {
+    const ip = from("10.1.0.4");
+    const statuses: number[] = [];
+    for (let i = 0; i < 6; i++) statuses.push((await post("/api/v1/trials", { email: `bad${i}`, deviceId: "dev_trial_eeee5" }, ip)).status);
+    expect(statuses).toEqual([400, 400, 400, 400, 400, 429]);
+    expect((await post("/api/v1/trials", { email: "bad", deviceId: "dev_trial_eeee5" }, from("10.1.0.5"))).status).toBe(400);
+  });
+
+  it("shows trials on the admin page", async () => {
+    const admin = await (await fetch(`${base}/admin`, { headers: auth })).text();
+    expect(admin).toContain("<b>Trial</b><br>Owner@Trial.example");
+    expect(admin).toContain('<span class="tag cobalt">trial</span>');
+    expect(admin).toContain("1 free trial ·");
+  });
+
+  it("ends on its end date, so the app falls back to Free", async () => {
+    const lic = [...store.licenses.values()].find((l) => l.keyHash === hashKey(trialKey))!;
+    store.licenses.set(lic.id, { ...lic, endsAt: new Date(Date.now() - 1000).toISOString() });
+    const r = await post("/api/v1/licenses/refresh", { licenseKey: trialKey, deviceId: "dev_trial_aaaa1" });
+    expect(r).toMatchObject({ status: 403, body: { code: "canceled" } });
+    expect(String(r.body.error)).toMatch(/free Team trial ended/);
+  });
+
+  it("points to the trial from the pilot and download pages", async () => {
+    for (const p of ["/pilot", "/download"]) {
+      const page = await (await fetch(base + p)).text();
+      expect(page).toContain("Try Team free for 14 days.");
+      expect(page).toContain("OneSeat → Plan");
+    }
+  });
+});
+
 describe("unconfigured service", () => {
   it("says what is missing instead of failing silently", async () => {
     const bare = createCloudApp(loadConfig({}), new MemoryStore(), () => {});
@@ -261,6 +352,8 @@ describe("unconfigured service", () => {
     try {
       expect((await (await fetch(`${b}/api/v1/stripe/webhook`, { method: "POST", body: "{}" })).json()).error).toMatch(/not configured/);
       expect((await fetch(`${b}/license-public-key.pem`)).status).toBe(404);
+      const trial = await fetch(`${b}/api/v1/trials`, { method: "POST", body: JSON.stringify({ email: "a@b.example", deviceId: "dev_trial_ffff6" }) });
+      expect(trial.status).toBe(503);
       expect((await fetch(`${b}/admin`)).status).toBe(401);
       expect(await (await fetch(`${b}/`)).text()).toContain("Checkout opens soon");
     } finally {

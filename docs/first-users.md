@@ -130,6 +130,14 @@ If a key is lost, create a new license for the team; the old one ends on its own
 When the end date passes, activation and refresh return `canceled` and the app falls back to
 Free. The team's data stays on their computers, and they can buy a plan at `/#plans`.
 
+**Self-serve trial.** Testers no longer need an invitation key: on Free, **Plan → Try Team free
+for 14 days** takes an email, and OneSeat Cloud (`POST /api/v1/trials`) issues a Team key
+(15 computers, status `trialing`, ends after 14 days) and activates that computer with it. The
+app shows the key once so the tester can use it on the team's other computers. One trial per
+email and per computer, ever; a repeat gets `trial_used`. Trials appear on `/admin` with the
+team "Trial" and a **trial** tag. Invitations from **Invite a pilot team** remain for the teams
+you set up yourself (longer pilots, tracked in `docs/pilot.md`).
+
 ## 6. Collect feedback
 
 - In the app: **Plan → Send feedback** (rating, topic, message). It lands in Neon and on

@@ -45,10 +45,16 @@ export class LicenseSigner {
     this.publicKeyPem = createPublicKey(this.key).export({ type: "spki", format: "pem" }).toString();
   }
 
-  token(input: { lic: string; tier: Tier; status: LicenseStatus; email: string; computers: number; deviceId: string }, nowSec = Math.floor(Date.now() / 1000)): {
+  /**
+   * A token valid offline for LICENSE_OFFLINE_DAYS, or until `endsAt` (ISO) when that is sooner:
+   * a trial or pilot license then stops on its end date even if the computer stays offline.
+   */
+  token(input: { lic: string; tier: Tier; status: LicenseStatus; email: string; computers: number; deviceId: string; endsAt?: string | null }, nowSec = Math.floor(Date.now() / 1000)): {
     token: string;
     payload: LicensePayload;
   } {
+    const offline = nowSec + LICENSE_OFFLINE_DAYS * 86400;
+    const ends = input.endsAt ? Math.floor(Date.parse(input.endsAt) / 1000) : NaN;
     const payload: LicensePayload = {
       v: 1,
       lic: input.lic,
@@ -59,7 +65,7 @@ export class LicenseSigner {
       features: [...PLANS[input.tier].features],
       deviceId: input.deviceId,
       iat: nowSec,
-      exp: nowSec + LICENSE_OFFLINE_DAYS * 86400,
+      exp: Number.isFinite(ends) && ends > nowSec ? Math.min(offline, ends) : offline,
     };
     const signed = encodeLicensePayload(payload);
     return { token: joinLicenseToken(signed, new Uint8Array(sign(null, Buffer.from(signed), this.key))), payload };

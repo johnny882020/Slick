@@ -16,7 +16,10 @@ import {
 } from "@oneseat/contracts";
 import { createDaemon } from "../src/daemon.js";
 import { LicenseManager } from "../src/license.js";
+import { fileURLToPath } from "node:url";
 import { MemorySkillStore, onCleanup, tmpDir } from "./helpers.js";
+
+const MCP_SERVER = fileURLToPath(new URL("./fixtures/fake-mcp-server.mjs", import.meta.url));
 
 const { privateKey, publicKey } = generateKeyPairSync("ed25519");
 const PUB = publicKey.export({ type: "spki", format: "pem" }).toString();
@@ -136,6 +139,68 @@ describe("LicenseManager", () => {
   });
 });
 
+const TRIAL_KEY = "OS-TR1A-K9PX-4HTR-WB3D";
+/** A fake cloud that answers /trials like OneSeat Cloud: one trial per email and per computer. */
+function trialCloud() {
+  const used = new Set<string>();
+  return cloud((path, body) => {
+    if (path === "/api/v1/trials") {
+      const email = String(body["email"]).toLowerCase();
+      const dev = String(body["deviceId"]);
+      if (used.has(email) || used.has(dev)) return { status: 409, json: { error: "this email or this computer has already used its free Team trial", code: "trial_used" } };
+      used.add(email).add(dev);
+      const exp = Math.floor(Date.now() / 1000) + 14 * 86400;
+      return { json: { licenseKey: TRIAL_KEY, token: mint({ deviceId: dev, tier: "team", status: "trialing", exp }), tier: "team", status: "trialing", computers: 15, used: 1 } };
+    }
+    if (path.endsWith("/deactivate")) return { json: { ok: true } };
+    return { json: { token: mint({ deviceId: String(body["deviceId"]), tier: "team", status: "trialing" }) } };
+  });
+}
+
+describe("LicenseManager.startTrial", () => {
+  it("starts a Team trial, saves its key like an activation, and refreshes with it", async () => {
+    const dir = tmpDir();
+    const c = trialCloud();
+    const lm = new LicenseManager({ dataDir: dir, publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: c.fetch });
+    const ent = await lm.startTrial("  Owner@Shop.example ");
+    expect(ent).toMatchObject({ tier: "team", status: "trialing", computers: 15, licenseKey: TRIAL_KEY, features: expect.arrayContaining(["mcp_connectors", "priority_support"]) });
+    expect(c.calls[0]).toMatchObject({ path: "/api/v1/trials", body: { email: "Owner@Shop.example", deviceId: lm.deviceId() } });
+    expect(Object.keys(c.calls[0]!.body).sort()).toEqual(["deviceId", "deviceName", "email"]);
+    expect(lm.status()).toMatchObject({ tier: "team", status: "trialing" });
+    if (process.platform !== "win32") expect(statSync(join(dir, "license.json")).mode & 0o777).toBe(0o600);
+    // The saved key is the trial key, so a later refresh (and feedback) use it.
+    const lm2 = new LicenseManager({ dataDir: dir, publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: c.fetch, now: () => new Date(Date.now() + 10 * 86_400_000) });
+    await lm2.refreshIfDue();
+    expect(c.calls.at(-1)).toMatchObject({ path: "/api/v1/licenses/refresh", body: { licenseKey: TRIAL_KEY } });
+    // A second trial on the same computer is refused before reaching the cloud.
+    const n = c.calls.length;
+    await expect(lm.startTrial("other@shop.example")).rejects.toMatchObject({ code: "has_license", message: expect.stringMatching(/already has OneSeat Team/) });
+    expect(c.calls.length).toBe(n);
+  });
+
+  it("explains a used trial, a bad email, rate limits, network trouble and a bad token", async () => {
+    const c = trialCloud();
+    const first = new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: c.fetch });
+    await first.startTrial("owner@shop.example");
+    const other = new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: c.fetch });
+    await expect(other.startTrial("OWNER@shop.example")).rejects.toMatchObject({ code: "trial_used", message: expect.stringMatching(/already had its free Team trial.*license key from your team/) });
+    expect(other.status().tier).toBe("free");
+    expect(other.hasSavedLicense()).toBe(false);
+    for (const bad of ["", "owner", "owner@shop", "a b@c.example", `${"x".repeat(250)}@c.example`])
+      await expect(other.startTrial(bad)).rejects.toMatchObject({ code: "bad_email" });
+    const limited = cloud(() => ({ status: 429, json: { error: "too many requests; try again in a minute", code: "rate_limited" } }));
+    await expect(new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: limited.fetch }).startTrial("a@b.example")).rejects.toMatchObject({ code: "rate_limited", message: expect.stringMatching(/wait a minute/) });
+    const down = new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: async () => { throw new Error("ENOTFOUND"); } });
+    await expect(down.startTrial("a@b.example")).rejects.toMatchObject({ code: "network", message: expect.stringMatching(/internet connection/) });
+    const forged = cloud((_p, body) => ({ json: { licenseKey: TRIAL_KEY, token: mint({ deviceId: String(body["deviceId"]) }, generateKeyPairSync("ed25519").privateKey) } }));
+    const f = new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: forged.fetch });
+    await expect(f.startTrial("a@b.example")).rejects.toMatchObject({ code: "bad_token" });
+    expect(f.hasSavedLicense()).toBe(false);
+    const noKey = cloud((_p, body) => ({ json: { token: mint({ deviceId: String(body["deviceId"]) }) } }));
+    await expect(new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: noKey.fetch }).startTrial("a@b.example")).rejects.toMatchObject({ code: "bad_token" });
+  });
+});
+
 describe("daemon plan gates", () => {
   function daemonWith(license?: LicenseManager) {
     const dataDir = tmpDir();
@@ -167,6 +232,25 @@ describe("daemon plan gates", () => {
     await expect(d.handle("apps.pin", bundle as never)).rejects.toMatchObject({ code: RPC_ERRORS.upgradeRequired });
   });
 
+  it("starts a Team trial with license.trial and then loads MCP connectors", async () => {
+    const dir = tmpDir();
+    const cfg = join(dir, "mcp.json");
+    writeFileSync(cfg, JSON.stringify({ mcpServers: { fake: { command: process.execPath, args: [MCP_SERVER] } } }));
+    const lm = new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: trialCloud().fetch });
+    const d = createDaemon({ store: new MemorySkillStore(), providers: { local: () => createScriptedProvider([]) }, dataDir: dir, startScheduler: false, log: () => {}, license: lm, mcpConfigPath: cfg });
+    onCleanup(() => void d.close());
+    await d.ready;
+    expect((await d.handle("mcp.status", {})).servers).toEqual([]); // Free: mcp.json is not loaded
+    await expect(d.handle("license.trial", {} as never)).rejects.toMatchObject({ code: RPC_ERRORS.invalidParams });
+    await expect(d.handle("license.trial", { email: "nope" })).rejects.toMatchObject({ code: RPC_ERRORS.blocked, data: { code: "bad_email" } });
+    const r = await d.handle("license.trial", { email: "owner@shop.example" });
+    expect(r).toMatchObject({ tier: "team", status: "trialing", licenseKey: TRIAL_KEY });
+    expect((await d.handle("mcp.status", {})).servers).toEqual([{ id: "fake", connected: true, tools: 12 }]);
+    expect((await d.handle("apps.pin", bundle as never)).app.app.id).toBe("hello");
+    await d.handle("license.deactivate", {});
+    await expect(d.handle("license.trial", { email: "owner@shop.example" })).rejects.toMatchObject({ code: RPC_ERRORS.blocked, data: { code: "trial_used" } });
+  });
+
   it("turns cloud errors into clear RPC errors", async () => {
     const full = cloud(() => ({ status: 409, json: { error: "already used on 3 of 3 computers", code: "computer_limit" } }));
     const d = daemonWith(new LicenseManager({ dataDir: tmpDir(), publicKeyPem: PUB, cloudUrl: "https://c.test", fetch: full.fetch }));
@@ -178,5 +262,6 @@ describe("daemon plan gates", () => {
     expect((await d.handle("apps.pin", bundle as never)).app.app.id).toBe("hello");
     expect(await d.handle("license.status", {})).toMatchObject({ tier: "free", reason: expect.stringMatching(/not configured/) });
     await expect(d.handle("license.activate", { licenseKey: KEY })).rejects.toMatchObject({ code: RPC_ERRORS.notFound });
+    await expect(d.handle("license.trial", { email: "a@b.example" })).rejects.toMatchObject({ code: RPC_ERRORS.notFound });
   });
 });
