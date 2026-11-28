@@ -1,4 +1,32 @@
-# OneSeat
+# Compliance Keeper
+
+**Can I keep selling this product, in this country, on this marketplace? And if not, what do I fix?**
+
+Compliance Keeper checks every product a small seller lists across EU countries and marketplaces.
+It covers packaging take-back, product safety (GPSR), and later electronics, batteries and textiles
+take-back. It shows what's missing, ranks the fixes by how many listings each one protects, and
+keeps the evidence. The rules are versioned, cited packs evaluated by a deterministic engine.
+
+- Plan: [`docs/plan/compliance-keeper-development-plan.md`](docs/plan/compliance-keeper-development-plan.md)
+- Phase 0 playbook (outreach, interviews, concierge audits): [`docs/gtm/phase-0-playbook.md`](docs/gtm/phase-0-playbook.md)
+- Rule format: [`docs/rulebook-format.md`](docs/rulebook-format.md) · packs in [`rules/`](rules/)
+- Research behind the decision: [`reports/`](reports/)
+
+Run a gap audit on the fictional example seller:
+
+```bash
+pnpm install
+```
+
+```bash
+pnpm audit:example
+```
+
+It writes `examples/audit/sample-report.html` and `.md`.
+
+---
+
+# OneSeat engine (reused)
 
 One desktop app (Windows + macOS), one skills library, any model. A single general agent runs
 repetitive business tasks as [Agent Skills](https://agentskills.io); the team connects one model

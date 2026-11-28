@@ -1,0 +1,12 @@
+{
+  "id": "example-seller",
+  "legalName": "Example Homeware Ltd (fictional example)",
+  "establishedIn": "GB",
+  "roles": ["manufacturer", "brand_owner"],
+  "registrations": [
+    { "obligation": "packaging_epr", "jurisdiction": "DE", "register": "LUCID", "number": "DE0000000000000", "validTo": "2026-12-15" }
+  ],
+  "schemes": [
+    { "obligation": "packaging_epr", "jurisdiction": "DE", "scheme": "Example dual system", "validTo": "2026-12-31" }
+  ]
+}

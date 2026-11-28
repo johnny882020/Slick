@@ -1,9 +1,35 @@
-# OneSeat
+# Compliance Keeper (built on the OneSeat engine)
 
-One desktop app (Windows + macOS), one skills library, any model. A general agent runs
-repetitive business tasks as Agent Skills. The user connects one model key.
+**Product direction (2026-11-28):** Compliance Keeper answers one question for small EU sellers on
+several marketplaces: *can I keep selling this product, in this country, on this marketplace, and
+if not, what do I fix?* The plan is `docs/plan/compliance-keeper-development-plan.md`, the Phase 0
+playbook is `docs/gtm/phase-0-playbook.md`, and the research behind it is in `reports/`.
 
-## Layout and ownership
+The OneSeat engine below (harness, approvals, action log, sandbox, registry, gateway, testkit,
+cloud) is reused. The desktop app and the generic starter skills are legacy and get no new features.
+
+## Compliance Keeper layout and ownership
+
+| Path | Stream | What |
+|---|---|---|
+| `packages/contracts/src/compliance.ts` | Lead | Compliance contracts v1. **Do not change without a lead review.** |
+| `rules/<jurisdiction>/<obligation>.yaml` | S1 | Rule packs. Format: `docs/rulebook-format.md` |
+| `packages/rulebook` | S1 | Load, lint (gate R1), citation checks (gate R2), signing, predicate evaluation |
+| `packages/obligations` | S2 | Catalog × rulebook → requirements, fixes, "Can I sell?" map, gap-audit report, CSV import, `keeper-audit` CLI |
+| `examples/audit` | S2 | Fictional example seller and catalog, plus the catalog template |
+| `docs/gtm` | S7 | Outreach, interviews and the concierge audit playbook |
+
+Rulebook rules:
+- Every rule cites an official source.
+- Predicates are deterministic.
+- Missing data evaluates to "unknown"; never guess.
+- New packs are `review.status: draft`.
+- Only `approved` packs (named legal reviewer) may drive filings.
+- AI proposes rules and classifications; the engine decides.
+
+Commands: `pnpm lint:rules`, `pnpm audit:example`.
+
+## OneSeat engine layout and ownership
 
 | Path | Stream | What |
 |---|---|---|

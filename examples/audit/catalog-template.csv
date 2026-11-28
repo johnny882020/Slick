@@ -1,0 +1,2 @@
+sku,title,brand,consumer_product,ships_packaged,packaging,electrical,weee_category,battery_included,battery_category,textile,listings,manufacturer_name,manufacturer_country,manufacturer_email,responsible_person_name,responsible_person_country,identifier,shown_on_listing,warnings_en,warnings_de,warnings_fr,warnings_it,warnings_es,warnings_nl,attr_note
+YOUR-SKU,Product name,Brand,yes,yes,"paper_cardboard:100:sales;plastic:10:shipping",no,,no,,no,"amazon:DE;bol:NL",Manufacturer name,DE,contact@example.com,,,MODEL-1,yes,,,,,,,
