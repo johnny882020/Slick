@@ -1,5 +1,5 @@
 id: de.packaging_epr
-version: 2026.11.1
+version: 2026.11.2
 jurisdiction: DE
 obligation: packaging_epr
 title: Packaging registration and take-back in Germany
@@ -9,9 +9,26 @@ effectiveFrom: "2026-08-12"
 effectiveTo: null
 confidence: medium
 review:
-  status: draft
+  status: verified
   notes: >
-    Drafted 2026-11-28 from the VerpackDG text on gesetze-im-internet.de (Stand: Art. 4 G v.
+    Independent verification on 2026-11-28. The automated check confirmed 31 of 43 citations. The four
+    VerpackDG citations that hit HTTP 503 (verpackdg-5-1, verpackdg-5-5, verpackdg-6,
+    verpackdg-9-1) were re-fetched from gesetze-im-internet.de and match word for word. The four
+    PPWR quotes reported missing (ppwr-3-15-d, ppwr-44-4, ppwr-45-3, ppwr-45-4-a) were confirmed
+    against the German Official Journal text in the Publications Office (Cellar) copy, because
+    EUR-Lex still serves an empty bot check; the ELI urls are kept. amazon-epr-de,
+    amazon-epr-deactivate and zalando-ppwr are on the pages verbatim (the misses were markup and
+    dash encoding), and the quote of the Amazon study PDF (secondary) was found in the PDF text. No
+    quote or url needed correcting. Fine amounts were checked against § 66(1) and (3) (registration
+    and Vollständigkeitserklärung €100,000, system participation €200,000, data reports €10,000).
+    Logic changes using the contracts v1.2 fields: the authorised-representative rule now also
+    excludes sellers with a German branch (seller.establishments), as § 5(2) says "keine
+    Niederlassung im Bundesgebiet". The data-report and Vollständigkeitserklärung requirements read
+    seller-level facts from seller.attributes instead of each product. The Vollständigkeitserklärung
+    also accepts a filed completeness_declaration or a yearly total of 30,000 kg or less. Effective
+    date (12 August 2026, PPWR Art. 71 and VerpackDG) and the severity and blocksListing flags were
+    checked against the sources and left unchanged; the remaining open questions are judgement
+    calls for the legal reviewer. Drafting note: drafted 2026-11-28 from the VerpackDG text on gesetze-im-internet.de (Stand: Art. 4 G v.
     13.7.2026 I Nr. 207), the PPWR text in the Official Journal (read through the Publications
     Office, because EUR-Lex returned empty pages to the research agent), the ZSVR / LUCID pages,
     and marketplace policy pages for Amazon.de, eBay.de, Kaufland.de and Zalando. The old
@@ -34,9 +51,12 @@ openQuestions:
     adds no packaging at all may not be a producer. Reviewer to decide whether `distributor`
     belongs in appliesWhen, or whether a packaging-level test is needed.
   - >
-    Authorised representative test uses seller.establishedIn != DE. The law says "keine
-    Niederlassung im Bundesgebiet": a foreign company with a German branch needs no
-    representative. The context has no branch field, so such sellers are over-flagged.
+    Authorised representative test: § 5(2) VerpackDG says "keine Niederlassung im Bundesgebiet", so
+    a foreign company with a German branch needs no representative. Since contracts v1.2 the rule
+    also reads seller.establishments (verifier change, 2026-11-28). A foreign seller that has not
+    supplied seller.establishments (an empty list if it has no branches) now gets "unknown" and is
+    asked for it, instead of being flagged. Confirm that a German branch (Zweigniederlassung) is
+    what "Niederlassung" means here.
   - >
     Authorised representative timing for sellers already registered before 12 Aug 2026: § 68(2)
     VerpackDG keeps old registrations valid and set 12 Nov 2026 as the deadline for changes under
@@ -59,13 +79,16 @@ openQuestions:
     reports. Confirm that a compliance service that is not the authorised representative may not
     file LUCID data reports for a German-established producer.
   - >
-    Data reports and the Vollständigkeitserklärung are judged on seller-level facts (annual
-    tonnage, filed reports) that the contracts have no seller field for. The predicates read
-    product.attributes flags instead (de_lucid_quantity_reports_up_to_date,
-    de_packaging_below_ve_thresholds, de_ve_filed_for_last_year). The tonnage thresholds (10 t for
-    simplified reporting; 80 t glass, 50 t paper and cardboard, 30 t other materials for the
-    Vollständigkeitserklärung) cannot be computed from the catalogue. A seller-level field may be
-    needed in a later contracts version.
+    Data reports and the Vollständigkeitserklärung depend on seller-level facts (annual tonnage,
+    filed reports). The draft read them from product.attributes; since contracts v1.2 the verifier
+    moved them to seller.attributes (de_lucid_quantity_reports_up_to_date,
+    de_packaging_below_ve_thresholds, de_ve_filed_for_last_year), added the declared operator
+    (kind completeness_declaration) and added seller.annualPackagingKg.DE of 30,000 kg or less as
+    proof of being below the thresholds. That works because 30 t is the lowest threshold, and the
+    total includes all packaging, so it can only overstate the regulated amount. Per-material
+    thresholds (80 t glass, 50 t paper and cardboard, 30 t other materials) still cannot be
+    computed, because annualPackagingKg is one total. declared with period last_year asks for the
+    previous year's declaration from 1 January, although it is only due on 15 May.
   - >
     Fulfilment and shipping packaging: who is the producer of the shipping box when a fulfilment
     service packs (Amazon FBA, Zalando ZFS) is not settled in the sources read. Zalando's Germany
@@ -101,9 +124,9 @@ openQuestions:
     approval (Zulassung) for packaging that does not need system participation, required from the
     end of 2027.
   - >
-    Source check: the PPWR quotes were copied from the German Official Journal text obtained from
-    publications.europa.eu (cellar), because eur-lex.europa.eu returned empty pages. The verifier
-    should re-check them at the EUR-Lex URL.
+    Source check: on 2026-11-28 eur-lex.europa.eu still returned an empty bot-check page. The
+    verifier confirmed the four PPWR quotes word for word against the German Official Journal text
+    from publications.europa.eu (Cellar, CELEX 32025R0040), the same act as the EUR-Lex ELI url.
 citations:
   - id: verpackdg-5-1
     title: VerpackDG § 5 Abs. 1 Beauftragung Dritter
@@ -540,7 +563,7 @@ rules:
       - key: lucid_quantity_reports
         label: Packaging quantity reports in LUCID match what you reported to your system
         kind: declaration
-        satisfiedWhen: { eq: [ product.attributes.de_lucid_quantity_reports_up_to_date, true ] }
+        satisfiedWhen: { eq: [ seller.attributes.de_lucid_quantity_reports_up_to_date, true ] }
         whoMayFile: [producer, authorised_representative]
         filing:
           channel: portal
@@ -561,7 +584,8 @@ rules:
       Producers whose household packaging last year reached 80 tonnes of glass, 50 tonnes of paper
       and cardboard, or 30 tonnes of plastics, metals and composites combined must file an audited
       declaration of completeness (Vollständigkeitserklärung) in LUCID by 15 May. Most small sellers
-      are below these limits, but ZSVR can ask anyone for one.
+      are below these limits: if all your packaging in Germany last year came to 30 tonnes or less,
+      you are below all three. ZSVR can still ask anyone for one.
     severity: medium
     consequence: >
       A missing or late declaration can be fined up to €100,000. There is no extension of the
@@ -582,8 +606,10 @@ rules:
         kind: declaration
         satisfiedWhen:
           any:
-            - { eq: [ product.attributes.de_packaging_below_ve_thresholds, true ] }
-            - { eq: [ product.attributes.de_ve_filed_for_last_year, true ] }
+            - { declared: { obligation: packaging_epr, kind: completeness_declaration, jurisdiction: DE } }
+            - { lte: [ seller.annualPackagingKg.DE, 30000 ] }
+            - { eq: [ seller.attributes.de_packaging_below_ve_thresholds, true ] }
+            - { eq: [ seller.attributes.de_ve_filed_for_last_year, true ] }
         whoMayFile: [producer, authorised_representative]
         filing:
           channel: portal
@@ -618,6 +644,7 @@ rules:
         - { eq: [ market, DE ] }
         - { eq: [ product.shipsPackaged, true ] }
         - not: { eq: [ seller.establishedIn, DE ] }
+        - not: { contains: [ seller.establishments, DE ] }
         - any:
             - { contains: [ seller.roles, manufacturer ] }
             - { contains: [ seller.roles, importer ] }

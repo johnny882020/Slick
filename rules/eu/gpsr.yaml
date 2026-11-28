@@ -1,5 +1,5 @@
 id: eu.gpsr
-version: 2026.11.1
+version: 2026.11.2
 jurisdiction: EU
 obligation: gpsr
 title: Product safety information for consumer products sold online in the EU
@@ -7,9 +7,9 @@ effectiveFrom: "2024-12-13"
 effectiveTo: null
 confidence: medium
 review:
-  status: draft
+  status: verified
   notes: >
-    Written from the Official Journal text of Regulation (EU) 2023/988 (GPSR) and Regulation (EU) 2019/1020, the Commission Notice C/2025/6233 (GPSR guidelines for businesses) and the marketplaces' own GPSR pages. EUR-Lex answered automated requests with a bot challenge, so the legal text was read from the Publications Office (Cellar) copy of the same OJ act; citations point to the EUR-Lex ELI links. The consolidated GPSR text of 29.05.2026 (amended by Regulation (EU) 2024/2748, the emergency/IMERA package) was compared: it adds Chapter IIa (emergency procedures) and a definition, and the quoted wording of Articles 9, 16, 19 and 22 is unchanged.
+    Independent verification on 2026-11-28. The automated check confirmed 9 of the 28 drafted citations (Amazon, eBay, bol, Kaufland, Zalando). EUR-Lex still answers automated requests with an empty bot challenge (HTTP 202), so the 18 blocked law and guidance citations (GPSR Articles 2, 9(5)-(7), 11(3), 12(1), 16(1), 16(3), 19, 19(b), 19(c), 22(9), 44(1), 52; Regulation (EU) 2019/1020 Article 4(2); Commission Notice C/2025/6233 x3) were confirmed word for word against the Publications Office (Cellar) copy of the same Official Journal acts, and each quote sits in the article its title names; the EUR-Lex ELI urls are kept. The Etsy quote reported missing is on the page verbatim (the mismatch was link markup). No quote needed correcting. Logic fixes: the Article 19 listing requirement and the marketplace manufacturer field now require a full postal address (street and city), as Articles 19(a) and 22(9)(a) say; the listing-identification requirement now also requires the details to be shown on the listing; four requirement labels were shortened to 120 characters or fewer with the detail kept in the rule summaries. Added citation com-guidelines-eaddress (Commission Notice, confirmed in the Cellar copy), which settles that a contact page counts as an electronic address but a bare website does not. Effective date (13 December 2024, Article 52), severities and blocksListing flags were checked against the cited texts and marketplace wording and left unchanged. The remaining open questions are scope simplifications for the legal reviewer, not errors. (Research basis, from the drafting agent: the consolidated GPSR text of 29.05.2026, as amended by Regulation (EU) 2024/2748, was compared and the quoted wording of Articles 9, 16, 19 and 22 is unchanged; the verifier did not re-read the consolidated version.)
 openQuestions:
   - >
     Sector law: for products covered by EU harmonisation legislation (for example toys, electrical equipment, cosmetics, CE-marked goods), GPSR Chapter III Section 1 (Articles 9 to 18, including the manufacturer, importer, distributor and Article 16 responsible-person duties) does not apply; sector law and Article 4 of Regulation (EU) 2019/1020 impose similar duties instead. Articles 19 (online listing) and 22 (marketplaces) apply to those products too. The engine has no "harmonised product" flag, so rules 1 to 4 are evaluated for all consumer products. Confirm this is acceptable as a simplification, or add a flag and split the citations.
@@ -18,7 +18,7 @@ openQuestions:
   - >
     Transitional rule (Article 51): units placed on the EU market before 13 December 2024 that met the old General Product Safety Directive may still be sold, and the new on-product labelling duties do not apply to them (Commission guidelines). The listing duties apply to any offer made from 13 December 2024. There is no "first placed on the market" date in the product data, so the engine cannot exempt old stock. Should a field be added?
   - >
-    "Electronic address": the rules accept either an email address or a website URL (bol and Kaufland accept a contact page link; Kaufland's mandatory field is "e-mail address or website URL"). Confirm with the Commission guidance or a legal reviewer that a URL alone satisfies Articles 9(6), 16(3) and 19.
+    "Electronic address": the rules accept either an email address or a website URL. The Commission Notice C/2025/6233 (citation com-guidelines-eaddress, confirmed 2026-11-28) says an electronic address can be an email address or a dedicated section of a website that lets consumers contact the business directly, and that a website as such is not enough. The engine cannot tell a contact page from a home page, so a URL is accepted as entered; onboarding should ask for a contact-form or contact-page URL, not the shop's home page.
   - >
     Language: the `localized` check accepts any one official language of the market (see MARKET_LANGUAGES). Article 9(7) says the language is "determined by the Member State". Some member states may require several languages (for example Belgium, Luxembourg, Finland) or accept others. National language rules were not researched for each member state.
   - >
@@ -166,6 +166,13 @@ citations:
     kind: regulator_guidance
     retrieved: "2026-11-28"
     quote: "This means that, for example, the new requirements to affix certain traceability and product safety information to the product, or its packaging, under the GPSR do not apply to products that were placed on the market before 13 December 2024."
+  - id: com-guidelines-eaddress
+    title: Commission Notice C/2025/6233, Guidelines (what an "electronic address" is)
+    url: https://eur-lex.europa.eu/eli/C/2025/6233/oj
+    publisher: European Commission
+    kind: regulator_guidance
+    retrieved: "2026-11-28"
+    quote: "An electronic address can be an e-mail address or dedicated section of your website that enables consumers to contact you directly and easily. A website is not in itself sufficient if it does not allow direct communication with you."
   - id: amazon-gpsr
     title: Amazon SP-API changelog, Sellers can prove their GPSR compliance on their Account Health page
     url: https://developer-docs.amazon.com/sp-api/changelog/sellers-can-prove-their-gpsr-compliance-on-their-account-health-page
@@ -245,7 +252,7 @@ rules:
     severity: blocking
     consequence: >
       The product may not be sold in the EU without one (sales ban). Amazon, eBay, Kaufland and bol deactivate, hide or keep listings offline without the responsible person's details. Member states set the fines.
-    citations: [ gpsr-16-1, gpsr-16-3, msr-4-2, com-guidelines-rp, gpsr-44 ]
+    citations: [ gpsr-16-1, gpsr-16-3, msr-4-2, com-guidelines-rp, com-guidelines-eaddress, gpsr-44 ]
     appliesWhen:
       all:
         - { eq: [ product.consumerProduct, true ] }
@@ -271,7 +278,7 @@ rules:
                 - { inEU: product.safety.responsiblePerson.country }
         group: responsible_person
       - key: responsible_person_on_product
-        label: The responsible person's name, postal address and email on the product, its packaging, the parcel or an accompanying document
+        label: Responsible person's name, postal address and email on the product or its packaging
         kind: label
         satisfiedWhen:
           all:
@@ -305,11 +312,11 @@ rules:
   - id: eu.gpsr.manufacturer_contact
     title: Put the manufacturer's name, postal address and email on the product
     summary: >
-      Every consumer product must show who made it: the manufacturer's name or registered brand, a postal address and an electronic address (email or contact page). It goes on the product, or if that is impossible on the packaging or in an accompanying document. Importers add their own name and address as well. If you only resell, you must check that this information is there before you sell.
+      Every consumer product must show who made it: the manufacturer's name or registered brand, a postal address and an electronic address (an email address, or a contact page on a website; a plain website link is not enough). It goes on the product, or if that is impossible on the packaging or in an accompanying document. Importers add their own name and address as well. If you only resell, you must check that this information is there before you sell.
     severity: blocking
     consequence: >
       Importers and distributors must not sell a product they know lacks this information. Amazon, eBay, Kaufland and bol deactivate, hide or take listings offline without manufacturer details. Member states set the fines.
-    citations: [ gpsr-9-6, gpsr-11, gpsr-12, gpsr-2, gpsr-52, com-guidelines-timing, gpsr-44 ]
+    citations: [ gpsr-9-6, gpsr-11, gpsr-12, gpsr-2, gpsr-52, com-guidelines-timing, com-guidelines-eaddress, gpsr-44 ]
     appliesWhen:
       all:
         - { eq: [ product.consumerProduct, true ] }
@@ -359,7 +366,7 @@ rules:
         - { eq: [ product.consumerProduct, true ] }
     requires:
       - key: product_identifier
-        label: Type, batch or serial number (or other identifier) visible on the product, or on the packaging if the product is too small
+        label: Type, batch or serial number visible on the product (or on its packaging if the product is too small)
         kind: label
         satisfiedWhen: { exists: product.safety.identifier }
         group: product_identification
@@ -378,7 +385,7 @@ rules:
         - { eq: [ product.consumerProduct, true ] }
     requires:
       - key: safety_information_localized
-        label: Instructions and safety warnings in an official language of the country you sell to (unless the product is safe to use without them)
+        label: Instructions and safety warnings in an official language of the country you sell to
         kind: label
         satisfiedWhen: { localized: product.safety.warnings }
         group: safety_information
@@ -408,7 +415,7 @@ rules:
     severity: blocking
     consequence: >
       Authorities can order offers removed; marketplaces deactivate or hide listings missing this information. Member states set the fines.
-    citations: [ gpsr-19, gpsr-19-b, gpsr-19-c, gpsr-9-7, gpsr-52, gpsr-44 ]
+    citations: [ gpsr-19, gpsr-19-b, gpsr-19-c, gpsr-9-7, gpsr-52, com-guidelines-eaddress, gpsr-44 ]
     appliesWhen:
       all:
         - { eq: [ product.consumerProduct, true ] }
@@ -420,13 +427,15 @@ rules:
           all:
             - { eq: [ product.safety.shownOnListing, true ] }
             - { exists: product.safety.manufacturer.name }
+            - { exists: product.safety.manufacturer.street }
+            - { exists: product.safety.manufacturer.city }
             - { exists: product.safety.manufacturer.country }
             - any:
                 - { exists: product.safety.manufacturer.email }
                 - { exists: product.safety.manufacturer.url }
         group: manufacturer_details
       - key: listing_responsible_person
-        label: EU responsible person's name, postal address and email shown on the listing (needed when the manufacturer is outside the EU)
+        label: EU responsible person's name, postal address and email shown on the listing
         kind: data_field
         satisfiedWhen:
           any:
@@ -446,6 +455,7 @@ rules:
         kind: data_field
         satisfiedWhen:
           all:
+            - { eq: [ product.safety.shownOnListing, true ] }
             - { eq: [ product.safety.hasImages, true ] }
             - { exists: product.safety.identifier }
         group: product_identification
@@ -479,6 +489,7 @@ rules:
           all:
             - { exists: product.safety.manufacturer.name }
             - { exists: product.safety.manufacturer.street }
+            - { exists: product.safety.manufacturer.city }
             - { exists: product.safety.manufacturer.country }
             - any:
                 - { exists: product.safety.manufacturer.email }

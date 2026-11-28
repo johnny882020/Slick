@@ -25,7 +25,7 @@ Product safety information · 6 products · 19 listings · **17 listings can be 
 
 1. Add manufacturer's name, postal address and email (or contact web page) on the product, packaging or accompanying document for 6 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
-3. This one fix covers: Manufacturer's name, postal address and email (or contact web page) on the product, packaging or accompanying document; Manufacturer name, postal address and email entered in the marketplace's GPSR fields; Manufacturer's name, postal address and email shown on the listing.
+3. This one fix covers: Manufacturer's name, postal address and email (or contact web page) on the product, packaging or accompanying document; Manufacturer's name, postal address and email shown on the listing; Manufacturer name, postal address and email entered in the marketplace's GPSR fields.
 
 ### 2. Name an EU responsible person and show them on products and listings — Germany, Spain, France, Italy, the Netherlands
 
@@ -34,15 +34,15 @@ Product safety information · 6 products · 19 listings · **17 listings can be 
 1. Appoint an authorised representative for Germany, Spain, France, Italy, the Netherlands; we introduce vetted partners with prices.
 2. Sign the mandate.
 3. Record the representative here; we share the details with your listings where required.
-4. This one fix covers: A responsible person established in the EU (importer, authorised representative or fulfilment provider) for this product; The responsible person's name, postal address and email on the product, its packaging, the parcel or an accompanying document; EU responsible person's name, postal address and email shown on the listing (needed when the manufacturer is outside the EU); EU responsible person entered in the marketplace's GPSR fields (needed when the manufacturer is outside the EU).
+4. This one fix covers: A responsible person established in the EU (importer, authorised representative or fulfilment provider) for this product; Responsible person's name, postal address and email on the product or its packaging; EU responsible person's name, postal address and email shown on the listing; EU responsible person entered in the marketplace's GPSR fields (needed when the manufacturer is outside the EU).
 
 ### 3. Add safety information and warnings in each country's language — Germany, Spain, France, Italy, the Netherlands
 
 Product safety information · 6 products · 15 listings · **13 listings can be blocked** · time: varies
 
-1. Add instructions and safety warnings in an official language of the country you sell to (unless the product is safe to use without them) for 6 products; we suggest values from your documents.
+1. Add instructions and safety warnings in an official language of the country you sell to for 6 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
-3. This one fix covers: Instructions and safety warnings in an official language of the country you sell to (unless the product is safe to use without them); Warnings and safety information shown on the listing in the buyer's language; Warnings and safety documents uploaded in the language of the marketplace country.
+3. This one fix covers: Instructions and safety warnings in an official language of the country you sell to; Warnings and safety information shown on the listing in the buyer's language; Warnings and safety documents uploaded in the language of the marketplace country.
 
 ### 4. Renew LUCID registration number — Germany
 
@@ -52,13 +52,13 @@ Packaging registration and take-back · 5 products · 6 listings · **5 listings
 2. Submit the registration (https://lucid.verpackungsregister.org/).
 3. Add the registration number here; we put it on your listings and keep it on file.
 
-### 5. Add a type, batch or serial number and product images — Germany, France, the Netherlands
+### 5. Add a type, batch or serial number and product images — Germany, France, Italy, the Netherlands
 
-Product safety information · 1 product · 3 listings · **3 listings can be blocked** · time: varies
+Product safety information · 3 products · 9 listings · **3 listings can be blocked** · time: varies
 
-1. Add type, batch or serial number (or other identifier) visible on the product, or on the packaging if the product is too small for 1 product; we suggest values from your documents.
+1. Add product picture, type and other identifier shown on the listing for 3 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
-3. This one fix covers: Type, batch or serial number (or other identifier) visible on the product, or on the packaging if the product is too small; Product picture, type and other identifier shown on the listing; Product images and type or model number entered on the marketplace listing.
+3. This one fix covers: Product picture, type and other identifier shown on the listing; Type, batch or serial number visible on the product (or on its packaging if the product is too small); Product images and type or model number entered on the marketplace listing.
 
 ### 6. Authorised representative in Spain with a written mandate — Spain
 
@@ -77,15 +77,7 @@ Packaging registration and take-back · 2 products · 2 listings · time: 1–30
 3. Submit the registration (https://sede.miteco.gob.es/portal/site/seMITECO/ficha-procedimiento?procedure_suborg_responsable=11&procedure_etiqueta_pdu=null&procedure_id=476).
 4. Add the registration number here; we put it on your listings and keep it on file.
 
-### 8. Authorised representative for packaging in Germany, named and confirmed in LUCID — Germany
-
-Packaging registration and take-back · 5 products · 6 listings · time: varies
-
-1. Appoint an authorised representative for Germany; we introduce vetted partners with prices.
-2. Sign the mandate.
-3. Record the representative here; we share the details with your listings where required.
-
-### 9. Contract with an approved French household packaging scheme (Citeo, Adelphe or Léko) — France
+### 8. Contract with an approved French household packaging scheme (Citeo, Adelphe or Léko) — France
 
 Packaging registration and take-back · 4 products · 4 listings · time: varies
 
@@ -93,7 +85,7 @@ Packaging registration and take-back · 4 products · 4 listings · time: varies
 2. Sign the contract and pay the licence fee for your expected volumes.
 3. Record the contract here so reports and renewals are tracked.
 
-### 10. Get French household packaging unique identification number (UIN / identifiant unique) from ADEME's SYDEREP register — France
+### 9. Get French household packaging unique identification number (UIN / identifiant unique) from ADEME's SYDEREP register — France
 
 Packaging registration and take-back · 4 products · 4 listings · time: 2–7 days
 
@@ -101,7 +93,7 @@ Packaging registration and take-back · 4 products · 4 listings · time: 2–7 
 2. Submit the registration (https://filieres-rep.ademe.fr/identifiant-unique).
 3. Add the registration number here; we put it on your listings and keep it on file.
 
-### 11. Written mandate appointing an authorised representative (mandataire) based in France for packaging duties — France
+### 10. Written mandate appointing an authorised representative (mandataire) based in France for packaging duties — France
 
 Packaging registration and take-back · 4 products · 4 listings · time: varies
 
@@ -109,7 +101,7 @@ Packaging registration and take-back · 4 products · 4 listings · time: varies
 2. Sign the mandate.
 3. Record the representative here; we share the details with your listings where required.
 
-### 12. Annual packaging report to the MITECO register (by 31 March) — Spain
+### 11. Annual packaging report to the MITECO register (by 31 March) — Spain
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -118,7 +110,7 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 3. Repeat every year: Report the previous calendar year's packaging between 2 January and 31 March (2026 data: 2 January to 31 March 2027). Signing needs a Spanish digital certificate or a representative registered in the REA. The EU Regulation sets 1 June; Spain still uses 31 March.
 
 
-### 13. Authorised representative for packaging in Italy (written mandate) — Italy
+### 12. Authorised representative for packaging in Italy (written mandate) — Italy
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -126,7 +118,7 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 2. Sign the mandate.
 3. Record the representative here; we share the details with your listings where required.
 
-### 14. CONAI contribution (CAC) declarations filed and paid (we check CONAI membership; keep your filing receipts) — Italy
+### 13. CONAI contribution (CAC) declarations filed and paid (we check CONAI membership; keep your filing receipts) — Italy
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -135,7 +127,7 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 3. Repeat every quarter: New members file quarterly (by 20 April, 20 July, 20 October and 20 January). After the first year, the class follows last year's contribution per material: exempt up to 200 euro, one annual declaration by 20 January up to 3,000 euro, quarterly up to 31,000 euro, and monthly (by the 20th) above that.
 
 
-### 15. CONAI membership as a foreign company (with a service address in Italy) — Italy
+### 14. CONAI membership as a foreign company (with a service address in Italy) — Italy
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -143,7 +135,7 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 2. Sign the contract and pay the licence fee for your expected volumes.
 3. Record the contract here so reports and renewals are tracked.
 
-### 16. Contract with an authorised Spanish packaging take-back scheme (SCRAP) or an approved individual system (SIRAP) — Spain
+### 15. Contract with an authorised Spanish packaging take-back scheme (SCRAP) or an approved individual system (SIRAP) — Spain
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -151,7 +143,7 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 2. Sign the contract and pay the licence fee for your expected volumes.
 3. Record the contract here so reports and renewals are tracked.
 
-### 17. Italian environmental label: material code for each packaging part and, for consumer packaging, disposal instructions, on the pack or online (record it as product attribute it_environmental_label)
+### 16. Italian environmental label: material code for each packaging part and, for consumer packaging, disposal instructions, on the pack or online (record it as product attribute it_environmental_label)
  — Italy
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
@@ -160,7 +152,7 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
  for 2 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
 
-### 18. Packaging data sent to your take-back scheme (by 28 February) — Spain
+### 17. Packaging data sent to your take-back scheme (by 28 February) — Spain
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -168,35 +160,35 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 2. Approve and submit it.
 3. Repeat every year: Send the previous year's packaging data to your collective scheme before 28 February; your scheme may ask for more frequent reports.
 
-### 19. Register number and take-back self-declaration given to each marketplace you sell on in Spain — Spain
+### 18. Register number and take-back self-declaration given to each marketplace you sell on in Spain — Spain
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
 1. Add register number and take-back self-declaration given to each marketplace you sell on in spain for 2 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
 
-### 20. Register number printed on invoices and delivery documents — Spain
+### 19. Register number printed on invoices and delivery documents — Spain
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
 1. Add register number printed on invoices and delivery documents for 2 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
 
-### 21. Triman logo and Info-tri sorting instructions on the packaging — France
+### 20. Triman logo and Info-tri sorting instructions on the packaging — France
 
 Packaging registration and take-back · 4 products · 4 listings · time: varies
 
 1. Add triman logo and info-tri sorting instructions on the packaging for 4 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
 
-### 22. UIN shown in your terms of sale and on your website or shop page — France
+### 21. UIN shown in your terms of sale and on your website or shop page — France
 
 Packaging registration and take-back · 4 products · 4 listings · time: varies
 
 1. Add uin shown in your terms of sale and on your website or shop page for 4 products; we suggest values from your documents.
 2. Approve publishing the details to your listings.
 
-### 23. Get Verpact sign-up (needed above 50,000 kg of packaging a year, or for any single-use plastic or deposit packaging) — the Netherlands
+### 22. Get Verpact sign-up (needed above 50,000 kg of packaging a year, or for any single-use plastic or deposit packaging) — the Netherlands
 
 Packaging registration and take-back · 3 products · 3 listings · time: varies
 
@@ -204,7 +196,7 @@ Packaging registration and take-back · 3 products · 3 listings · time: varies
 2. Submit the registration (https://www.verpact.nl/nl/aanmeldformulier).
 3. Add the registration number here; we put it on your listings and keep it on file.
 
-### 24. Yearly packaging declaration to Verpact (needed above 50,000 kg a year, or for any single-use plastic or deposit packaging) — the Netherlands
+### 23. Yearly packaging declaration to Verpact (needed above 50,000 kg a year, or for any single-use plastic or deposit packaging) — the Netherlands
 
 Packaging registration and take-back · 3 products · 3 listings · time: varies
 
@@ -213,7 +205,7 @@ Packaging registration and take-back · 3 products · 3 listings · time: varies
 3. Repeat every year: Declare the previous calendar year's packaging weights and numbers before 1 April. Pay advance instalments by the last day of each quarter. If your volume will change a lot, send Verpact an updated estimate for the current year.
 
 
-### 25. Get Entry in RENAP, Italy's national producer register (packaging section not open yet; CONAI membership counts for now) — Italy
+### 24. Get Entry in RENAP, Italy's national producer register (packaging section not open yet; CONAI membership counts for now) — Italy
 
 Packaging registration and take-back · 2 products · 2 listings · time: varies
 
@@ -226,10 +218,12 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 
 | What | Products |
 |---|---|
+| establishments | 6 |
+| safety hasImages | 5 |
+| annualPackagingKg DE | 5 |
 | attributes de_lucid_quantity_reports_up_to_date | 5 |
 | attributes de_packaging_below_ve_thresholds | 5 |
 | attributes de_ve_filed_for_last_year | 5 |
-| safety hasImages | 5 |
 | whether it ships in packaging | 1 |
 
 ## Sources
@@ -324,14 +318,14 @@ Packaging registration and take-back · 2 products · 2 listings · time: varies
 
 ## Rule packs used
 
-- de.packaging_epr 2026.11.1 (draft)
+- de.packaging_epr 2026.11.2 (verified)
 - es.packaging_epr 2026.11.1 (draft)
-- eu.gpsr 2026.11.1 (draft)
-- fr.packaging_epr 2026.11.1 (draft)
+- eu.gpsr 2026.11.2 (verified)
+- fr.packaging_epr 2026.11.2 (verified)
 - it.packaging_epr 2026.11.1 (draft)
 - nl.packaging_epr 2026.11.1 (draft)
 
 ## Notes
 
 - This audit is information, not legal advice. Filings are made only after you approve them, and only from rules a qualified reviewer has signed off.
-- 6 of 6 rule packs used here are not yet signed off by a legal reviewer (de.packaging_epr: draft, es.packaging_epr: draft, eu.gpsr: draft, fr.packaging_epr: draft, it.packaging_epr: draft, nl.packaging_epr: draft). Treat their results as a first check.
+- 6 of 6 rule packs used here are not yet signed off by a legal reviewer (de.packaging_epr: verified, es.packaging_epr: draft, eu.gpsr: verified, fr.packaging_epr: verified, it.packaging_epr: draft, nl.packaging_epr: draft). Treat their results as a first check.
