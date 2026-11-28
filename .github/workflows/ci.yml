@@ -61,7 +61,11 @@ jobs:
         run: pnpm build
 
       - name: "Gate 1: unit tests with coverage (90% lines on core packages)"
-        run: pnpm gates --only 1 --report gates-report/gate-1.json
+        run: pnpm gates --only 1 --core contracts,gateway,harness,registry,rulebook,obligations --report gates-report/gate-1.json
+
+      - name: "Gate R1: rule packs lint (schema, predicates, citations present)"
+        if: ${{ !cancelled() }}
+        run: pnpm lint:rules
 
       - name: "Gates 2-5: provider parity, skill lint, security scan, evals (dry run)"
         if: ${{ !cancelled() }}
